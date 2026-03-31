@@ -4,6 +4,12 @@ Structurer is a lightweight web app to build stories using narrative structures,
 
 It gives you a visual board with 12 phases (columns) where you can create, edit, and move color-coded notes (plot, character, theme).
 
+## Use It Online (Private by Design)
+
+If you prefer, you can use Structurer directly online at [structurer.sullo.co](https://structurer.sullo.co/).
+
+The web version keeps your work private in your browser `localStorage`: no user accounts, no server-side database, and no cookies required for board data.
+
 ## Current Features
 
 - Dashboard with board list and empty state
