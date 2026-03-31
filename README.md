@@ -1,8 +1,8 @@
 # Structurer
 
-Structurer is a lightweight web app to build stories using narrative structures, starting with **Hero's Journey**.
+Structurer is a lightweight web app to build stories using multiple narrative structures.
 
-It gives you a visual board with 12 phases (columns) where you can create, edit, and move color-coded notes (plot, character, theme).
+It gives you a visual board where phase columns depend on the selected structure, and where you can create, edit, and move color-coded notes (plot, character, theme).
 
 ## Use It Online (Private by Design)
 
@@ -12,18 +12,46 @@ The web version keeps your work private in your browser `localStorage`: no user 
 
 ## Current Features
 
+- Landing page with product overview, privacy note, and demo map by structure
 - Dashboard with board list and empty state
 - Create and open multiple boards
+- Choose structure per board at creation time
+- Create custom structures (saved locally) with user-defined phase rows
 - Board routes by slug (example: `/gatti_come_spine`)
+- Home route at `/` (landing)
 - Dashboard route at `/dashboard`
-- 12-phase Hero's Journey board
+- Structure-driven boards with variable phase count
 - Quick-add note menu on each phase
 - Character notes with archetype selection
 - Drag-and-drop notes across columns and within the same column
+- Open a board by clicking its tile (desktop and mobile)
+- Export a board to JSON and import saved boards from JSON
 - Options menu:
   - Resize all columns with a slider
   - Toggle wrapped columns (multi-row) vs horizontal scroll
 - Persistence via `localStorage`
+
+## Pre-Built Structures
+
+- Hero's Journey
+- Three-Act Structure
+- Save the Cat
+- Story Circle
+- 7-Point Story Structure
+- Romancing the Beat
+- MICE Quotient
+
+You can also create and save your own custom structures directly in the dashboard.
+
+## Included Demos
+
+- Hero's Journey -> The Matrix
+- Three-Act Structure -> Jurassic Park
+- Save the Cat -> Back to the Future
+- Story Circle -> Finding Nemo
+- 7-Point Story Structure -> Harry Potter and the Sorcerer's Stone
+- Romancing the Beat -> Pride and Prejudice
+- MICE Quotient -> Inception
 
 ## Tech Stack
 
@@ -71,6 +99,8 @@ All data is stored in browser `localStorage`:
 
 - boards: `structurer.boards.v1`
 - UI settings (column width, wrap mode): `structurer.settings.v1`
+- custom structures: `structurer.customStructures.v1`
+- optional dev reset flag: `activate.reset`
 
 No backend is currently used.
 

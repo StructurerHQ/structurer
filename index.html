@@ -20,25 +20,46 @@
           <h2>A private workspace for story structure</h2>
           <p>
             Structurer helps writers build stories with visual boards, color-coded notes, characters, and narrative
-            phases such as Hero's Journey and Three-Act Structure.
+            phases across built-in and custom structures.
           </p>
           <button id="go-dashboard" type="button">Open dashboard</button>
         </section>
 
         <section class="landing-grid">
-          <article class="landing-card">
-            <h3>Privacy first</h3>
-            <p>
-              Everything you write stays in your browser local storage. No server-side database is used, no user
-              accounts are created, and no cookies are required for app data.
-            </p>
-          </article>
-          <article class="landing-card">
-            <h3>Included demos</h3>
-            <p>
-              The app includes simple demo boards (The Matrix and Jurassic Park) to show the workflow. They are
-              intentionally lightweight examples: your own boards can be far more detailed and complex.
-            </p>
+          <div class="landing-stack">
+            <article class="landing-card card-plot">
+              <h3>Privacy first</h3>
+              <p>
+                Everything you write stays in your browser local storage. No server-side database is used, no user
+                accounts are created, and no cookies are required for app data.
+              </p>
+            </article>
+            <article class="landing-card card-neutral">
+              <h3>Portable boards</h3>
+              <p>
+                Export any board as JSON and import it in another browser or computer. Your format is consistent
+                across instances of Structurer.
+              </p>
+            </article>
+            <article class="landing-card card-theme">
+              <h3>About the demos</h3>
+              <p>
+                Demos use well-known films, but Structurer is designed for any narrative format: novels, short
+                stories, screenplays, serialized fiction, and more.
+              </p>
+            </article>
+          </div>
+          <article class="landing-card card-character landing-demos-card">
+            <h3>Demo map (Structure → Film)</h3>
+            <ul class="demo-map">
+              <li><strong>Hero's Journey:</strong> The Matrix</li>
+              <li><strong>Three-Act Structure:</strong> Jurassic Park</li>
+              <li><strong>Save the Cat:</strong> Back to the Future</li>
+              <li><strong>Story Circle:</strong> Finding Nemo</li>
+              <li><strong>7-Point Story Structure:</strong> Harry Potter and the Sorcerer's Stone</li>
+              <li><strong>Romancing the Beat:</strong> Pride and Prejudice</li>
+              <li><strong>MICE Quotient:</strong> Inception</li>
+            </ul>
           </article>
         </section>
       </section>
@@ -46,7 +67,7 @@
       <section id="home-view" class="view hidden">
         <header class="topbar dashboard-topbar">
           <nav class="dashboard-topbar-left app-nav" aria-label="Dashboard navigation">
-            <button id="go-landing-from-dashboard" class="ghost-button" type="button">🏠 Home</button>
+            <button id="go-landing-from-dashboard" class="ghost-button back-arrow-button" type="button" aria-label="Back to home">←</button>
           </nav>
           <div class="dashboard-topbar-center">
             <h1>Dashboard</h1>
@@ -54,45 +75,74 @@
           <div class="dashboard-topbar-right"></div>
         </header>
 
-        <section class="home-create">
-          <h2>Create a new board</h2>
-          <form id="create-board-form" class="create-board-form">
-            <input id="board-title" type="text" maxlength="80" placeholder="Board name (e.g. Book One Draft)" required />
-            <select id="board-structure" aria-label="Story structure">
-              <option value="hero_journey">Hero's Journey</option>
-              <option value="three_act">Three-Act Structure</option>
-              <option value="save_the_cat">Save the Cat</option>
-              <option value="story_circle">Story Circle</option>
-              <option value="seven_point">7-Point Story Structure</option>
-              <option value="romancing_the_beat">Romancing the Beat</option>
-              <option value="mice_quotient">MICE Quotient</option>
-            </select>
-            <button type="submit">Create board</button>
-          </form>
-          <button id="reset-app-data" class="ghost-button danger-menu-item" type="button">Reset app data (dev)</button>
-        </section>
-
         <section id="empty-state" class="empty-state">
           <p>No boards yet. Create your first board to start mapping your story.</p>
         </section>
 
         <section id="boards-list" class="boards-list"></section>
 
-        <section class="home-import">
-          <h2>Import a saved board</h2>
+        <details class="home-create collapsible-panel">
+          <summary>
+            <h2>Create a new board</h2>
+          </summary>
+          <form id="create-board-form" class="create-board-form">
+            <input id="board-title" type="text" maxlength="80" placeholder="Board name" required />
+            <select id="board-structure" aria-label="Story structure"></select>
+            <button type="submit">Create board</button>
+          </form>
+          <button id="reset-app-data" class="ghost-button danger-menu-item" type="button">Reset app data (dev)</button>
+        </details>
+
+        <details class="home-custom-structure collapsible-panel">
+          <summary>
+            <h2>Create custom structure</h2>
+          </summary>
+          <p class="subtitle">Each row is one phase/column in the board.</p>
+          <form id="create-structure-form" class="create-structure-form">
+            <input id="structure-name-input" type="text" maxlength="80" placeholder="Structure name" required />
+            <div id="structure-phases-list" class="structure-phases-list"></div>
+            <div class="structure-form-actions">
+              <button id="add-structure-phase" class="ghost-button" type="button">Add row</button>
+              <button type="submit">Save structure</button>
+            </div>
+          </form>
+        </details>
+
+        <details class="home-import collapsible-panel">
+          <summary>
+            <h2>Import a saved board</h2>
+          </summary>
           <p class="subtitle">Load a board JSON exported from Structurer.</p>
           <div class="import-actions">
             <button id="import-board-button" class="ghost-button" type="button">Import board</button>
             <input id="import-board-input" type="file" accept="application/json,.json" hidden />
           </div>
-        </section>
+        </details>
+
+        <div id="board-actions-modal-overlay" class="modal-overlay hidden">
+          <div class="modal board-actions-modal" role="dialog" aria-modal="true" aria-label="Board actions">
+            <h2>Board actions</h2>
+            <div class="board-actions-modal-list">
+              <button id="modal-export-board" class="ghost-button" type="button">Export the board</button>
+              <button id="modal-delete-board" class="ghost-button danger-menu-item" type="button">Delete the board</button>
+            </div>
+            <div class="modal-actions">
+              <button id="close-board-actions-modal" class="ghost-button" type="button">Close</button>
+            </div>
+          </div>
+        </div>
       </section>
 
       <section id="editor-view" class="view hidden">
         <header class="topbar editor-topbar">
           <div class="editor-topbar-left">
-            <button id="go-home-from-board" class="ghost-button" type="button">🏠 Home</button>
-            <button id="go-dashboard-from-board" class="ghost-button" type="button">📚 Dashboard</button>
+            <button id="go-dashboard-from-board" class="ghost-button back-arrow-button" type="button" aria-label="Back to dashboard">←</button>
+          </div>
+          <div class="editor-topbar-center">
+            <h1 id="editor-title">Hero's Journey Board</h1>
+            <p id="structure-name" class="subtitle">Hero's Journey</p>
+          </div>
+          <div class="editor-topbar-right">
             <div class="options-wrap">
               <button id="options-button" class="ghost-button" type="button">⚙️ Options</button>
               <div id="options-menu" class="options-menu hidden">
@@ -101,10 +151,6 @@
               </div>
             </div>
           </div>
-          <div class="editor-topbar-center">
-            <h1 id="editor-title">Hero's Journey Board</h1>
-          </div>
-          <div id="structure-name" class="editor-topbar-right">Hero's Journey</div>
         </header>
 
         <section id="board" class="board" aria-label="Hero's journey board"></section>

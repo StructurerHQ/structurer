@@ -9,11 +9,12 @@ import inceptionMiceDemo from "./data/inception-mice-quotient-demo.json";
 
 const STORAGE_KEY = "structurer.boards.v1";
 const SETTINGS_KEY = "structurer.settings.v1";
+const CUSTOM_STRUCTURES_KEY = "structurer.customStructures.v1";
 const DEV_RESET_FLAG_KEY = "activate.reset";
 const HOME_ROUTE = "/dashboard";
 const DEFAULT_COLUMN_WIDTH = 260;
 
-const STRUCTURES = {
+const BUILTIN_STRUCTURES = {
   hero_journey: {
     id: "hero_journey",
     name: "Hero's Journey",
@@ -142,6 +143,8 @@ let boards = loadedBoards || [];
 let currentBoardId = null;
 let draggedNoteId = null;
 let resizingNoteId = null;
+let boardActionsModalBoardId = null;
+let customStructures = loadCustomStructures();
 const initialSettings = loadSettings();
 let columnMinWidth = initialSettings.columnMinWidth ?? DEFAULT_COLUMN_WIDTH;
 let wrapColumns = initialSettings.wrapColumns ?? true;
@@ -154,10 +157,17 @@ const emptyState = document.querySelector("#empty-state");
 const createBoardForm = document.querySelector("#create-board-form");
 const boardTitleInput = document.querySelector("#board-title");
 const boardStructureSelect = document.querySelector("#board-structure");
+const createStructureForm = document.querySelector("#create-structure-form");
+const structureNameInput = document.querySelector("#structure-name-input");
+const structurePhasesList = document.querySelector("#structure-phases-list");
+const addStructurePhaseBtn = document.querySelector("#add-structure-phase");
 const importBoardButton = document.querySelector("#import-board-button");
 const importBoardInput = document.querySelector("#import-board-input");
+const boardActionsModalOverlay = document.querySelector("#board-actions-modal-overlay");
+const closeBoardActionsModalBtn = document.querySelector("#close-board-actions-modal");
+const modalExportBoardBtn = document.querySelector("#modal-export-board");
+const modalDeleteBoardBtn = document.querySelector("#modal-delete-board");
 const goLandingFromDashboardBtn = document.querySelector("#go-landing-from-dashboard");
-const goHomeFromBoardBtn = document.querySelector("#go-home-from-board");
 const goDashboardFromBoardBtn = document.querySelector("#go-dashboard-from-board");
 const editorTitle = document.querySelector("#editor-title");
 const structureNameEl = document.querySelector("#structure-name");
@@ -203,6 +213,38 @@ function loadSettings() {
 
 function saveSettings() {
   localStorage.setItem(SETTINGS_KEY, JSON.stringify({ columnMinWidth, wrapColumns }));
+}
+
+function loadCustomStructures() {
+  try {
+    const parsed = JSON.parse(localStorage.getItem(CUSTOM_STRUCTURES_KEY) || "[]");
+    if (!Array.isArray(parsed)) return [];
+    return parsed.filter(
+      (item) =>
+        item &&
+        typeof item.id === "string" &&
+        typeof item.name === "string" &&
+        Array.isArray(item.phases),
+    );
+  } catch {
+    return [];
+  }
+}
+
+function saveCustomStructures() {
+  localStorage.setItem(CUSTOM_STRUCTURES_KEY, JSON.stringify(customStructures));
+}
+
+function getAllStructures() {
+  const map = { ...BUILTIN_STRUCTURES };
+  for (const structure of customStructures) {
+    map[structure.id] = structure;
+  }
+  return map;
+}
+
+function getAllStructureList() {
+  return Object.values(getAllStructures());
 }
 
 function isDevResetEnabled() {
@@ -269,7 +311,40 @@ function getCurrentBoard() {
 }
 
 function getStructureConfig(structureId) {
-  return STRUCTURES[structureId] || STRUCTURES.hero_journey;
+  return getAllStructures()[structureId] || BUILTIN_STRUCTURES.hero_journey;
+}
+
+function renderStructureOptions(selectedId = null) {
+  const structures = getAllStructureList();
+  boardStructureSelect.innerHTML = structures
+    .map((structure) => {
+      const selectedAttr = structure.id === (selectedId || boardStructureSelect.value || "hero_journey") ? "selected" : "";
+      return `<option value="${structure.id}" ${selectedAttr}>${structure.name}</option>`;
+    })
+    .join("");
+}
+
+function structurePhaseRowTemplate(index, value = "") {
+  return `
+    <div class="structure-phase-row">
+      <span class="phase-row-index">${index + 1}.</span>
+      <input
+        type="text"
+        data-role="phase-input"
+        maxlength="80"
+        placeholder="Phase name"
+        value="${value}"
+        required
+      />
+      <button type="button" class="ghost-button" data-role="remove-phase-row" aria-label="Remove row">✕</button>
+    </div>
+  `;
+}
+
+function renderStructurePhaseRows(values = ["", "", ""]) {
+  structurePhasesList.innerHTML = values
+    .map((value, index) => structurePhaseRowTemplate(index, value))
+    .join("");
 }
 
 function kindLabel(kind) {
@@ -313,15 +388,19 @@ function boardCardTemplate(board) {
   const noteCount = board.notes.length;
   const structure = getStructureConfig(board.structureId);
   return `
-    <article class="board-card" data-board-id="${board.id}">
+    <article class="board-card" data-board-id="${board.id}" role="button" tabindex="0" aria-label="Open ${board.title}">
       <div>
         <strong>${board.title}</strong>
-        <div class="board-meta">${structure.name} • ${noteCount} notes • Updated ${formatDate(board.updatedAt)}</div>
+        <div class="board-meta">
+          <div class="board-meta-line">${structure.name} • ${noteCount} notes</div>
+          <div class="board-meta-line">Updated ${formatDate(board.updatedAt)}</div>
+        </div>
       </div>
       <div class="board-actions">
-        <button type="button" data-role="open-board">Open</button>
-        <button type="button" data-role="export-board">Export</button>
-        <button type="button" class="danger-button" data-role="delete-board">Delete</button>
+        <button type="button" class="action-button" data-role="board-actions" aria-label="Board actions">
+          <span class="action-icon" aria-hidden="true">⋯</span>
+          <span class="action-label">Actions</span>
+        </button>
       </div>
     </article>
   `;
@@ -525,10 +604,10 @@ function createBoard(title, structureId = "hero_journey") {
 }
 
 function createDemoBoardFromJson(demoData) {
-  const structureEntry = Object.values(STRUCTURES).find(
+  const structureEntry = getAllStructureList().find(
     (item) => item.name === (demoData.structure || "Hero's Journey"),
   );
-  const structure = structureEntry || STRUCTURES.hero_journey;
+  const structure = structureEntry || BUILTIN_STRUCTURES.hero_journey;
   const notes = (demoData.notes || []).map((note, index) => ({
     id: index + 1,
     kind: note.kind || "plot",
@@ -584,14 +663,24 @@ function downloadBoard(board) {
   URL.revokeObjectURL(url);
 }
 
+function closeBoardActionsModal() {
+  boardActionsModalOverlay.classList.add("hidden");
+  boardActionsModalBoardId = null;
+}
+
+function openBoardActionsModal(boardId) {
+  boardActionsModalBoardId = boardId;
+  boardActionsModalOverlay.classList.remove("hidden");
+}
+
 function importBoardFromJson(rawText) {
   const parsed = JSON.parse(rawText);
   if (!parsed || typeof parsed !== "object" || !Array.isArray(parsed.notes)) {
     throw new Error("Invalid board JSON format.");
   }
 
-  const structureEntry = Object.values(STRUCTURES).find((item) => item.name === parsed.structure);
-  const structure = structureEntry || STRUCTURES.hero_journey;
+  const structureEntry = getAllStructureList().find((item) => item.name === parsed.structure);
+  const structure = structureEntry || BUILTIN_STRUCTURES.hero_journey;
   const title = typeof parsed.title === "string" && parsed.title.trim() ? parsed.title.trim() : "Imported Board";
   const phaseCount = structure.phases.length;
   const notes = parsed.notes.map((note, index) => {
@@ -737,37 +826,79 @@ createBoardForm.addEventListener("submit", (event) => {
   boardTitleInput.value = "";
 });
 
+addStructurePhaseBtn.addEventListener("click", () => {
+  const values = [...structurePhasesList.querySelectorAll('[data-role="phase-input"]')].map((input) => input.value);
+  values.push("");
+  renderStructurePhaseRows(values);
+});
+
+structurePhasesList.addEventListener("click", (event) => {
+  const removeButton = event.target.closest('button[data-role="remove-phase-row"]');
+  if (!removeButton) return;
+  const rows = [...structurePhasesList.querySelectorAll(".structure-phase-row")];
+  if (rows.length <= 2) return;
+  removeButton.closest(".structure-phase-row").remove();
+  const values = [...structurePhasesList.querySelectorAll('[data-role="phase-input"]')].map((input) => input.value);
+  renderStructurePhaseRows(values);
+});
+
+createStructureForm.addEventListener("submit", (event) => {
+  event.preventDefault();
+  const name = structureNameInput.value.trim();
+  if (!name) return;
+
+  const phaseValues = [...structurePhasesList.querySelectorAll('[data-role="phase-input"]')]
+    .map((input) => input.value.trim())
+    .filter(Boolean);
+
+  if (phaseValues.length < 2) {
+    window.alert("Please add at least 2 phases.");
+    return;
+  }
+
+  const baseId = `custom_${slugifyTitle(name)}`;
+  let id = baseId;
+  let suffix = 2;
+  while (getAllStructures()[id]) {
+    id = `${baseId}_${suffix}`;
+    suffix += 1;
+  }
+
+  customStructures.push({
+    id,
+    name,
+    phases: phaseValues,
+  });
+  saveCustomStructures();
+  renderStructureOptions(id);
+  structureNameInput.value = "";
+  renderStructurePhaseRows(["", "", ""]);
+  window.alert(`Structure "${name}" saved.`);
+});
+
 boardsList.addEventListener("click", (event) => {
-  const target = event.target;
-  const boardCard = target.closest(".board-card");
+  const boardCard = event.target.closest(".board-card");
   if (!boardCard) return;
   const boardId = boardCard.dataset.boardId;
-  if (target.dataset.role === "open-board") {
-    openBoard(boardId);
+  const actionButton = event.target.closest("button[data-role]");
+  if (actionButton && actionButton.dataset.role === "board-actions") {
+    openBoardActionsModal(boardId);
     return;
   }
-  if (target.dataset.role === "export-board") {
-    const board = boards.find((item) => item.id === boardId);
-    if (!board) return;
-    downloadBoard(board);
-    return;
-  }
-  if (target.dataset.role === "delete-board") {
-    const board = boards.find((item) => item.id === boardId);
-    if (!board) return;
-    const confirmed = window.confirm(`Delete board "${board.title}"? This action cannot be undone.`);
-    if (!confirmed) return;
-    boards = boards.filter((item) => item.id !== boardId);
-    saveBoards();
-    renderHome();
+  openBoard(boardId);
+});
+
+boardsList.addEventListener("keydown", (event) => {
+  if (event.target.closest("button")) return;
+  const boardCard = event.target.closest(".board-card");
+  if (!boardCard) return;
+  if (event.key === "Enter" || event.key === " ") {
+    event.preventDefault();
+    openBoard(boardCard.dataset.boardId);
   }
 });
 
 goLandingFromDashboardBtn.addEventListener("click", () => {
-  openLanding();
-});
-
-goHomeFromBoardBtn.addEventListener("click", () => {
   openLanding();
 });
 
@@ -795,6 +926,28 @@ importBoardInput.addEventListener("change", async (event) => {
   } finally {
     importBoardInput.value = "";
   }
+});
+
+closeBoardActionsModalBtn.addEventListener("click", () => {
+  closeBoardActionsModal();
+});
+
+modalExportBoardBtn.addEventListener("click", () => {
+  const board = boards.find((item) => item.id === boardActionsModalBoardId);
+  if (!board) return;
+  downloadBoard(board);
+  closeBoardActionsModal();
+});
+
+modalDeleteBoardBtn.addEventListener("click", () => {
+  const board = boards.find((item) => item.id === boardActionsModalBoardId);
+  if (!board) return;
+  const confirmed = window.confirm(`Delete board "${board.title}"? This action cannot be undone.`);
+  if (!confirmed) return;
+  boards = boards.filter((item) => item.id !== board.id);
+  saveBoards();
+  renderHome();
+  closeBoardActionsModal();
 });
 
 function closeOptionsMenu() {
@@ -834,6 +987,7 @@ resetAppDataBtn.addEventListener("click", () => {
 
   localStorage.removeItem(STORAGE_KEY);
   localStorage.removeItem(SETTINGS_KEY);
+  localStorage.removeItem(CUSTOM_STRUCTURES_KEY);
   window.location.assign(HOME_ROUTE);
 });
 
@@ -1023,8 +1177,14 @@ resizeModalOverlay.addEventListener("click", (event) => {
   }
 });
 
+boardActionsModalOverlay.addEventListener("click", (event) => {
+  if (event.target === boardActionsModalOverlay) {
+    closeBoardActionsModal();
+  }
+});
+
 boards.forEach((board) => {
-  const guessedStructure = Object.values(STRUCTURES).find((item) => item.name === board.structure);
+  const guessedStructure = getAllStructureList().find((item) => item.name === board.structure);
   if (!board.structureId) {
     board.structureId = guessedStructure ? guessedStructure.id : "hero_journey";
   }
@@ -1053,4 +1213,6 @@ window.addEventListener("popstate", () => {
 applyColumnWidth();
 applyWrapColumns();
 applyDevFlags();
+renderStructureOptions("hero_journey");
+renderStructurePhaseRows(["", "", ""]);
 syncRouteToState(true);
