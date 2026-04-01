@@ -127,6 +127,10 @@ No backend is currently used.
 - Added board grouping (create group from boards, group route, sequential group view, contextual back navigation).
 - Added custom note types with color selection via visual color grid (non-technical UX).
 - Added readable note-first UX: notes render in read mode by default and switch to full edit mode on click.
+- Improved group board reorder reliability with a robust drop/dragend commit fallback.
+- Added subtle reorder animations and a short "Order saved" feedback in the group reorder modal.
+- Refactored the app into additional focused modules (`group-modals`, `navigation`, `board-interactions`, `board-note-actions`) to keep `main.js` maintainable.
+- Improved character note readability by compacting archetype and character name into a single header label in board view.
 
 **1.2.0**
 - Reorganized project structure by introducing `src/` entrypoints (`/src/main.js`, `/src/styles.css`).

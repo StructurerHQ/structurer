@@ -34,6 +34,10 @@ import {
   renderStructureOptionsHtml,
   structurePhaseRowTemplate,
 } from "./ui-render";
+import { createGroupModalController } from "./group-modals";
+import { createNavigationController } from "./navigation";
+import { createBoardInteractionsController } from "./board-interactions";
+import { createBoardNoteActionsController } from "./board-note-actions";
 
 const loadedBoards = loadBoards();
 let boards = loadedBoards || [];
@@ -42,20 +46,8 @@ let groups = loadGroups();
 let currentBoardId = null;
 let currentGroupId = null;
 let boardBackGroupId = null;
-let draggedNoteId = null;
-let draggedPhaseIndex = null;
-let armedNoteDragId = null;
-let noteDropPreview = null;
-let phaseDropPreviewIndex = null;
-let resizingNoteId = null;
 let editingNoteId = null;
 let boardActionsModalBoardId = null;
-let groupActionsModalGroupId = null;
-let groupReorderModalGroupId = null;
-let draggedReorderBoardId = null;
-let groupReorderDropIndex = null;
-let groupReorderCommitted = false;
-let groupReorderStatusTimer = null;
 let customStructures = loadCustomStructures();
 let customArchetypes = loadCustomArchetypes();
 let customNoteTypes = loadCustomNoteTypes();
@@ -332,30 +324,6 @@ function ensureUniqueGroupSlug(baseSlug, excludedGroupId = null) {
   return slug;
 }
 
-function normalizePathname(pathname) {
-  if (!pathname || pathname === "/") return "/";
-  return pathname.endsWith("/") ? pathname.slice(0, -1) : pathname;
-}
-
-function boardRoutePath(board) {
-  return `/${board.slug}`;
-}
-
-function groupRoutePath(group) {
-  return `/group/${group.slug}`;
-}
-
-function navigateTo(path, replace = false) {
-  const target = normalizePathname(path);
-  const current = normalizePathname(window.location.pathname);
-  if (target === current) return;
-  if (replace) {
-    window.history.replaceState({}, "", target);
-    return;
-  }
-  window.history.pushState({}, "", target);
-}
-
 function getCurrentBoard() {
   return boards.find((board) => board.id === currentBoardId) || null;
 }
@@ -604,42 +572,42 @@ function renderInsights(note) {
   )}px | ${archetypeText}`;
 }
 
+const navigation = createNavigationController({
+  views: { landingView, homeView, groupView, editorView },
+  homeRoute: HOME_ROUTE,
+  getBoards: () => boards,
+  getGroups: () => groups,
+  getCurrentBoardId: () => currentBoardId,
+  setCurrentBoardId: (id) => {
+    currentBoardId = id;
+  },
+  setCurrentGroupId: (id) => {
+    currentGroupId = id;
+  },
+  setBoardBackGroupId: (id) => {
+    boardBackGroupId = id;
+  },
+  clearEditingNoteId: () => {
+    editingNoteId = null;
+  },
+  renderHome,
+  renderEditor,
+  renderGroup,
+  renderInsights,
+  applyColumnWidth,
+  applyWrapColumns,
+});
+
 function showHome() {
-  currentBoardId = null;
-  currentGroupId = null;
-  landingView.classList.add("hidden");
-  homeView.classList.remove("hidden");
-  groupView.classList.add("hidden");
-  editorView.classList.add("hidden");
-  renderHome();
+  navigation.showHome();
 }
 
 function showLanding() {
-  currentBoardId = null;
-  currentGroupId = null;
-  landingView.classList.remove("hidden");
-  homeView.classList.add("hidden");
-  groupView.classList.add("hidden");
-  editorView.classList.add("hidden");
+  navigation.showLanding();
 }
 
 function showBoard(boardId) {
-  const board = boards.find((item) => item.id === boardId);
-  if (!board) {
-    showHome();
-    return;
-  }
-  currentBoardId = boardId;
-  editingNoteId = null;
-  currentGroupId = null;
-  landingView.classList.add("hidden");
-  homeView.classList.add("hidden");
-  groupView.classList.add("hidden");
-  editorView.classList.remove("hidden");
-  renderEditor();
-  renderInsights(null);
-  applyColumnWidth();
-  applyWrapColumns();
+  navigation.showBoard(boardId);
 }
 
 function renderGroup() {
@@ -697,24 +665,36 @@ function renderGroup() {
 }
 
 function showGroup(groupId) {
-  const group = groups.find((item) => item.id === groupId);
-  if (!group) {
-    showHome();
-    return;
-  }
-  currentGroupId = groupId;
-  currentBoardId = null;
-  landingView.classList.add("hidden");
-  homeView.classList.add("hidden");
-  groupView.classList.remove("hidden");
-  editorView.classList.add("hidden");
-  renderGroup();
+  navigation.showGroup(groupId);
 }
 
 function touchBoard(board) {
   board.updatedAt = Date.now();
   saveBoards();
 }
+
+const groupModalController = createGroupModalController({
+  elements: {
+    groupActionsModalOverlay,
+    closeGroupActionsModalBtn,
+    modalReorderGroupBoardsBtn,
+    modalRemoveBoardFromGroupBtn,
+    groupReorderModalOverlay,
+    closeGroupReorderModalBtn,
+    groupReorderListEl,
+    groupReorderStatusEl,
+  },
+  getGroups: () => groups,
+  setGroups: (nextGroups) => {
+    groups = nextGroups;
+  },
+  getBoards: () => boards,
+  getCurrentGroupId: () => currentGroupId,
+  saveGroups,
+  renderHome,
+  renderGroup,
+  openHome,
+});
 
 function createBoard(title, structureId = "hero_journey") {
   const baseSlug = slugifyTitle(title);
@@ -808,89 +788,6 @@ function closeBoardActionsModal() {
   boardActionsModalBoardId = null;
 }
 
-function closeGroupActionsModal() {
-  groupActionsModalOverlay.classList.add("hidden");
-  groupActionsModalGroupId = null;
-}
-
-function openGroupActionsModal(groupId) {
-  groupActionsModalGroupId = groupId;
-  groupActionsModalOverlay.classList.remove("hidden");
-}
-
-function closeGroupReorderModal() {
-  groupReorderModalOverlay.classList.add("hidden");
-  groupReorderModalGroupId = null;
-  draggedReorderBoardId = null;
-  groupReorderDropIndex = null;
-  groupReorderCommitted = false;
-  if (groupReorderStatusTimer) {
-    window.clearTimeout(groupReorderStatusTimer);
-    groupReorderStatusTimer = null;
-  }
-  if (groupReorderStatusEl) {
-    groupReorderStatusEl.textContent = "";
-    groupReorderStatusEl.classList.remove("is-visible");
-  }
-  groupReorderListEl.querySelectorAll(".reorder-placeholder").forEach((el) => el.remove());
-}
-
-function renderGroupReorderList(group) {
-  const html = group.boardIds
-    .map((id) => boards.find((item) => item.id === id))
-    .filter(Boolean)
-    .map(
-      (board) => `<div class="reorder-item" draggable="true" data-board-id="${board.id}">
-      <span class="reorder-handle">⋮⋮</span>
-      <span>${board.title}</span>
-    </div>`,
-    )
-    .join("");
-  groupReorderListEl.innerHTML = html;
-}
-
-function openGroupReorderModal(group) {
-  groupReorderModalGroupId = group.id;
-  renderGroupReorderList(group);
-  groupReorderModalOverlay.classList.remove("hidden");
-}
-
-function showGroupReorderStatus(message) {
-  if (!groupReorderStatusEl) return;
-  if (groupReorderStatusTimer) {
-    window.clearTimeout(groupReorderStatusTimer);
-    groupReorderStatusTimer = null;
-  }
-  groupReorderStatusEl.textContent = message;
-  groupReorderStatusEl.classList.add("is-visible");
-  groupReorderStatusTimer = window.setTimeout(() => {
-    groupReorderStatusEl.classList.remove("is-visible");
-    groupReorderStatusEl.textContent = "";
-    groupReorderStatusTimer = null;
-  }, 1000);
-}
-
-function commitGroupReorderIfNeeded() {
-  if (!draggedReorderBoardId || !Number.isInteger(groupReorderDropIndex)) return false;
-  const group = groups.find((item) => item.id === groupReorderModalGroupId);
-  if (!group) return false;
-  const currentIds = [...group.boardIds];
-  const from = currentIds.indexOf(draggedReorderBoardId);
-  if (from < 0) return false;
-  const idsWithoutDragged = currentIds.filter((id) => id !== draggedReorderBoardId);
-  const insertIndex = Math.max(0, Math.min(groupReorderDropIndex, idsWithoutDragged.length));
-  idsWithoutDragged.splice(insertIndex, 0, draggedReorderBoardId);
-  if (idsWithoutDragged.join("|") === currentIds.join("|")) return false;
-  group.boardIds = idsWithoutDragged;
-  group.updatedAt = Date.now();
-  saveGroups();
-  renderHome();
-  if (currentGroupId === group.id) renderGroup();
-  renderGroupReorderList(group);
-  showGroupReorderStatus("Order saved");
-  return true;
-}
-
 function openBoardActionsModal(boardId) {
   boardActionsModalBoardId = boardId;
   boardActionsModalOverlay.classList.remove("hidden");
@@ -952,177 +849,38 @@ function importBoardFromJson(rawText) {
 }
 
 function openBoard(boardId, replaceRoute = false, fromGroupId = null) {
-  const board = boards.find((item) => item.id === boardId);
-  if (!board) {
-    boardBackGroupId = null;
-    showHome();
-    navigateTo(HOME_ROUTE, replaceRoute);
-    return;
-  }
-  boardBackGroupId = fromGroupId;
-  showBoard(boardId);
-  navigateTo(boardRoutePath(board), replaceRoute);
+  navigation.openBoard(boardId, replaceRoute, fromGroupId);
 }
 
 function openHome(replaceRoute = false) {
-  showHome();
-  navigateTo(HOME_ROUTE, replaceRoute);
+  navigation.openHome(replaceRoute);
 }
 
 function openLanding(replaceRoute = false) {
-  showLanding();
-  navigateTo("/", replaceRoute);
+  navigation.openLanding(replaceRoute);
 }
 
 function openGroup(groupId, replaceRoute = false) {
-  const group = groups.find((item) => item.id === groupId);
-  if (!group) {
-    openHome(replaceRoute);
-    return;
-  }
-  showGroup(groupId);
-  navigateTo(groupRoutePath(group), replaceRoute);
+  navigation.openGroup(groupId, replaceRoute);
 }
 
 function syncRouteToState(replaceRoute = true) {
-  const path = normalizePathname(window.location.pathname);
-  if (path === "/") {
-    openLanding(replaceRoute);
-    return;
-  }
-  if (path === HOME_ROUTE) {
-    openHome(replaceRoute);
-    return;
-  }
-  if (path.startsWith("/group/")) {
-    const slug = path.replace("/group/", "");
-    const group = groups.find((item) => item.slug === slug);
-    if (!group) {
-      openHome(replaceRoute);
-      return;
-    }
-    showGroup(group.id);
-    return;
-  }
-
-  const slug = path.slice(1);
-  const board = boards.find((item) => item.slug === slug);
-  if (!board) {
-    openLanding(replaceRoute);
-    return;
-  }
-  boardBackGroupId = null;
-  showBoard(board.id);
+  navigation.syncRouteToState(replaceRoute);
 }
 
-function addNote(kind, column, archetype = "none") {
-  const board = getCurrentBoard();
-  if (!board) return;
-  const phaseCount = getStructureConfig(board.structureId).phases.length;
-  const safeColumn = Math.max(0, Math.min(column, phaseCount - 1));
-  const newOrder = getColumnNotes(board.notes, safeColumn).length;
-  const newNoteId = board.nextNoteId++;
-  board.notes.push({
-    id: newNoteId,
-    kind,
-    column: safeColumn,
-    order: newOrder,
-    text: "",
-    characterName: "",
-    archetype,
-    collapsed: false,
-  });
-  editingNoteId = newNoteId;
-  touchBoard(board);
-  renderEditor();
-  renderInsights(board.notes[board.notes.length - 1]);
-}
-
-function getDropIndex(notesContainer, pointerY) {
-  const candidateNotes = [...notesContainer.querySelectorAll(".note")].filter(
-    (noteEl) => Number(noteEl.dataset.id) !== draggedNoteId,
-  );
-  for (let index = 0; index < candidateNotes.length; index += 1) {
-    const rect = candidateNotes[index].getBoundingClientRect();
-    if (pointerY < rect.top + rect.height / 2) return index;
-  }
-  return candidateNotes.length;
-}
-
-function clearNoteDropPreview() {
-  noteDropPreview = null;
-  boardEl.querySelectorAll(".note-drop-placeholder").forEach((el) => el.remove());
-}
-
-function renderNoteDropPreview(columnEl, targetIndex) {
-  const notesContainer = columnEl.querySelector(".notes");
-  if (!notesContainer) return;
-  notesContainer.querySelectorAll(".note-drop-placeholder").forEach((el) => el.remove());
-  const placeholder = document.createElement("div");
-  placeholder.className = "note-drop-placeholder";
-  const noteNodes = [...notesContainer.querySelectorAll(".note")].filter(
-    (noteEl) => Number(noteEl.dataset.id) !== draggedNoteId,
-  );
-  if (targetIndex >= noteNodes.length) {
-    notesContainer.appendChild(placeholder);
-  } else {
-    notesContainer.insertBefore(placeholder, noteNodes[targetIndex]);
-  }
-}
-
-function clearPhaseDropPreview() {
-  phaseDropPreviewIndex = null;
-  const placeholder = boardEl.querySelector(".phase-drop-placeholder");
-  if (placeholder) placeholder.remove();
-}
-
-function renderPhaseDropPreview(insertionIndex) {
-  const realColumns = [...boardEl.querySelectorAll(".column")];
-  let placeholder = boardEl.querySelector(".phase-drop-placeholder");
-  if (!placeholder) {
-    placeholder = document.createElement("section");
-    placeholder.className = "phase-drop-placeholder";
-  }
-  const cappedIndex = Math.max(0, Math.min(insertionIndex, realColumns.length));
-  if (cappedIndex >= realColumns.length) {
-    boardEl.appendChild(placeholder);
-  } else {
-    boardEl.insertBefore(placeholder, realColumns[cappedIndex]);
-  }
-}
-
-function moveNote(noteId, targetColumn, targetIndex) {
-  const board = getCurrentBoard();
-  if (!board) return;
-  const phaseCount = getStructureConfig(board.structureId).phases.length;
-  const safeTargetColumn = Math.max(0, Math.min(targetColumn, phaseCount - 1));
-  const movingNote = board.notes.find((note) => note.id === noteId);
-  if (!movingNote) return;
-
-  const sourceColumn = movingNote.column;
-  const clampedIndex = Math.max(0, targetIndex);
-
-  if (sourceColumn === safeTargetColumn) {
-    const reordered = getColumnNotes(board.notes, sourceColumn).filter((note) => note.id !== noteId);
-    reordered.splice(clampedIndex, 0, movingNote);
-    reordered.forEach((note, index) => {
-      note.order = index;
-    });
-    return;
-  }
-
-  const sourceList = getColumnNotes(board.notes, sourceColumn).filter((note) => note.id !== noteId);
-  sourceList.forEach((note, index) => {
-    note.order = index;
-  });
-
-  const targetList = getColumnNotes(board.notes, safeTargetColumn);
-  movingNote.column = safeTargetColumn;
-  targetList.splice(clampedIndex, 0, movingNote);
-  targetList.forEach((note, index) => {
-    note.order = index;
-  });
-}
+const boardInteractions = createBoardInteractionsController({
+  boardEl,
+  getCurrentBoard,
+  getStructureConfig,
+  getColumnNotes,
+  reorderPhaseAndNotes,
+  touchBoard,
+  renderEditor,
+  renderInsights,
+  setEditingNoteId: (id) => {
+    editingNoteId = id;
+  },
+});
 
 createBoardForm.addEventListener("submit", (event) => {
   event.preventDefault();
@@ -1209,7 +967,7 @@ groupsList.addEventListener("click", (event) => {
   if (!groupCard) return;
   const actionButton = event.target.closest('button[data-role="group-actions"]');
   if (actionButton) {
-    openGroupActionsModal(groupCard.dataset.groupId);
+    groupModalController.openGroupActionsModal(groupCard.dataset.groupId);
     return;
   }
   openGroup(groupCard.dataset.groupId);
@@ -1348,60 +1106,6 @@ if (modalAddBoardToGroupBtn) {
   });
 }
 
-if (closeGroupActionsModalBtn) {
-  closeGroupActionsModalBtn.addEventListener("click", () => {
-    closeGroupActionsModal();
-  });
-}
-
-if (closeGroupReorderModalBtn) {
-  closeGroupReorderModalBtn.addEventListener("click", () => {
-    closeGroupReorderModal();
-  });
-}
-
-if (modalReorderGroupBoardsBtn) {
-  modalReorderGroupBoardsBtn.addEventListener("click", () => {
-    const group = groups.find((item) => item.id === groupActionsModalGroupId);
-    if (!group) return;
-    if (group.boardIds.length < 2) {
-      window.alert("Reorder is available when the group has at least 2 boards.");
-      return;
-    }
-    openGroupReorderModal(group);
-    closeGroupActionsModal();
-  });
-}
-
-if (modalRemoveBoardFromGroupBtn) {
-  modalRemoveBoardFromGroupBtn.addEventListener("click", () => {
-    const group = groups.find((item) => item.id === groupActionsModalGroupId);
-    if (!group) return;
-    const choices = group.boardIds
-      .map((id, index) => {
-        const board = boards.find((item) => item.id === id);
-        return board ? `${index + 1}. ${board.title}` : null;
-      })
-      .filter(Boolean)
-      .join("\n");
-    const selectedInput = window.prompt(`Remove which board?\n${choices}`);
-    if (!selectedInput) return;
-    const selected = Number(selectedInput) - 1;
-    if (!Number.isInteger(selected) || selected < 0 || selected >= group.boardIds.length) return;
-    group.boardIds.splice(selected, 1);
-    if (group.boardIds.length === 0) {
-      groups = groups.filter((item) => item.id !== group.id);
-      if (currentGroupId === group.id) openHome();
-    } else {
-      group.updatedAt = Date.now();
-    }
-    saveGroups();
-    renderHome();
-    if (currentGroupId === group.id) renderGroup();
-    closeGroupActionsModal();
-  });
-}
-
 modalDeleteBoardBtn.addEventListener("click", () => {
   const board = boards.find((item) => item.id === boardActionsModalBoardId);
   if (!board) return;
@@ -1473,15 +1177,6 @@ columnWidthSlider.addEventListener("input", (event) => {
   saveSettings();
 });
 
-function closeAllColumnMenus() {
-  boardEl.querySelectorAll('[data-role="column-menu"]').forEach((menu) => {
-    menu.classList.add("hidden");
-  });
-  boardEl.querySelectorAll('[data-role="character-submenu"]').forEach((submenu) => {
-    submenu.classList.add("hidden");
-  });
-}
-
 boardEl.addEventListener("input", (event) => {
   const target = event.target;
   const noteEl = target.closest(".note");
@@ -1508,252 +1203,21 @@ boardEl.addEventListener("input", (event) => {
   touchBoard(board);
   renderInsights(note);
 });
-
-boardEl.addEventListener("click", (event) => {
-  const target = event.target;
-
-  if (target.dataset.role === "open-column-menu") {
-    const columnEl = target.closest(".column");
-    if (!columnEl) return;
-    const menu = columnEl.querySelector('[data-role="column-menu"]');
-    const willOpen = menu.classList.contains("hidden");
-    closeAllColumnMenus();
-    if (willOpen) {
-      menu.classList.remove("hidden");
-    }
-    return;
-  }
-
-  if (target.dataset.role === "toggle-character-submenu") {
-    const menu = target.closest('[data-role="column-menu"]');
-    if (!menu) return;
-    const submenu = menu.querySelector('[data-role="character-submenu"]');
-    submenu.classList.toggle("hidden");
-    return;
-  }
-
-  if (target.dataset.role === "quick-add") {
-    addNote(target.dataset.kind, Number(target.dataset.column));
-    closeAllColumnMenus();
-    return;
-  }
-
-  if (target.dataset.role === "quick-add-character") {
-    addNote("character", Number(target.dataset.column), target.dataset.archetype);
-    closeAllColumnMenus();
-    return;
-  }
-
-  if (target.dataset.role === "define-custom-archetype") {
-    const newName = window.prompt("Custom archetype name:");
-    if (!newName) return;
-    const created = createCustomArchetype(newName);
-    if (!created) return;
-    addNote("character", Number(target.dataset.column), created.id);
-    closeAllColumnMenus();
-    return;
-  }
-
-  if (target.dataset.role === "define-custom-note-type") {
-    const newName = window.prompt("Custom note type name:");
-    if (!newName) return;
-    openNoteTypeColorPicker().then((pickedColor) => {
-      if (!pickedColor) return;
-      const createdType = createCustomNoteType(newName, pickedColor);
-      if (!createdType) return;
-      addNote(createdType.id, Number(target.dataset.column));
-    });
-    closeAllColumnMenus();
-    return;
-  }
-
-  const noteEl = target.closest(".note");
-  const board = getCurrentBoard();
-  if (!noteEl || !board) return;
-
-  const id = Number(noteEl.dataset.id);
-  const note = board.notes.find((item) => item.id === id);
-  if (!note) return;
-
-  if (target.dataset.role === "delete") {
-    board.notes = board.notes.filter((item) => item.id !== id);
-    if (editingNoteId === id) editingNoteId = null;
-    normalizeOrders(board.notes, board.structureId);
-    touchBoard(board);
-    renderEditor();
-    renderInsights(null);
-    return;
-  }
-  if (!target.closest("textarea, input, select, button")) {
+const boardNoteActions = createBoardNoteActionsController({
+  boardEl,
+  boardInteractions,
+  getCurrentBoard,
+  getEditingNoteId: () => editingNoteId,
+  setEditingNoteId: (id) => {
     editingNoteId = id;
-    renderEditor();
-  }
-  renderInsights(note);
-});
-
-boardEl.addEventListener("dblclick", (event) => {
-  if (event.target.closest("button, textarea, input, select")) return;
-  const noteHead = event.target.closest(".note-head");
-  if (!noteHead) return;
-  const noteEl = noteHead.closest(".note");
-  const board = getCurrentBoard();
-  if (!noteEl || !board) return;
-  const id = Number(noteEl.dataset.id);
-  const note = board.notes.find((item) => item.id === id);
-  if (!note) return;
-  note.collapsed = !note.collapsed;
-  touchBoard(board);
-  renderEditor();
-  renderInsights(note);
-});
-
-boardEl.addEventListener("dragstart", (event) => {
-  const target = event.target;
-  if (target.closest('[data-role="phase-drag-handle"]')) {
-    const columnEl = target.closest(".column");
-    if (!columnEl) return;
-    draggedPhaseIndex = Number(columnEl.dataset.column);
-    event.dataTransfer.effectAllowed = "move";
-    event.dataTransfer.setData("text/plain", `phase:${draggedPhaseIndex}`);
-    return;
-  }
-  if (target.closest(".note")) {
-    const noteEl = target.closest(".note");
-    const noteId = Number(noteEl?.dataset.id);
-    if (Number.isInteger(noteId) && armedNoteDragId === noteId) {
-      draggedNoteId = noteId;
-      noteEl.classList.add("is-dragging");
-      event.dataTransfer.effectAllowed = "move";
-      event.dataTransfer.setData("text/plain", String(draggedNoteId));
-      return;
-    }
-    event.preventDefault();
-    return;
-  }
-  if (target.closest("textarea, input, select, button")) {
-    event.preventDefault();
-    return;
-  }
-  const noteEl = target.closest(".note");
-  if (!noteEl) return;
-
-  draggedNoteId = Number(noteEl.dataset.id);
-  noteEl.classList.add("is-dragging");
-  event.dataTransfer.effectAllowed = "move";
-  event.dataTransfer.setData("text/plain", String(draggedNoteId));
-});
-
-boardEl.addEventListener("dragover", (event) => {
-  if (draggedPhaseIndex !== null) {
-    const columnEl = event.target.closest(".column");
-    const placeholderEl = event.target.closest(".phase-drop-placeholder");
-    if (!columnEl && !placeholderEl) return;
-    event.preventDefault();
-    event.dataTransfer.dropEffect = "move";
-    if (!columnEl) return;
-    const rect = columnEl.getBoundingClientRect();
-    const targetColumn = Number(columnEl.dataset.column);
-    const insertionIndex = targetColumn + (event.clientX > rect.left + rect.width / 2 ? 1 : 0);
-    if (phaseDropPreviewIndex !== insertionIndex) {
-      phaseDropPreviewIndex = insertionIndex;
-      renderPhaseDropPreview(insertionIndex);
-    }
-    return;
-  }
-  if (draggedNoteId === null) return;
-  const columnEl = event.target.closest(".column");
-  if (!columnEl) return;
-  event.preventDefault();
-  event.dataTransfer.dropEffect = "move";
-  const notesContainer = columnEl.querySelector(".notes");
-  if (!notesContainer) return;
-  const targetIndex = getDropIndex(notesContainer, event.clientY);
-  const targetColumn = Number(columnEl.dataset.column);
-  if (
-    !noteDropPreview ||
-    noteDropPreview.column !== targetColumn ||
-    noteDropPreview.index !== targetIndex
-  ) {
-    noteDropPreview = { column: targetColumn, index: targetIndex };
-    renderNoteDropPreview(columnEl, targetIndex);
-  }
-});
-
-boardEl.addEventListener("drop", (event) => {
-  if (draggedPhaseIndex !== null) {
-    const columnEl = event.target.closest(".column");
-    const placeholderEl = event.target.closest(".phase-drop-placeholder");
-    if (!columnEl && !placeholderEl) return;
-    event.preventDefault();
-    const structure = getStructureConfig(getCurrentBoard()?.structureId || "hero_journey");
-    const phaseCount = structure.phases.length;
-    const insertionIndex =
-      phaseDropPreviewIndex === null
-        ? Number(columnEl?.dataset.column || 0)
-        : phaseDropPreviewIndex;
-    const targetColumn = insertionIndex > draggedPhaseIndex ? insertionIndex - 1 : insertionIndex;
-    const board = getCurrentBoard();
-    if (!board) return;
-    reorderPhaseAndNotes(board, draggedPhaseIndex, Math.max(0, Math.min(targetColumn, phaseCount - 1)));
-    draggedPhaseIndex = null;
-    clearPhaseDropPreview();
-    touchBoard(board);
-    renderEditor();
-    renderInsights(null);
-    return;
-  }
-  if (draggedNoteId === null) return;
-  const columnEl = event.target.closest(".column");
-  if (!columnEl) return;
-  const notesContainer = columnEl.querySelector(".notes");
-  if (!notesContainer) return;
-  event.preventDefault();
-
-  const targetColumn = noteDropPreview ? noteDropPreview.column : Number(columnEl.dataset.column);
-  const targetIndex = noteDropPreview ? noteDropPreview.index : getDropIndex(notesContainer, event.clientY);
-  moveNote(draggedNoteId, targetColumn, targetIndex);
-
-  const board = getCurrentBoard();
-  const movedNote = board ? board.notes.find((note) => note.id === draggedNoteId) : null;
-  draggedNoteId = null;
-  clearNoteDropPreview();
-  if (board) touchBoard(board);
-  renderEditor();
-  renderInsights(movedNote || null);
-});
-
-boardEl.addEventListener("dragend", () => {
-  draggedNoteId = null;
-  draggedPhaseIndex = null;
-  armedNoteDragId = null;
-  clearNoteDropPreview();
-  clearPhaseDropPreview();
-  boardEl.querySelectorAll(".note.is-dragging").forEach((note) => note.classList.remove("is-dragging"));
-});
-
-boardEl.addEventListener("mousedown", (event) => {
-  const target = event.target;
-  if (target.closest('[data-role="note-drag-handle"]')) {
-    const noteEl = target.closest(".note");
-    armedNoteDragId = Number(noteEl?.dataset.id);
-  } else {
-    armedNoteDragId = null;
-  }
-  if (target.matches('textarea[data-role="text"]')) {
-    resizingNoteId = Number(target.dataset.noteId);
-  }
-});
-
-boardEl.addEventListener("mouseup", (event) => {
-  const target = event.target;
-  if (!target.matches('textarea[data-role="text"]') || resizingNoteId === null) return;
-  const board = getCurrentBoard();
-  if (!board) return;
-  const note = board.notes.find((item) => item.id === resizingNoteId);
-  if (!note) return;
-  note.customHeight = target.offsetHeight;
-  touchBoard(board);
-  resizingNoteId = null;
+  },
+  normalizeOrders,
+  touchBoard,
+  renderEditor,
+  renderInsights,
+  createCustomArchetype,
+  openNoteTypeColorPicker,
+  createCustomNoteType,
 });
 
 document.addEventListener("click", (event) => {
@@ -1761,7 +1225,7 @@ document.addEventListener("click", (event) => {
     closeOptionsMenu();
   }
   if (!event.target.closest(".phase-head")) {
-    closeAllColumnMenus();
+    boardNoteActions.closeAllColumnMenus();
   }
   if (!event.target.closest(".note")) {
     if (editingNoteId !== null) {
@@ -1772,8 +1236,7 @@ document.addEventListener("click", (event) => {
 });
 
 document.addEventListener("mouseup", () => {
-  resizingNoteId = null;
-  armedNoteDragId = null;
+  boardInteractions.clearPointerState();
 });
 
 resizeModalOverlay.addEventListener("click", (event) => {
@@ -1786,75 +1249,6 @@ boardActionsModalOverlay.addEventListener("click", (event) => {
   if (event.target === boardActionsModalOverlay) {
     closeBoardActionsModal();
   }
-});
-
-groupActionsModalOverlay.addEventListener("click", (event) => {
-  if (event.target === groupActionsModalOverlay) {
-    closeGroupActionsModal();
-  }
-});
-
-groupReorderModalOverlay.addEventListener("click", (event) => {
-  if (event.target === groupReorderModalOverlay) {
-    closeGroupReorderModal();
-  }
-});
-
-groupReorderListEl.addEventListener("dragstart", (event) => {
-  const item = event.target.closest(".reorder-item");
-  if (!item) return;
-  draggedReorderBoardId = item.dataset.boardId;
-  groupReorderDropIndex = null;
-  groupReorderCommitted = false;
-  item.classList.add("is-dragging");
-  if (event.dataTransfer) {
-    event.dataTransfer.effectAllowed = "move";
-    event.dataTransfer.setData("text/plain", draggedReorderBoardId);
-  }
-});
-
-groupReorderListEl.addEventListener("dragover", (event) => {
-  if (!draggedReorderBoardId) return;
-  event.preventDefault();
-  groupReorderListEl.querySelectorAll(".reorder-placeholder").forEach((el) => el.remove());
-  const items = [...groupReorderListEl.querySelectorAll(".reorder-item")].filter(
-    (el) => el.dataset.boardId !== draggedReorderBoardId,
-  );
-  let insertIndex = items.length;
-  for (let index = 0; index < items.length; index += 1) {
-    const item = items[index];
-    const rect = item.getBoundingClientRect();
-    if (event.clientY < rect.top + rect.height / 2) {
-      insertIndex = index;
-      break;
-    }
-  }
-  groupReorderDropIndex = insertIndex;
-
-  const placeholder = document.createElement("div");
-  placeholder.className = "reorder-placeholder";
-  if (insertIndex >= items.length) {
-    groupReorderListEl.appendChild(placeholder);
-  } else {
-    items[insertIndex].insertAdjacentElement("beforebegin", placeholder);
-  }
-});
-
-groupReorderListEl.addEventListener("drop", (event) => {
-  if (!draggedReorderBoardId) return;
-  event.preventDefault();
-  groupReorderCommitted = commitGroupReorderIfNeeded();
-});
-
-groupReorderListEl.addEventListener("dragend", () => {
-  if (!groupReorderCommitted) {
-    commitGroupReorderIfNeeded();
-  }
-  groupReorderCommitted = false;
-  draggedReorderBoardId = null;
-  groupReorderDropIndex = null;
-  groupReorderListEl.querySelectorAll(".reorder-placeholder").forEach((el) => el.remove());
-  groupReorderListEl.querySelectorAll(".reorder-item.is-dragging").forEach((el) => el.classList.remove("is-dragging"));
 });
 
 boards.forEach((board) => {

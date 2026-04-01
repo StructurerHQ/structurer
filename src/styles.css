@@ -803,6 +803,7 @@ h1 {
 
 .character-fields {
   display: grid;
+  grid-template-columns: minmax(120px, 38%) minmax(0, 1fr);
   gap: 6px;
   margin-bottom: 6px;
 }

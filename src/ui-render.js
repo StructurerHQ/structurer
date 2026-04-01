@@ -48,25 +48,22 @@ export function boardCardTemplate(board, structureName, updatedAtText) {
 export function noteTemplate(note, archetypes, archetype, noteType, isEditing = false) {
   const collapsed = Boolean(note.collapsed);
   const textPreview = (note.text || "").trim();
-  const collapsedPreview =
+  const characterLabel =
     note.kind === "character"
       ? [archetype?.label || "", note.characterName || ""]
           .map((part) => part.trim())
           .filter(Boolean)
-          .join(" - ") || textPreview || "Character note"
+          .join(" - ") || "Character"
+      : "";
+  const collapsedPreview =
+    note.kind === "character"
+      ? characterLabel || textPreview || "Character note"
       : textPreview || "Empty note";
 
   const characterUI =
     isEditing && !collapsed && note.kind === "character"
       ? `
       <div class="character-fields">
-        <input
-          type="text"
-          data-role="character-name"
-          value="${note.characterName || ""}"
-          placeholder="Character name"
-          aria-label="Character name"
-        />
         <select data-role="archetype" aria-label="Character archetype">
           ${archetypes
             .map(
@@ -77,6 +74,13 @@ export function noteTemplate(note, archetypes, archetype, noteType, isEditing = 
             )
             .join("")}
         </select>
+        <input
+          type="text"
+          data-role="character-name"
+          value="${note.characterName || ""}"
+          placeholder="Character name"
+          aria-label="Character name"
+        />
       </div>
     `
       : "";
@@ -90,8 +94,10 @@ export function noteTemplate(note, archetypes, archetype, noteType, isEditing = 
         ${collapsed ? `<div class="collapsed-preview" title="${collapsedPreview}">${collapsedPreview}</div>` : ""}
         ${
           !collapsed
-            ? `<span class="badge">${noteType?.label || "Note"} ${
-                note.kind === "character" && archetype.icon ? archetype.icon : ""
+            ? `<span class="badge">${
+                note.kind === "character"
+                  ? `${archetype.icon ? `${archetype.icon} ` : ""}${characterLabel}`
+                  : noteType?.label || "Note"
               }</span>`
             : ""
         }
@@ -110,7 +116,7 @@ export function noteTemplate(note, archetypes, archetype, noteType, isEditing = 
         style="${note.customHeight ? `height: ${note.customHeight}px;` : ""}"
         placeholder="Write your note..."
       >${note.text || ""}</textarea>`
-            : `${note.kind === "character" ? `<div class="note-readonly-character">${note.characterName || "Unnamed character"}</div>` : ""}<div class="note-readonly-text">${(note.text || "").trim() || " "}</div>`
+            : `<div class="note-readonly-text">${(note.text || "").trim() || " "}</div>`
       }
     </article>
   `;
