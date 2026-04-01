@@ -87,6 +87,9 @@
 
         <section id="groups-list" class="boards-list"></section>
         <section id="boards-list" class="boards-list"></section>
+        <div class="home-list-controls">
+          <button id="toggle-demo-visibility" class="link-button" type="button">Hide demos</button>
+        </div>
 
         <details class="home-create collapsible-panel">
           <summary>
@@ -101,7 +104,7 @@
 
         <details class="home-custom-structure collapsible-panel">
           <summary>
-            <h2>Create custom structure</h2>
+            <h2>Add a structure not listed</h2>
           </summary>
           <p class="subtitle">Each row is one phase/column in the board.</p>
           <form id="create-structure-form" class="create-structure-form">
@@ -109,20 +112,37 @@
             <div id="structure-phases-list" class="structure-phases-list"></div>
             <div class="structure-form-actions">
               <button id="add-structure-phase" class="ghost-button" type="button">Add row</button>
-              <button type="submit">Save structure</button>
+              <button class="ghost-button" type="submit">Save structure</button>
             </div>
           </form>
         </details>
 
         <details class="home-import collapsible-panel">
           <summary>
-            <h2>Import a saved board</h2>
+            <h2>Import/merge a saved board</h2>
           </summary>
           <p class="subtitle">Load a board JSON exported from Structurer.</p>
           <div class="import-actions">
             <button id="import-board-button" class="ghost-button" type="button">Import board</button>
             <input id="import-board-input" type="file" accept="application/json,.json" hidden />
           </div>
+        </details>
+
+        <details class="home-create-group collapsible-panel">
+          <summary>
+            <h2>Create group</h2>
+          </summary>
+          <p class="subtitle">Name the group and select which boards to include.</p>
+          <form id="create-group-form" class="create-group-form">
+            <label class="create-group-name-label" for="create-group-name">Group name</label>
+            <input id="create-group-name" type="text" maxlength="80" placeholder="Group name" required />
+            <fieldset class="create-group-boards-fieldset">
+              <legend>Boards to include</legend>
+              <div id="create-group-boards-list" class="create-group-boards-list"></div>
+              <p id="create-group-boards-empty" class="subtitle hidden">No boards yet. Create a board first.</p>
+            </fieldset>
+            <button class="ghost-button" type="submit">Create group</button>
+          </form>
         </details>
 
         <div class="home-dev-reset">
@@ -141,6 +161,16 @@
             </div>
             <div class="modal-actions">
               <button id="close-board-actions-modal" class="ghost-button" type="button">Close</button>
+            </div>
+          </div>
+        </div>
+        <div id="add-board-to-group-modal-overlay" class="modal-overlay hidden">
+          <div class="modal board-actions-modal" role="dialog" aria-modal="true" aria-labelledby="add-board-to-group-title">
+            <h2 id="add-board-to-group-title">Add to group</h2>
+            <p class="subtitle">Choose a group. The board will be added to the end of that group.</p>
+            <div id="add-board-to-group-list" class="board-actions-modal-list add-board-to-group-list"></div>
+            <div class="modal-actions">
+              <button id="close-add-board-to-group-modal" class="ghost-button" type="button">Cancel</button>
             </div>
           </div>
         </div>
@@ -205,60 +235,191 @@
         </header>
 
         <section class="help-card">
-          <h2>Core concepts</h2>
-          <ul>
-            <li><strong>Board:</strong> your story workspace built on one structure.</li>
-            <li><strong>Phases:</strong> columns of the selected structure.</li>
-            <li><strong>Notes:</strong> color-coded cards (plot, theme, character, custom types).</li>
-            <li><strong>Groups:</strong> ordered collections of boards for multi-board planning.</li>
-          </ul>
-        </section>
+          <h2>Structurer FAQ</h2>
+          <p class="subtitle">Click a question to expand the answer.</p>
 
-        <section class="help-card">
-          <h2>How to add notes</h2>
-          <ul>
-            <li>In a phase, click <strong>+</strong> then choose note type.</li>
-            <li>For character notes, choose an archetype first.</li>
-            <li>Drag notes with the handle (<strong>⋮⋮</strong>) to reorder or move across phases.</li>
-          </ul>
-        </section>
+          <details class="help-faq-item" open>
+            <summary>What is a board?</summary>
+            <div class="help-faq-content">
+              <p>
+                A board is your main story workspace. Every board uses one narrative structure (for example Hero's
+                Journey, Story Circle, or a custom structure) and renders each phase as a column.
+              </p>
+              <p>
+                You can think of a board as a visual planning canvas: you place notes inside phases, reorder phases
+                when needed, and refine the story over time. A board also stores its own phase order, notes, and update
+                history used for merge operations during import.
+              </p>
+            </div>
+          </details>
 
-        <section class="help-card">
-          <h2>Custom note types and archetypes</h2>
-          <ul>
-            <li>From the phase <strong>+</strong> menu, choose <strong>Define custom note type...</strong></li>
-            <li>Pick a visual color from the color grid.</li>
-            <li>For custom archetypes, choose <strong>Define custom archetype...</strong> in the character submenu.</li>
-          </ul>
-        </section>
+          <details class="help-faq-item">
+            <summary>What is a story structure?</summary>
+            <div class="help-faq-content">
+              <p>
+                A story structure is an organizational framework that helps shape a narrative arc: setup, rising
+                tension, turning points, climax, and resolution. It does not replace creativity, but gives you a map
+                to manage pacing and progression.
+              </p>
+              <p>
+                If you want background reading, start with
+                <a href="https://en.wikipedia.org/wiki/Story_structure" target="_blank" rel="noopener noreferrer"
+                  >Narrative structure (Wikipedia)</a
+                >.
+              </p>
+            </div>
+          </details>
 
-        <section class="help-card">
-          <h2>Custom structures</h2>
-          <ul>
-            <li>In dashboard, open <strong>Create custom structure</strong>.</li>
-            <li>Add phase rows and save. The structure becomes selectable for new boards.</li>
-          </ul>
-        </section>
+          <details class="help-faq-item">
+            <summary>Which story structures are pre-built in Structurer?</summary>
+            <div class="help-faq-content">
+              <p>Structurer currently includes these pre-built structures:</p>
+              <ul>
+                <li>
+                  <a href="https://en.wikipedia.org/wiki/Hero%27s_journey" target="_blank" rel="noopener noreferrer"
+                    >Hero's Journey</a
+                  >
+                </li>
+                <li>
+                  <a
+                    href="https://en.wikipedia.org/wiki/The_Hero_with_a_Thousand_Faces"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    >Hero with a Thousand Faces</a
+                  >
+                </li>
+                <li>
+                  <a href="https://en.wikipedia.org/wiki/Three-act_structure" target="_blank" rel="noopener noreferrer"
+                    >Three-Act Structure</a
+                  >
+                </li>
+                <li>
+                  <a
+                    href="https://en.wikipedia.org/wiki/Save_the_Cat!:_The_Last_Book_on_Screenwriting_You%27ll_Ever_Need"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    >Save the Cat</a
+                  >
+                </li>
+                <li>
+                  <a href="https://channel101.fandom.com/wiki/Story_Structure_104:_The_Juicy_Details" target="_blank" rel="noopener noreferrer"
+                    >Story Circle</a
+                  >
+                </li>
+                <li>
+                  <a href="https://www.helpingwritersbecomeauthors.com/secrets-story-structure-complete-series/" target="_blank" rel="noopener noreferrer"
+                    >7-Point Story Structure</a
+                  >
+                </li>
+                <li>
+                  <a href="https://www.campfirewriting.com/learn/romancing-the-beat" target="_blank" rel="noopener noreferrer"
+                    >Romancing the Beat</a
+                  >
+                </li>
+                <li>
+                  <a href="https://blog.karenwoodward.org/2012/10/orson-scott-card-mice-quotient-how-to.html" target="_blank" rel="noopener noreferrer"
+                    >MICE Quotient</a
+                  >
+                </li>
+              </ul>
+            </div>
+          </details>
 
-        <section class="help-card">
-          <h2>Export, import, and merge</h2>
-          <ul>
-            <li>Export from board actions in dashboard.</li>
-            <li>Import from <strong>Import a saved board</strong>.</li>
-            <li>If imported board UID is new, a new board is created.</li>
-            <li>If imported board UID already exists, notes are merged by note UID using most recent update.</li>
-            <li><strong>Best practice for multi-device sync:</strong> do one initial export/import first to align IDs, then continue with incremental export/import merges.</li>
-            <li>If phase order differs, merge is blocked and a comparison modal is shown.</li>
-          </ul>
-        </section>
+          <details class="help-faq-item">
+            <summary>What are phases and notes?</summary>
+            <div class="help-faq-content">
+              <p>
+                <strong>Phases</strong> are the structure steps (columns). <strong>Notes</strong> are cards inside
+                those columns. Notes can represent plot points, themes, characters, or custom note types.
+              </p>
+              <p>
+                Drag notes with the handle (<strong>⋮⋮</strong>) to reorder them inside a phase or move them across
+                phases. You can collapse notes for compact reading and open them in edit mode when needed.
+              </p>
+            </div>
+          </details>
 
-        <section class="help-card">
-          <h2>Groups</h2>
-          <ul>
-            <li>Create a group by opening board actions and selecting <strong>Add board to group</strong>.</li>
-            <li>Open a group from dashboard to review boards in sequence.</li>
-            <li>Use group actions to reorder boards or remove a board from the group.</li>
-          </ul>
+          <details class="help-faq-item">
+            <summary>How do I create a note?</summary>
+            <div class="help-faq-content">
+              <p>
+                In the board editor, click <strong>+</strong> in the phase header. Then select the note type from the
+                menu. Character notes open from the character submenu so you can choose an archetype immediately.
+              </p>
+              <p>
+                New notes are saved locally and can be moved, collapsed, edited, and resized at any time.
+              </p>
+            </div>
+          </details>
+
+          <details class="help-faq-item">
+            <summary>How do I create custom note types and custom archetypes?</summary>
+            <div class="help-faq-content">
+              <p>
+                Use the phase <strong>+</strong> menu:
+              </p>
+              <ul>
+                <li><strong>Define custom note type...</strong> to create a new note category and choose its color.</li>
+                <li><strong>Define custom archetype...</strong> inside the character submenu to add a new archetype.</li>
+              </ul>
+              <p>
+                These custom definitions are saved in your browser and become reusable across boards.
+              </p>
+            </div>
+          </details>
+
+          <details class="help-faq-item">
+            <summary>I want to use a structure that is not listed. What should I do?</summary>
+            <div class="help-faq-content">
+              <p>
+                Go to dashboard and open <strong>Add a structure not listed</strong>. Add one phase per row, save, and
+                the new structure will appear in the board creation selector.
+              </p>
+              <p>
+                For example, if you want to follow a structure like <em>Freytag's Pyramid</em> (which is not included
+                by default), you can add its phases manually and save it as your own reusable structure.
+              </p>
+            </div>
+          </details>
+
+          <details class="help-faq-item">
+            <summary>How do export, import, and merge work?</summary>
+            <div class="help-faq-content">
+              <p>
+                Export a board from dashboard board actions. Import from <strong>Import/merge a saved board</strong> in
+                dashboard.
+              </p>
+              <ul>
+                <li>If the imported board UID is new, Structurer creates a new board.</li>
+                <li>If the imported board UID already exists, Structurer merges notes by note UID.</li>
+                <li>When both sides changed, the most recent update wins.</li>
+              </ul>
+              <p>
+                <strong>Recommended multi-device workflow:</strong> do one initial export/import to align IDs between
+                the two copies. After that, repeat export/import for incremental merges.
+              </p>
+              <p>
+                If phase order differs between the two versions, merge is blocked and Structurer shows a side-by-side
+                conflict modal so you can align the board manually and retry.
+              </p>
+            </div>
+          </details>
+
+          <details class="help-faq-item">
+            <summary>What are groups and when should I use them?</summary>
+            <div class="help-faq-content">
+              <p>
+                Groups let you organize multiple boards into a sequence. This is useful for multi-arc projects,
+                series planning, or alternate structure explorations of the same story.
+              </p>
+              <p>
+                Use <strong>Create group</strong> in the dashboard to name a group and pick boards with checkboxes.
+                To add an existing board to a group later, open that board’s actions and choose
+                <strong>Add board to group</strong> (available once you have at least one group), then pick the group
+                from the list. Manage order and membership from group actions on the dashboard.
+              </p>
+            </div>
+          </details>
         </section>
       </section>
 
@@ -324,10 +485,10 @@
       </div>
 
       <footer class="app-footer">
-        <a href="https://github.com/sullof/structurer" target="_blank" rel="noopener noreferrer">Structurer</a> is made with love by
+        <a href="https://github.com/sullof/structurer" target="_blank" rel="noopener noreferrer">Structurer</a> is open source and made by
         <a href="https://github.com/sullof" target="_blank" rel="noopener noreferrer">Sullof</a> (the director)
-        and
-        <a href="https://www.cursor.com/" target="_blank" rel="noopener noreferrer">Cursor AI</a> (the scriptwriter)
+        and 
+        <a href="https://www.cursor.com/" target="_blank" rel="noopener noreferrer">Cursor AI</a> (the scriptwriter).
       </footer>
     </main>
     <script type="module" src="/src/main.js"></script>

@@ -119,6 +119,15 @@ No backend is currently used.
 
 ## History
 
+**1.6.0**
+- Added an in-app Help route (`/help`) with an expandable FAQ covering core concepts, workflows, import/merge strategy, and external references for story structures.
+- Improved dashboard information architecture with accordion behavior for collapsible panels (opening one closes the others).
+- Refined desktop dashboard density/readability by widening board/group cards and reducing unnecessary wrapping in metadata rows.
+- Added a dashboard control to hide/show demo boards, persisted in settings so writers can focus on personal projects.
+- Improved grouping UX with a dedicated "Create group" panel (group name + board checkboxes) directly in dashboard.
+- Updated "Add board to group" flow: action is enabled only when groups exist and now opens a list-based picker modal of existing groups.
+- Polished dashboard UI consistency for new controls/actions (inline hide demos link, aligned action buttons, and panel heading/button style parity).
+
 **1.5.0**
 - Added stable short `uid` identifiers with automatic migration for boards, notes, groups, custom structures, custom archetypes, and custom note types.
 - Added `updatedAt` migration and tracking for notes and custom entities, laying the foundation for deterministic merge behavior.

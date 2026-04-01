@@ -32,6 +32,10 @@ body {
   display: none;
 }
 
+.hidden {
+  display: none;
+}
+
 .topbar {
   display: flex;
   align-items: flex-end;
@@ -125,7 +129,8 @@ h1 {
 .empty-state,
 .boards-list,
 .home-import,
-.home-custom-structure {
+.home-custom-structure,
+.home-create-group {
   background: #fff;
   border: 1px solid var(--line);
   border-radius: 12px;
@@ -250,6 +255,60 @@ h1 {
   gap: 6px;
 }
 
+.help-faq-item {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: #fafafa;
+  margin-top: 10px;
+  overflow: hidden;
+}
+
+.help-faq-item summary {
+  cursor: pointer;
+  list-style: none;
+  font-weight: 600;
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.help-faq-item summary::-webkit-details-marker {
+  display: none;
+}
+
+.help-faq-item summary::after {
+  content: "▾";
+  color: #374151;
+  font-size: 0.95rem;
+  margin-left: 8px;
+  transition: transform 140ms ease;
+}
+
+.help-faq-item[open] summary::after {
+  transform: rotate(180deg);
+}
+
+.help-faq-content {
+  padding: 0 14px 14px;
+  color: #374151;
+}
+
+.help-faq-content p {
+  margin: 0 0 10px;
+}
+
+.help-faq-content p:last-child {
+  margin-bottom: 0;
+}
+
+.help-faq-content ul {
+  margin: 0 0 10px;
+  padding-left: 18px;
+  display: grid;
+  gap: 4px;
+}
+
 .create-board-form {
   display: grid;
   grid-template-columns: minmax(220px, 1fr) auto;
@@ -302,6 +361,41 @@ h1 {
 .boards-list {
   display: grid;
   gap: 10px;
+}
+
+.home-list-controls {
+  display: flex;
+  justify-content: flex-start;
+  margin: 8px 0 12px;
+  grid-column: 1 / -1;
+}
+
+.link-button {
+  border: 0;
+  background: transparent;
+  color: #2563eb;
+  font: inherit;
+  font-size: 0.9rem;
+  padding: 0;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.link-button:hover {
+  color: #1d4ed8;
+}
+
+.link-button:focus-visible {
+  outline: 2px solid #93c5fd;
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+#groups-list,
+#boards-list {
+  grid-template-columns: repeat(auto-fill, minmax(440px, 1fr));
+  align-items: start;
 }
 
 .group-board-stack {
@@ -440,12 +534,85 @@ h1 {
 
 .collapsible-panel summary h2 {
   margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
 }
 
 .collapsible-panel form,
 .collapsible-panel .subtitle,
 .collapsible-panel .ghost-button {
   margin-top: 10px;
+}
+
+.home-create-group .create-group-form {
+  display: grid;
+  gap: 10px;
+}
+
+.create-group-name-label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #374151;
+}
+
+.create-group-form input[type="text"] {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 8px 10px;
+  font: inherit;
+  width: 100%;
+  max-width: 420px;
+}
+
+.create-group-boards-fieldset {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 10px 12px;
+  margin: 0;
+}
+
+.create-group-boards-fieldset legend {
+  padding: 0 6px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #374151;
+}
+
+.create-group-boards-list {
+  display: grid;
+  gap: 8px;
+  margin-top: 6px;
+  max-height: 240px;
+  overflow: auto;
+}
+
+.create-group-board-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  cursor: pointer;
+  font-size: 0.92rem;
+  line-height: 1.35;
+}
+
+.create-group-board-row input {
+  margin-top: 3px;
+  flex-shrink: 0;
+}
+
+.create-group-form .ghost-button[type="submit"] {
+  justify-self: end;
+  width: auto;
+}
+
+.add-board-to-group-list .group-picker-item {
+  width: 100%;
+  text-align: left;
+}
+
+.board-actions-modal .ghost-button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
 }
 
 .create-structure-form {
@@ -1014,6 +1181,11 @@ h1 {
   .board-card {
     grid-template-columns: minmax(0, 1fr) auto;
     gap: 10px;
+  }
+
+  #groups-list,
+  #boards-list {
+    grid-template-columns: 1fr;
   }
 
   .board-actions {
