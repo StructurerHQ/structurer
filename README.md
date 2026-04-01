@@ -119,6 +119,10 @@ No backend is currently used.
 
 ## History
 
+**1.8.0**
+- Phase column titles now keep the casing from the structure configuration (built-in, custom, or imported) instead of being forced to uppercase in CSS.
+- Dashboard section headings (`Groups` / `Boards`) are shown only when that section has at least one item, so empty collections do not show a redundant label.
+
 **1.7.0**
 - Improved group creation UX with a dedicated dashboard panel (`Create group`) that collects group name and board selection via checkboxes.
 - Added immediate navigation to the newly created group after submit, so users get instant feedback and avoid accidental duplicate creation.
