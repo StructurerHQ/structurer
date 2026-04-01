@@ -110,7 +110,7 @@ export function noteTemplate(note, archetypes, archetype, noteType, isEditing = 
         style="${note.customHeight ? `height: ${note.customHeight}px;` : ""}"
         placeholder="Write your note..."
       >${note.text || ""}</textarea>`
-            : `<div class="note-readonly-text">${(note.text || "").trim() || " "}</div>`
+            : `${note.kind === "character" ? `<div class="note-readonly-character">${note.characterName || "Unnamed character"}</div>` : ""}<div class="note-readonly-text">${(note.text || "").trim() || " "}</div>`
       }
     </article>
   `;

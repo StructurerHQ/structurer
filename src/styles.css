@@ -309,6 +309,59 @@ h1 {
   word-break: break-word;
 }
 
+.reorder-list {
+  margin-top: 10px;
+  display: grid;
+  gap: 8px;
+}
+
+.reorder-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+  padding: 8px 10px;
+  cursor: grab;
+  transition: transform 0.14s ease, box-shadow 0.14s ease, border-color 0.14s ease;
+}
+
+.reorder-item:active {
+  cursor: grabbing;
+}
+
+.reorder-item.is-dragging {
+  border-color: #60a5fa;
+  box-shadow: 0 8px 20px rgba(59, 130, 246, 0.18);
+}
+
+.reorder-handle {
+  color: #6b7280;
+  font-size: 0.95rem;
+}
+
+.reorder-placeholder {
+  height: 40px;
+  border: 2px dashed #9ca3af;
+  border-radius: 8px;
+  background: rgba(156, 163, 175, 0.1);
+  transition: all 0.12s ease;
+}
+
+.reorder-status {
+  min-height: 1.2em;
+  margin: 8px 0 0;
+  color: #065f46;
+  font-size: 0.9rem;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+
+.reorder-status.is-visible {
+  opacity: 1;
+}
+
 .home-import h2 {
   margin: 0 0 6px;
   font-size: 1rem;
@@ -495,6 +548,12 @@ h1 {
 .board.wrap-columns {
   grid-template-columns: repeat(auto-fit, minmax(var(--column-min-width), 1fr));
   overflow-x: visible;
+  align-items: stretch;
+}
+
+.board.wrap-columns .column {
+  min-height: 0;
+  height: 100%;
 }
 
 .options-wrap {
@@ -726,6 +785,15 @@ h1 {
   white-space: pre-wrap;
   word-break: break-word;
   line-height: 1.35;
+}
+
+.note-readonly-character {
+  border: 1px solid rgba(17, 24, 39, 0.15);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.65);
+  padding: 6px 8px;
+  font-weight: 600;
+  margin-top: 4px;
 }
 
 .note textarea {

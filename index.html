@@ -134,6 +134,29 @@
             </div>
           </div>
         </div>
+        <div id="group-actions-modal-overlay" class="modal-overlay hidden">
+          <div class="modal board-actions-modal" role="dialog" aria-modal="true" aria-label="Group actions">
+            <h2>Group actions</h2>
+            <div class="board-actions-modal-list">
+              <button id="modal-reorder-group-boards" class="ghost-button" type="button">Reorder boards</button>
+              <button id="modal-remove-board-from-group" class="ghost-button danger-menu-item" type="button">Remove board</button>
+            </div>
+            <div class="modal-actions">
+              <button id="close-group-actions-modal" class="ghost-button" type="button">Close</button>
+            </div>
+          </div>
+        </div>
+        <div id="group-reorder-modal-overlay" class="modal-overlay hidden">
+          <div class="modal board-actions-modal" role="dialog" aria-modal="true" aria-label="Reorder boards">
+            <h2>Reorder boards</h2>
+            <p class="subtitle">Drag boards to change their order in this group.</p>
+            <div id="group-reorder-list" class="reorder-list"></div>
+            <p id="group-reorder-status" class="reorder-status" aria-live="polite"></p>
+            <div class="modal-actions">
+              <button id="close-group-reorder-modal" class="ghost-button" type="button">Done</button>
+            </div>
+          </div>
+        </div>
       </section>
 
       <section id="group-view" class="view hidden">
