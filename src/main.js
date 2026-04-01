@@ -58,6 +58,7 @@ let pendingNoteTypeColorResolve = null;
 const initialSettings = loadSettings();
 let columnMinWidth = initialSettings.columnMinWidth ?? DEFAULT_COLUMN_WIDTH;
 let wrapColumns = initialSettings.wrapColumns ?? true;
+let showDemoBoards = initialSettings.showDemoBoards ?? true;
 
 const landingView = document.querySelector("#landing-view");
 const homeView = document.querySelector("#home-view");
@@ -80,6 +81,13 @@ const boardActionsModalOverlay = document.querySelector("#board-actions-modal-ov
 const closeBoardActionsModalBtn = document.querySelector("#close-board-actions-modal");
 const modalRenameBoardBtn = document.querySelector("#modal-rename-board");
 const modalAddBoardToGroupBtn = document.querySelector("#modal-add-board-to-group");
+const addBoardToGroupModalOverlay = document.querySelector("#add-board-to-group-modal-overlay");
+const addBoardToGroupListEl = document.querySelector("#add-board-to-group-list");
+const closeAddBoardToGroupModalBtn = document.querySelector("#close-add-board-to-group-modal");
+const createGroupForm = document.querySelector("#create-group-form");
+const createGroupNameInput = document.querySelector("#create-group-name");
+const createGroupBoardsListEl = document.querySelector("#create-group-boards-list");
+const createGroupBoardsEmptyEl = document.querySelector("#create-group-boards-empty");
 const modalExportBoardBtn = document.querySelector("#modal-export-board");
 const modalDeleteBoardBtn = document.querySelector("#modal-delete-board");
 const groupActionsModalOverlay = document.querySelector("#group-actions-modal-overlay");
@@ -125,6 +133,10 @@ const goDashboardBtn = document.querySelector("#go-dashboard");
 const boardEl = document.querySelector("#board");
 const groupBoardStackEl = document.querySelector("#group-board-stack");
 const insightsEl = document.querySelector("#insights");
+const homeListControlsEl = document.querySelector(".home-list-controls");
+const toggleDemoVisibilityBtn = document.querySelector("#toggle-demo-visibility");
+const homeCollapsiblePanels = [...document.querySelectorAll("#home-view .collapsible-panel")];
+let addBoardToGroupTargetBoardId = null;
 
 function loadBoards() {
   return loadBoardsFromStorage(STORAGE_KEY);
@@ -194,7 +206,7 @@ function loadSettings() {
 }
 
 function saveSettings() {
-  saveSettingsToStorage(SETTINGS_KEY, { columnMinWidth, wrapColumns });
+  saveSettingsToStorage(SETTINGS_KEY, { columnMinWidth, wrapColumns, showDemoBoards });
 }
 
 function loadCustomStructures() {
@@ -348,6 +360,14 @@ function applyColumnWidth() {
 function applyWrapColumns() {
   boardEl.classList.toggle("wrap-columns", wrapColumns);
   toggleWrapColumnsBtn.textContent = `Wrap columns: ${wrapColumns ? "On" : "Off"}`;
+}
+
+function escapeHtml(text) {
+  return String(text ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
 }
 
 function slugifyTitle(title) {
@@ -539,6 +559,26 @@ function formatPhaseTitle(phase) {
   return String(phase || "").trim();
 }
 
+function renderCreateGroupBoardCheckboxes() {
+  if (!createGroupBoardsListEl || !createGroupBoardsEmptyEl) return;
+  const sorted = [...boards].sort((a, b) => b.updatedAt - a.updatedAt);
+  if (sorted.length === 0) {
+    createGroupBoardsListEl.innerHTML = "";
+    createGroupBoardsEmptyEl.classList.remove("hidden");
+    return;
+  }
+  createGroupBoardsEmptyEl.classList.add("hidden");
+  createGroupBoardsListEl.innerHTML = sorted
+    .map(
+      (board) => `
+    <label class="create-group-board-row">
+      <input type="checkbox" name="create-group-board" value="${board.id}" />
+      <span>${escapeHtml(board.title)}</span>
+    </label>`,
+    )
+    .join("");
+}
+
 function groupCardTemplate(group) {
   const boardTitles = group.boardIds
     .map((id) => boards.find((board) => board.id === id)?.title)
@@ -620,6 +660,8 @@ function applyPhaseOrder(board, newOrder) {
 
 function renderHome() {
   const validBoardIds = new Set(boards.map((board) => board.id));
+  demoBoardIds = demoBoardIds.filter((id) => validBoardIds.has(id));
+  saveDemoBoardIds();
   groups.forEach((group) => {
     group.boardIds = group.boardIds.filter((id) => validBoardIds.has(id));
   });
@@ -629,14 +671,21 @@ function renderHome() {
   groupsList.innerHTML = sortedGroups.map(groupCardTemplate).join("");
   groupsList.style.display = sortedGroups.length > 0 ? "grid" : "none";
 
-  const sortedBoards = [...boards].sort((a, b) => b.updatedAt - a.updatedAt);
+  const sortedBoards = [...boards]
+    .filter((board) => showDemoBoards || !isDemoBoard(board))
+    .sort((a, b) => b.updatedAt - a.updatedAt);
   boardsList.innerHTML = sortedBoards
     .map((board) => {
       const structure = getStructureConfig(board.structureId);
       return boardCardTemplate(board, structure.name, formatDate(board.updatedAt));
     })
     .join("");
-  emptyState.style.display = boards.length === 0 && groups.length === 0 ? "block" : "none";
+  if (homeListControlsEl) {
+    boardsList.appendChild(homeListControlsEl);
+  }
+  emptyState.style.display = sortedBoards.length === 0 && sortedGroups.length === 0 ? "block" : "none";
+  applyDemoVisibilityControl();
+  renderCreateGroupBoardCheckboxes();
 }
 
 function renderEditor() {
@@ -909,6 +958,17 @@ function isLikelyDemoBoard(board) {
   });
 }
 
+function isDemoBoard(board) {
+  if (!board) return false;
+  if (demoBoardIds.includes(board.id)) return true;
+  return isLikelyDemoBoard(board);
+}
+
+function applyDemoVisibilityControl() {
+  if (!toggleDemoVisibilityBtn) return;
+  toggleDemoVisibilityBtn.textContent = showDemoBoards ? "Hide demos" : "Show demos";
+}
+
 function replaceDemoBoardsOnly() {
   const currentDemoIds = new Set(
     boards
@@ -997,6 +1057,31 @@ function closeBoardActionsModal() {
 function openBoardActionsModal(boardId) {
   boardActionsModalBoardId = boardId;
   boardActionsModalOverlay.classList.remove("hidden");
+  if (modalAddBoardToGroupBtn) {
+    modalAddBoardToGroupBtn.disabled = groups.length === 0;
+    modalAddBoardToGroupBtn.title = groups.length === 0 ? "Create a group first" : "";
+  }
+}
+
+function closeAddBoardToGroupModal() {
+  if (addBoardToGroupModalOverlay) addBoardToGroupModalOverlay.classList.add("hidden");
+  addBoardToGroupTargetBoardId = null;
+}
+
+function openAddBoardToGroupModal(boardId) {
+  if (!addBoardToGroupModalOverlay || !addBoardToGroupListEl) return;
+  if (groups.length === 0) return;
+  addBoardToGroupTargetBoardId = boardId;
+  const sorted = [...groups].sort((a, b) => b.updatedAt - a.updatedAt);
+  addBoardToGroupListEl.innerHTML = sorted
+    .map(
+      (group) => `
+    <button type="button" class="ghost-button group-picker-item" data-group-id="${group.id}">
+      ${escapeHtml(group.title)} <span class="board-meta">(${group.boardIds.length} boards)</span>
+    </button>`,
+    )
+    .join("");
+  addBoardToGroupModalOverlay.classList.remove("hidden");
 }
 
 function closePhaseOrderConflictModal() {
@@ -1460,6 +1545,19 @@ if (cancelNoteTypeColorBtn) {
   });
 }
 
+if (homeCollapsiblePanels.length > 0) {
+  homeCollapsiblePanels.forEach((panel) => {
+    panel.addEventListener("toggle", () => {
+      if (!panel.open) return;
+      homeCollapsiblePanels.forEach((otherPanel) => {
+        if (otherPanel !== panel) {
+          otherPanel.open = false;
+        }
+      });
+    });
+  });
+}
+
 closeBoardActionsModalBtn.addEventListener("click", () => {
   closeBoardActionsModal();
 });
@@ -1503,32 +1601,70 @@ if (modalRenameBoardBtn) {
 
 if (modalAddBoardToGroupBtn) {
   modalAddBoardToGroupBtn.addEventListener("click", () => {
-    const board = boards.find((item) => item.id === boardActionsModalBoardId);
-    if (!board) return;
-    const hint = groups.length > 0 ? `Existing: ${groups.map((g) => g.title).join(", ")}` : "No groups yet.";
-    const groupName = window.prompt(`Group name to add this board.\n${hint}`);
-    if (!groupName) return;
-    const trimmed = groupName.trim();
-    if (!trimmed) return;
-    let group = groups.find((item) => item.title.toLowerCase() === trimmed.toLowerCase());
-    if (!group) {
-      group = {
-        id: crypto.randomUUID(),
-        uid: generateUniqueUid(),
-        title: trimmed,
-        slug: ensureUniqueGroupSlug(slugifyTitle(trimmed)),
-        boardIds: [],
-        updatedAt: Date.now(),
-      };
-      groups.push(group);
-    }
+    const boardId = boardActionsModalBoardId;
+    if (!boardId || groups.length === 0) return;
+    closeBoardActionsModal();
+    openAddBoardToGroupModal(boardId);
+  });
+}
+
+if (addBoardToGroupListEl) {
+  addBoardToGroupListEl.addEventListener("click", (event) => {
+    const btn = event.target.closest("[data-group-id]");
+    if (!btn) return;
+    const boardId = addBoardToGroupTargetBoardId;
+    if (!boardId) return;
+    const group = groups.find((item) => item.id === btn.dataset.groupId);
+    const board = boards.find((item) => item.id === boardId);
+    if (!group || !board) return;
     if (!group.boardIds.includes(board.id)) {
       group.boardIds.push(board.id);
     }
     group.updatedAt = Date.now();
     saveGroups();
     renderHome();
-    closeBoardActionsModal();
+    closeAddBoardToGroupModal();
+  });
+}
+
+if (closeAddBoardToGroupModalBtn) {
+  closeAddBoardToGroupModalBtn.addEventListener("click", () => {
+    closeAddBoardToGroupModal();
+  });
+}
+
+if (addBoardToGroupModalOverlay) {
+  addBoardToGroupModalOverlay.addEventListener("click", (event) => {
+    if (event.target === addBoardToGroupModalOverlay) {
+      closeAddBoardToGroupModal();
+    }
+  });
+}
+
+if (createGroupForm && createGroupNameInput) {
+  createGroupForm.addEventListener("submit", (event) => {
+    event.preventDefault();
+    const title = createGroupNameInput.value.trim();
+    if (!title) return;
+    const checkedIds = [...createGroupForm.querySelectorAll('input[name="create-group-board"]:checked')].map(
+      (input) => input.value,
+    );
+    if (checkedIds.length === 0) {
+      window.alert("Select at least one board to include.");
+      return;
+    }
+    const group = {
+      id: crypto.randomUUID(),
+      uid: generateUniqueUid(),
+      title,
+      slug: ensureUniqueGroupSlug(slugifyTitle(title)),
+      boardIds: [...checkedIds],
+      updatedAt: Date.now(),
+    };
+    groups.push(group);
+    saveGroups();
+    createGroupForm.reset();
+    renderHome();
   });
 }
 
@@ -1610,6 +1746,14 @@ if (resetDemoDataBtn) {
     if (!confirmed) return;
     replaceDemoBoardsOnly();
     openHome();
+  });
+}
+
+if (toggleDemoVisibilityBtn) {
+  toggleDemoVisibilityBtn.addEventListener("click", () => {
+    showDemoBoards = !showDemoBoards;
+    saveSettings();
+    renderHome();
   });
 }
 
@@ -1737,6 +1881,7 @@ window.addEventListener("popstate", () => {
 applyColumnWidth();
 applyWrapColumns();
 applyDevFlags();
+applyDemoVisibilityControl();
 renderStructureOptions("hero_journey");
 renderStructurePhaseRows(["", "", ""]);
 syncRouteToState(true);
