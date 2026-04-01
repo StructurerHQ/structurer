@@ -36,6 +36,7 @@ const loadedBoards = loadBoards();
 let boards = loadedBoards || [];
 let currentBoardId = null;
 let draggedNoteId = null;
+let draggedPhaseIndex = null;
 let resizingNoteId = null;
 let boardActionsModalBoardId = null;
 let customStructures = loadCustomStructures();
@@ -60,6 +61,7 @@ const importBoardButton = document.querySelector("#import-board-button");
 const importBoardInput = document.querySelector("#import-board-input");
 const boardActionsModalOverlay = document.querySelector("#board-actions-modal-overlay");
 const closeBoardActionsModalBtn = document.querySelector("#close-board-actions-modal");
+const modalRenameBoardBtn = document.querySelector("#modal-rename-board");
 const modalExportBoardBtn = document.querySelector("#modal-export-board");
 const modalDeleteBoardBtn = document.querySelector("#modal-delete-board");
 const goLandingFromDashboardBtn = document.querySelector("#go-landing-from-dashboard");
@@ -70,6 +72,7 @@ const optionsButton = document.querySelector("#options-button");
 const optionsMenu = document.querySelector("#options-menu");
 const openResizeModalBtn = document.querySelector("#open-resize-modal");
 const toggleWrapColumnsBtn = document.querySelector("#toggle-wrap-columns");
+const resetPhaseOrderBtn = document.querySelector("#reset-phase-order");
 const resetAppDataBtn = document.querySelector("#reset-app-data");
 const resizeModalOverlay = document.querySelector("#resize-modal-overlay");
 const closeResizeModalBtn = document.querySelector("#close-resize-modal");
@@ -262,6 +265,57 @@ function formatPhaseTitle(phase) {
   return String(phase || "").trim();
 }
 
+function identityPhaseOrder(length) {
+  return Array.from({ length }, (_, index) => index);
+}
+
+function isValidPhaseOrder(order, phaseCount) {
+  if (!Array.isArray(order) || order.length !== phaseCount) return false;
+  const unique = new Set(order);
+  if (unique.size !== phaseCount) return false;
+  return order.every((value) => Number.isInteger(value) && value >= 0 && value < phaseCount);
+}
+
+function getBoardPhaseOrder(board) {
+  const phaseCount = getStructureConfig(board.structureId).phases.length;
+  if (isValidPhaseOrder(board.phaseOrder, phaseCount)) return board.phaseOrder;
+  return identityPhaseOrder(phaseCount);
+}
+
+function getBoardPhases(board) {
+  const structure = getStructureConfig(board.structureId);
+  const order = getBoardPhaseOrder(board);
+  return order.map((phaseIndex) => structure.phases[phaseIndex]);
+}
+
+function reorderPhaseAndNotes(board, sourceIndex, targetIndex) {
+  const phaseCount = getStructureConfig(board.structureId).phases.length;
+  if (sourceIndex === targetIndex || sourceIndex < 0 || targetIndex < 0) return;
+  if (sourceIndex >= phaseCount || targetIndex >= phaseCount) return;
+  const oldOrder = getBoardPhaseOrder(board);
+  const newOrder = [...oldOrder];
+  const [moved] = newOrder.splice(sourceIndex, 1);
+  newOrder.splice(targetIndex, 0, moved);
+  applyPhaseOrder(board, newOrder);
+}
+
+function applyPhaseOrder(board, newOrder) {
+  const phaseCount = getStructureConfig(board.structureId).phases.length;
+  if (!isValidPhaseOrder(newOrder, phaseCount)) return;
+  const oldOrder = getBoardPhaseOrder(board);
+  const phaseIdToNewVisualIndex = new Map();
+  newOrder.forEach((phaseId, visualIndex) => phaseIdToNewVisualIndex.set(phaseId, visualIndex));
+
+  board.notes.forEach((note) => {
+    const phaseId = oldOrder[note.column];
+    if (phaseId === undefined) return;
+    const nextColumn = phaseIdToNewVisualIndex.get(phaseId);
+    if (Number.isInteger(nextColumn)) note.column = nextColumn;
+  });
+  normalizeOrders(board.notes, board.structureId);
+  board.phaseOrder = newOrder;
+}
+
 function renderHome() {
   const sortedBoards = [...boards].sort((a, b) => b.updatedAt - a.updatedAt);
   boardsList.innerHTML = sortedBoards
@@ -277,7 +331,7 @@ function renderEditor() {
   const board = getCurrentBoard();
   if (!board) return;
   const structure = getStructureConfig(board.structureId);
-  const phases = structure.phases;
+  const phases = getBoardPhases(board);
   const archetypes = getAllArchetypes();
 
   editorTitle.textContent = board.title;
@@ -288,7 +342,10 @@ function renderEditor() {
       return `
       <section class="column" data-column="${columnIndex}">
         <div class="phase-head">
-          <h2 class="phase-title">${formatPhaseTitle(phase)}</h2>
+          <div class="phase-title-wrap">
+            <button class="phase-drag" data-role="phase-drag-handle" title="Drag phase" draggable="true">⋮⋮</button>
+            <h2 class="phase-title">${formatPhaseTitle(phase)}</h2>
+          </div>
           <button class="phase-add" data-role="open-column-menu" title="Add note">+</button>
           ${columnMenuTemplate(columnIndex, archetypes)}
         </div>
@@ -379,6 +436,7 @@ function createBoard(title, structureId = "hero_journey") {
     slug,
     structureId: structure.id,
     structure: structure.name,
+    phaseOrder: identityPhaseOrder(structure.phases.length),
     nextNoteId: 1,
     notes: [],
     updatedAt: Date.now(),
@@ -401,6 +459,7 @@ function createDemoBoardFromJson(demoData) {
     text: note.text || "",
     characterName: note.characterName || "",
     archetype: note.archetype || "none",
+    collapsed: Boolean(note.collapsed),
   }));
 
   return {
@@ -409,6 +468,9 @@ function createDemoBoardFromJson(demoData) {
     slug: ensureUniqueSlug(slugifyTitle(demoData.title || "demo_board")),
     structureId: structure.id,
     structure: structure.name,
+    phaseOrder: isValidPhaseOrder(demoData.phaseOrder, structure.phases.length)
+      ? [...demoData.phaseOrder]
+      : identityPhaseOrder(structure.phases.length),
     nextNoteId: notes.length + 1,
     notes,
     updatedAt: Date.now(),
@@ -420,6 +482,7 @@ function boardToExportPayload(board) {
   return {
     title: board.title,
     structure: structure.name,
+    phaseOrder: getBoardPhaseOrder(board),
     notes: [...board.notes]
       .sort((a, b) => (a.column - b.column) || ((a.order || 0) - (b.order || 0)))
       .map((note) => ({
@@ -430,6 +493,7 @@ function boardToExportPayload(board) {
         characterName: note.characterName || "",
         archetype: note.archetype || "none",
         customHeight: note.customHeight || undefined,
+        collapsed: Boolean(note.collapsed),
       })),
   };
 }
@@ -479,6 +543,7 @@ function importBoardFromJson(rawText) {
       characterName: note.characterName || "",
       archetype: note.archetype || "none",
       customHeight: Number.isFinite(note.customHeight) ? note.customHeight : undefined,
+      collapsed: Boolean(note.collapsed),
     };
   });
 
@@ -488,6 +553,9 @@ function importBoardFromJson(rawText) {
     slug: ensureUniqueSlug(slugifyTitle(title)),
     structureId: structure.id,
     structure: structure.name,
+    phaseOrder: isValidPhaseOrder(parsed.phaseOrder, structure.phases.length)
+      ? [...parsed.phaseOrder]
+      : identityPhaseOrder(structure.phases.length),
     nextNoteId: notes.length + 1,
     notes,
     updatedAt: Date.now(),
@@ -553,6 +621,7 @@ function addNote(kind, column, archetype = "none") {
     text: "",
     characterName: "",
     archetype,
+    collapsed: false,
   });
   touchBoard(board);
   renderEditor();
@@ -724,6 +793,22 @@ modalExportBoardBtn.addEventListener("click", () => {
   closeBoardActionsModal();
 });
 
+if (modalRenameBoardBtn) {
+  modalRenameBoardBtn.addEventListener("click", () => {
+    const board = boards.find((item) => item.id === boardActionsModalBoardId);
+    if (!board) return;
+    const nextTitle = window.prompt("Rename board:", board.title);
+    if (nextTitle === null) return;
+    const trimmed = nextTitle.trim();
+    if (!trimmed) return;
+    board.title = trimmed;
+    board.slug = ensureUniqueSlug(slugifyTitle(trimmed), board.id);
+    touchBoard(board);
+    renderHome();
+    closeBoardActionsModal();
+  });
+}
+
 modalDeleteBoardBtn.addEventListener("click", () => {
   const board = boards.find((item) => item.id === boardActionsModalBoardId);
   if (!board) return;
@@ -762,6 +847,17 @@ toggleWrapColumnsBtn.addEventListener("click", () => {
   applyWrapColumns();
   saveSettings();
 });
+
+if (resetPhaseOrderBtn) {
+  resetPhaseOrderBtn.addEventListener("click", () => {
+    closeOptionsMenu();
+    const board = getCurrentBoard();
+    if (!board) return;
+    applyPhaseOrder(board, identityPhaseOrder(getStructureConfig(board.structureId).phases.length));
+    touchBoard(board);
+    renderEditor();
+  });
+}
 
 resetAppDataBtn.addEventListener("click", () => {
   closeOptionsMenu();
@@ -873,6 +969,14 @@ boardEl.addEventListener("click", (event) => {
   const note = board.notes.find((item) => item.id === id);
   if (!note) return;
 
+  if (target.dataset.role === "toggle-collapse") {
+    note.collapsed = !note.collapsed;
+    touchBoard(board);
+    renderEditor();
+    renderInsights(note);
+    return;
+  }
+
   if (target.dataset.role === "delete") {
     board.notes = board.notes.filter((item) => item.id !== id);
     normalizeOrders(board.notes, board.structureId);
@@ -884,8 +988,32 @@ boardEl.addEventListener("click", (event) => {
   renderInsights(note);
 });
 
+boardEl.addEventListener("dblclick", (event) => {
+  if (event.target.closest("button, textarea, input, select")) return;
+  const noteHead = event.target.closest(".note-head");
+  if (!noteHead) return;
+  const noteEl = noteHead.closest(".note");
+  const board = getCurrentBoard();
+  if (!noteEl || !board) return;
+  const id = Number(noteEl.dataset.id);
+  const note = board.notes.find((item) => item.id === id);
+  if (!note) return;
+  note.collapsed = !note.collapsed;
+  touchBoard(board);
+  renderEditor();
+  renderInsights(note);
+});
+
 boardEl.addEventListener("dragstart", (event) => {
   const target = event.target;
+  if (target.closest('[data-role="phase-drag-handle"]')) {
+    const columnEl = target.closest(".column");
+    if (!columnEl) return;
+    draggedPhaseIndex = Number(columnEl.dataset.column);
+    event.dataTransfer.effectAllowed = "move";
+    event.dataTransfer.setData("text/plain", `phase:${draggedPhaseIndex}`);
+    return;
+  }
   if (target.closest("textarea, input, select, button")) {
     event.preventDefault();
     return;
@@ -900,6 +1028,13 @@ boardEl.addEventListener("dragstart", (event) => {
 });
 
 boardEl.addEventListener("dragover", (event) => {
+  if (draggedPhaseIndex !== null) {
+    const columnEl = event.target.closest(".column");
+    if (!columnEl) return;
+    event.preventDefault();
+    event.dataTransfer.dropEffect = "move";
+    return;
+  }
   if (draggedNoteId === null) return;
   const columnEl = event.target.closest(".column");
   if (!columnEl) return;
@@ -908,6 +1043,20 @@ boardEl.addEventListener("dragover", (event) => {
 });
 
 boardEl.addEventListener("drop", (event) => {
+  if (draggedPhaseIndex !== null) {
+    const columnEl = event.target.closest(".column");
+    if (!columnEl) return;
+    event.preventDefault();
+    const targetColumn = Number(columnEl.dataset.column);
+    const board = getCurrentBoard();
+    if (!board) return;
+    reorderPhaseAndNotes(board, draggedPhaseIndex, targetColumn);
+    draggedPhaseIndex = null;
+    touchBoard(board);
+    renderEditor();
+    renderInsights(null);
+    return;
+  }
   if (draggedNoteId === null) return;
   const columnEl = event.target.closest(".column");
   if (!columnEl) return;
@@ -929,6 +1078,7 @@ boardEl.addEventListener("drop", (event) => {
 
 boardEl.addEventListener("dragend", () => {
   draggedNoteId = null;
+  draggedPhaseIndex = null;
   boardEl.querySelectorAll(".note.is-dragging").forEach((note) => note.classList.remove("is-dragging"));
 });
 
@@ -982,6 +1132,9 @@ boards.forEach((board) => {
     board.structureId = guessedStructure ? guessedStructure.id : "hero_journey";
   }
   board.structure = getStructureConfig(board.structureId).name;
+  if (!isValidPhaseOrder(board.phaseOrder, getStructureConfig(board.structureId).phases.length)) {
+    board.phaseOrder = identityPhaseOrder(getStructureConfig(board.structureId).phases.length);
+  }
   normalizeOrders(board.notes, board.structureId);
 });
 if (loadedBoards === null) {

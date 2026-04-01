@@ -52,8 +52,18 @@ export function boardCardTemplate(board, structureName, updatedAtText) {
 }
 
 export function noteTemplate(note, archetypes, archetype) {
-  const characterUI =
+  const collapsed = Boolean(note.collapsed);
+  const textPreview = (note.text || "").trim();
+  const collapsedPreview =
     note.kind === "character"
+      ? [archetype?.label || "", note.characterName || ""]
+          .map((part) => part.trim())
+          .filter(Boolean)
+          .join(" - ") || textPreview || "Character note"
+      : textPreview || "Empty note";
+
+  const characterUI =
+    !collapsed && note.kind === "character"
       ? `
       <div class="character-fields">
         <input
@@ -78,20 +88,33 @@ export function noteTemplate(note, archetypes, archetype) {
       : "";
 
   return `
-    <article class="note" data-id="${note.id}" data-kind="${note.kind}" draggable="true">
+    <article class="note ${collapsed ? "is-collapsed" : ""}" data-id="${note.id}" data-kind="${note.kind}" draggable="true">
       <div class="note-head">
-        <span class="badge">${kindLabel(note.kind)} ${
-          note.kind === "character" && archetype.icon ? archetype.icon : ""
-        }</span>
-        <button class="delete" data-role="delete" title="Delete note">✕</button>
+        <button class="collapse-toggle" data-role="toggle-collapse" title="${
+          collapsed ? "Expand note" : "Collapse note"
+        }">${collapsed ? "▾" : "▴"}</button>
+        ${
+          collapsed
+            ? `<div class="collapsed-preview" title="${collapsedPreview}">${collapsedPreview}</div>`
+            : `<span class="badge">${kindLabel(note.kind)} ${
+                note.kind === "character" && archetype.icon ? archetype.icon : ""
+              }</span>`
+        }
+        <div class="note-head-actions">
+          <button class="delete" data-role="delete" title="Delete note">✕</button>
+        </div>
       </div>
       ${characterUI}
-      <textarea
+      ${
+        collapsed
+          ? ""
+          : `<textarea
         data-role="text"
         data-note-id="${note.id}"
         style="${note.customHeight ? `height: ${note.customHeight}px;` : ""}"
         placeholder="Write your note..."
-      >${note.text || ""}</textarea>
+      >${note.text || ""}</textarea>`
+      }
     </article>
   `;
 }

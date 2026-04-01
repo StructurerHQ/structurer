@@ -505,6 +505,28 @@ h1 {
   position: relative;
 }
 
+.phase-title-wrap {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+
+.phase-drag {
+  border: 0;
+  background: transparent;
+  color: #6b7280;
+  cursor: grab;
+  font-size: 0.95rem;
+  padding: 0;
+  width: 16px;
+  flex: 0 0 16px;
+}
+
+.phase-drag:active {
+  cursor: grabbing;
+}
+
 .phase-add {
   border: 1px solid var(--line);
   background: #f8f8f8;
@@ -610,6 +632,36 @@ h1 {
   align-items: center;
   margin-bottom: 6px;
   gap: 6px;
+  min-width: 0;
+}
+
+.note-head-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.collapse-toggle {
+  border: 0;
+  background: transparent;
+  font-size: 0.9rem;
+  cursor: pointer;
+  padding: 0;
+  width: 18px;
+  flex: 0 0 18px;
+}
+
+.collapsed-preview {
+  min-width: 0;
+  width: 0;
+  max-width: 100%;
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-weight: 600;
+  font-size: 0.78rem;
+  color: #374151;
 }
 
 .badge {
@@ -625,6 +677,10 @@ h1 {
   background: transparent;
   font-size: 0.9rem;
   cursor: pointer;
+}
+
+.note.is-collapsed .note-head {
+  margin-bottom: 0;
 }
 
 .note textarea,

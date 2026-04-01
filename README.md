@@ -112,6 +112,11 @@ No backend is currently used.
 
 ## History
 
+**1.3.0**
+- Added board rename action from dashboard board actions modal.
+- Added note collapse/expand with single-line preview and persisted collapsed state.
+- Included collapsed state in board import/export payloads.
+
 **1.2.0**
 - Reorganized project structure by introducing `src/` entrypoints (`/src/main.js`, `/src/styles.css`).
 - Moved app modules and demo datasets under `src/` for a cleaner, more scalable layout.
