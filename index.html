@@ -53,6 +53,7 @@
             <h3>Demo map (Structure → Film)</h3>
             <ul class="demo-map">
               <li><strong>Hero's Journey:</strong> The Matrix</li>
+              <li><strong>Hero with a Thousand Faces:</strong> The Odyssey</li>
               <li><strong>Three-Act Structure:</strong> Jurassic Park</li>
               <li><strong>Save the Cat:</strong> Back to the Future</li>
               <li><strong>Story Circle:</strong> Finding Nemo</li>
@@ -91,7 +92,6 @@
             <select id="board-structure" aria-label="Story structure"></select>
             <button type="submit">Create board</button>
           </form>
-          <button id="reset-app-data" class="ghost-button danger-menu-item" type="button">Reset app data (dev)</button>
         </details>
 
         <details class="home-custom-structure collapsible-panel">
@@ -119,6 +119,10 @@
             <input id="import-board-input" type="file" accept="application/json,.json" hidden />
           </div>
         </details>
+
+        <div class="home-dev-reset">
+          <button id="reset-app-data" class="ghost-button danger-menu-item" type="button">Reset app data (dev)</button>
+        </div>
 
         <div id="board-actions-modal-overlay" class="modal-overlay hidden">
           <div class="modal board-actions-modal" role="dialog" aria-modal="true" aria-label="Board actions">

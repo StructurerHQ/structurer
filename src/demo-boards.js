@@ -1,4 +1,5 @@
 import matrixDemo from "./data/matrix-demo.json";
+import odysseyHeroThousandFacesDemo from "./data/odyssey-hero-thousand-faces-demo.json";
 import jurassicParkThreeActDemo from "./data/jurassic-park-three-act-demo.json";
 import backToTheFutureSaveTheCatDemo from "./data/back-to-the-future-save-the-cat-demo.json";
 import findingNemoStoryCircleDemo from "./data/finding-nemo-story-circle-demo.json";
@@ -8,6 +9,7 @@ import inceptionMiceDemo from "./data/inception-mice-quotient-demo.json";
 
 export const DEMO_BOARD_DATA = [
   matrixDemo,
+  odysseyHeroThousandFacesDemo,
   jurassicParkThreeActDemo,
   backToTheFutureSaveTheCatDemo,
   findingNemoStoryCircleDemo,

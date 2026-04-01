@@ -1,0 +1,28 @@
+{
+  "title": "The Odyssey",
+  "structure": "Hero with a Thousand Faces",
+  "notes": [
+    { "kind": "plot", "column": 0, "order": 0, "text": "After Troy, Odysseus is called to a final journey home across unknown seas." },
+    { "kind": "character", "column": 0, "order": 1, "characterName": "Odysseus", "archetype": "hero", "text": "Brilliant and proud, he accepts the voyage but underestimates its cost." },
+    { "kind": "plot", "column": 1, "order": 0, "text": "His men resist discipline and Odysseus himself delays choices that would shorten the return." },
+    { "kind": "plot", "column": 2, "order": 0, "text": "Athena repeatedly intervenes with guidance and protection." },
+    { "kind": "character", "column": 2, "order": 1, "characterName": "Athena", "archetype": "mentor", "text": "Divine intelligence that nudges the hero toward maturity." },
+    { "kind": "plot", "column": 3, "order": 0, "text": "Odysseus leaves the known world and enters monstrous, sacred, and lawless territories." },
+    { "kind": "plot", "column": 4, "order": 0, "text": "In caves, storms, and shipwrecks, he symbolically dies to his old identity as a war hero." },
+    { "kind": "plot", "column": 5, "order": 0, "text": "Cyclops, Laestrygonians, Circe, and the underworld forge him through escalating trials." },
+    { "kind": "plot", "column": 6, "order": 0, "text": "With Nausicaa and the memory of Penelope, he glimpses grace, loyalty, and rightful belonging." },
+    { "kind": "character", "column": 6, "order": 1, "characterName": "Penelope", "archetype": "ally", "text": "Steadfast counterpart who preserves Ithaca's moral center." },
+    { "kind": "plot", "column": 7, "order": 0, "text": "The comforts of Circe and Calypso test his will to return and his fidelity to purpose." },
+    { "kind": "plot", "column": 8, "order": 0, "text": "Confronting Poseidon's wrath and his own hubris, Odysseus accepts limits beyond cleverness." },
+    { "kind": "character", "column": 8, "order": 1, "characterName": "Poseidon", "archetype": "shadow", "text": "Embodies the cosmic consequences of pride." },
+    { "kind": "plot", "column": 9, "order": 0, "text": "He reaches clarity: home is not conquest, but restored order and identity." },
+    { "kind": "plot", "column": 10, "order": 0, "text": "The boon is his hard-won wisdom and the chance to heal Ithaca." },
+    { "kind": "plot", "column": 11, "order": 0, "text": "Even when close to home, Odysseus hesitates and must still conceal himself." },
+    { "kind": "plot", "column": 12, "order": 0, "text": "A rapid chain of reversals carries him from beggar-disguise to decisive action." },
+    { "kind": "plot", "column": 13, "order": 0, "text": "Athena, Telemachus, and loyal allies enable the final restoration." },
+    { "kind": "character", "column": 13, "order": 1, "characterName": "Telemachus", "archetype": "ally", "text": "Represents continuity and the future of the household." },
+    { "kind": "plot", "column": 14, "order": 0, "text": "Odysseus re-enters Ithaca fully, recognized and tested in both violence and restraint." },
+    { "kind": "plot", "column": 15, "order": 0, "text": "He becomes both warrior and king, balancing cunning with justice." },
+    { "kind": "plot", "column": 16, "order": 0, "text": "Peace is restored; life can continue without the old fear of collapse." }
+  ]
+}
