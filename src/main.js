@@ -276,7 +276,7 @@ function openNoteTypeColorPicker() {
 }
 
 function isDevResetEnabled() {
-  return isFlagEnabled(DEV_RESET_FLAG_KEY);
+  return isFlagEnabled(DEV_RESET_FLAG_KEY) || isFlagEnabled("activate-reset");
 }
 
 function applyDevFlags() {
@@ -507,9 +507,12 @@ function renderEditor() {
   const archetypes = getAllArchetypes();
   const noteTypes = getAllNoteTypes();
   const editingId = editingNoteId;
+  const defaultOrder = identityPhaseOrder(structure.phases.length);
+  const currentOrder = getBoardPhaseOrder(board);
+  const isModifiedOrder = currentOrder.some((phaseIndex, index) => phaseIndex !== defaultOrder[index]);
 
   editorTitle.textContent = board.title;
-  structureNameEl.textContent = structure.name;
+  structureNameEl.textContent = isModifiedOrder ? `${structure.name} (modified)` : structure.name;
   boardEl.innerHTML = phases
     .map((phase, columnIndex) => {
       const noteItems = getColumnNotes(board.notes, columnIndex);
@@ -749,11 +752,25 @@ function createDemoBoardFromJson(demoData) {
 
 function boardToExportPayload(board) {
   const structure = getStructureConfig(board.structureId);
+  const usedNoteTypeIds = new Set(board.notes.map((note) => note.kind || "plot"));
+  const usedArchetypeIds = new Set(
+    board.notes
+      .filter((note) => note.kind === "character")
+      .map((note) => note.archetype || "none"),
+  );
+  const exportedNoteTypes = getAllNoteTypes().filter(
+    (type) => usedNoteTypeIds.has(type.id) && !BUILTIN_NOTE_TYPES.some((builtin) => builtin.id === type.id),
+  );
+  const exportedArchetypes = getAllArchetypes().filter(
+    (archetype) =>
+      usedArchetypeIds.has(archetype.id) && !BUILTIN_ARCHETYPES.some((builtin) => builtin.id === archetype.id),
+  );
   return {
     title: board.title,
     structure: structure.name,
     phaseOrder: getBoardPhaseOrder(board),
-    noteTypes: getAllNoteTypes(),
+    noteTypes: exportedNoteTypes,
+    archetypes: exportedArchetypes,
     notes: [...board.notes]
       .sort((a, b) => (a.column - b.column) || ((a.order || 0) - (b.order || 0)))
       .map((note) => ({
@@ -799,31 +816,90 @@ function importBoardFromJson(rawText) {
     throw new Error("Invalid board JSON format.");
   }
 
+  const normalizeKey = (value) => String(value || "").trim().toLowerCase().replace(/\s+/g, " ");
+
   const structureEntry = getAllStructureList().find((item) => item.name === parsed.structure);
   const structure = structureEntry || BUILTIN_STRUCTURES.hero_journey;
+  const noteTypeIdMap = new Map();
+  const archetypeIdMap = new Map();
+
   if (Array.isArray(parsed.noteTypes)) {
+    let noteTypesChanged = false;
     parsed.noteTypes.forEach((type) => {
       if (!type || typeof type.id !== "string" || typeof type.label !== "string" || typeof type.color !== "string") {
         return;
       }
-      if (BUILTIN_NOTE_TYPES.some((item) => item.id === type.id)) return;
-      if (customNoteTypes.some((item) => item.id === type.id)) return;
-      customNoteTypes.push({ id: type.id, label: type.label, color: type.color });
+      if (BUILTIN_NOTE_TYPES.some((item) => item.id === type.id)) {
+        noteTypeIdMap.set(type.id, type.id);
+        return;
+      }
+      const byLabelAndColor = getAllNoteTypes().find(
+        (item) => normalizeKey(item.label) === normalizeKey(type.label) && normalizeKey(item.color) === normalizeKey(type.color),
+      );
+      if (byLabelAndColor) {
+        noteTypeIdMap.set(type.id, byLabelAndColor.id);
+        return;
+      }
+      const idAlreadyExists = getAllNoteTypes().some((item) => item.id === type.id);
+      const importedType = idAlreadyExists
+        ? createCustomNoteType(type.label, type.color)
+        : { id: type.id, label: type.label.trim(), color: type.color };
+      if (!importedType) return;
+      if (!idAlreadyExists) {
+        customNoteTypes.push(importedType);
+      }
+      noteTypesChanged = true;
+      noteTypeIdMap.set(type.id, importedType.id);
     });
-    saveCustomNoteTypes();
+    if (noteTypesChanged) {
+      saveCustomNoteTypes();
+    }
+  }
+
+  if (Array.isArray(parsed.archetypes)) {
+    let archetypesChanged = false;
+    parsed.archetypes.forEach((archetype) => {
+      if (!archetype || typeof archetype.id !== "string" || typeof archetype.label !== "string") return;
+      const existingByName = getAllArchetypes().find(
+        (item) => normalizeKey(item.label) === normalizeKey(archetype.label),
+      );
+      if (existingByName) {
+        archetypeIdMap.set(archetype.id, existingByName.id);
+        return;
+      }
+      const baseId = `custom_${slugifyTitle(archetype.label)}`;
+      let id = getAllArchetypes().some((item) => item.id === archetype.id) ? baseId : archetype.id;
+      let suffix = 2;
+      while (getAllArchetypes().some((item) => item.id === id)) {
+        id = `${baseId}_${suffix}`;
+        suffix += 1;
+      }
+      customArchetypes.push({
+        id,
+        icon: typeof archetype.icon === "string" ? archetype.icon : "✨",
+        label: archetype.label.trim(),
+      });
+      archetypesChanged = true;
+      archetypeIdMap.set(archetype.id, id);
+    });
+    if (archetypesChanged) {
+      saveCustomArchetypes();
+    }
   }
   const title = typeof parsed.title === "string" && parsed.title.trim() ? parsed.title.trim() : "Imported Board";
   const phaseCount = structure.phases.length;
   const notes = parsed.notes.map((note, index) => {
     const column = Number.isInteger(note.column) ? note.column : 0;
+    const importedKind = note.kind || "plot";
+    const importedArchetype = note.archetype || "none";
     return {
       id: index + 1,
-      kind: note.kind || "plot",
+      kind: noteTypeIdMap.get(importedKind) || importedKind,
       column: Math.max(0, Math.min(column, phaseCount - 1)),
       order: Number.isInteger(note.order) ? note.order : index,
       text: note.text || "",
       characterName: note.characterName || "",
-      archetype: note.archetype || "none",
+      archetype: archetypeIdMap.get(importedArchetype) || importedArchetype,
       customHeight: Number.isFinite(note.customHeight) ? note.customHeight : undefined,
       collapsed: Boolean(note.collapsed),
     };

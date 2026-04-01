@@ -234,6 +234,12 @@ h1 {
   margin-top: 10px;
 }
 
+.home-dev-reset {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 14px;
+}
+
 .create-board-form input {
   grid-column: 1 / -1;
   border: 1px solid var(--line);

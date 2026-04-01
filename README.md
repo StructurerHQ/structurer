@@ -40,6 +40,7 @@ The web version keeps your work private in your browser `localStorage`: no user 
 ## Pre-Built Structures
 
 - Hero's Journey
+- Hero with a Thousand Faces
 - Three-Act Structure
 - Save the Cat
 - Story Circle
@@ -52,6 +53,7 @@ You can also create and save your own custom structures directly in the dashboar
 ## Included Demos
 
 - Hero's Journey -> The Matrix
+- Hero with a Thousand Faces -> The Odyssey
 - Three-Act Structure -> Jurassic Park
 - Save the Cat -> Back to the Future
 - Story Circle -> Finding Nemo
@@ -106,7 +108,7 @@ All data is stored in browser `localStorage`:
 - boards: `structurer.boards.v1`
 - UI settings (column width, wrap mode): `structurer.settings.v1`
 - custom structures: `structurer.customStructures.v1`
-- optional dev reset flag: `activate.reset`
+- optional dev reset flag: `activate.reset` (legacy alias supported: `activate-reset`)
 
 No backend is currently used.
 
@@ -117,6 +119,11 @@ No backend is currently used.
 - For suggestions or feature requests, drop me a line.
 
 ## History
+
+**1.4.0**
+- Added a new pre-built structure: Hero with a Thousand Faces (Campbell monomyth phases).
+- Added a new demo board: The Odyssey (Hero with a Thousand Faces).
+- Simplified demo board titles by removing redundant structure names in parentheses (structure is already shown in board metadata).
 
 **1.3.0**
 - Added board rename action from dashboard board actions modal.
