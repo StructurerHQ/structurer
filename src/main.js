@@ -67,6 +67,8 @@ const groupView = document.querySelector("#group-view");
 const editorView = document.querySelector("#editor-view");
 const groupsList = document.querySelector("#groups-list");
 const boardsList = document.querySelector("#boards-list");
+const dashboardGroupsHeading = document.querySelector("#dashboard-groups-heading");
+const dashboardBoardsHeading = document.querySelector("#dashboard-boards-heading");
 const emptyState = document.querySelector("#empty-state");
 const createBoardForm = document.querySelector("#create-board-form");
 const boardTitleInput = document.querySelector("#board-title");
@@ -689,6 +691,12 @@ function renderHome() {
     .join("");
   if (homeListControlsEl) {
     boardsList.appendChild(homeListControlsEl);
+  }
+  if (dashboardGroupsHeading) {
+    dashboardGroupsHeading.classList.toggle("hidden", sortedGroups.length === 0);
+  }
+  if (dashboardBoardsHeading) {
+    dashboardBoardsHeading.classList.toggle("hidden", sortedBoards.length === 0);
   }
   emptyState.style.display = sortedBoards.length === 0 && sortedGroups.length === 0 ? "block" : "none";
   applyDemoVisibilityControl();
