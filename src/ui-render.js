@@ -24,12 +24,6 @@ export function structurePhaseRowTemplate(index, value = "") {
   `;
 }
 
-export function kindLabel(kind) {
-  if (kind === "plot") return "Plot";
-  if (kind === "character") return "Character";
-  return "Theme";
-}
-
 export function boardCardTemplate(board, structureName, updatedAtText) {
   const noteCount = board.notes.length;
   return `
@@ -51,7 +45,7 @@ export function boardCardTemplate(board, structureName, updatedAtText) {
   `;
 }
 
-export function noteTemplate(note, archetypes, archetype) {
+export function noteTemplate(note, archetypes, archetype, noteType) {
   const collapsed = Boolean(note.collapsed);
   const textPreview = (note.text || "").trim();
   const collapsedPreview =
@@ -88,15 +82,15 @@ export function noteTemplate(note, archetypes, archetype) {
       : "";
 
   return `
-    <article class="note ${collapsed ? "is-collapsed" : ""}" data-id="${note.id}" data-kind="${note.kind}" draggable="true">
+    <article class="note ${collapsed ? "is-collapsed" : ""}" data-id="${note.id}" data-kind="${note.kind}" draggable="true" style="--note-bg: ${
+    noteType?.color || "#f3f4f6"
+  };">
       <div class="note-head">
-        <button class="collapse-toggle" data-role="toggle-collapse" title="${
-          collapsed ? "Expand note" : "Collapse note"
-        }">${collapsed ? "▾" : "▴"}</button>
+        <button class="phase-drag" data-role="note-drag-handle" title="Drag note">⋮⋮</button>
         ${
           collapsed
             ? `<div class="collapsed-preview" title="${collapsedPreview}">${collapsedPreview}</div>`
-            : `<span class="badge">${kindLabel(note.kind)} ${
+            : `<span class="badge">${noteType?.label || "Note"} ${
                 note.kind === "character" && archetype.icon ? archetype.icon : ""
               }</span>`
         }
@@ -119,18 +113,25 @@ export function noteTemplate(note, archetypes, archetype) {
   `;
 }
 
-export function columnMenuTemplate(columnIndex, archetypes) {
+export function columnMenuTemplate(columnIndex, archetypes, noteTypes) {
+  const nonCharacterTypes = noteTypes.filter((type) => type.id !== "character");
+  const hasCharacter = noteTypes.some((type) => type.id === "character");
   return `
     <div class="column-menu hidden" data-role="column-menu">
-      <button class="menu-item" data-role="quick-add" data-kind="plot" data-column="${columnIndex}">
-        Add plot note
-      </button>
-      <button class="menu-item" data-role="quick-add" data-kind="theme" data-column="${columnIndex}">
-        Add theme note
-      </button>
-      <button class="menu-item" data-role="toggle-character-submenu">
+      ${nonCharacterTypes
+        .map(
+          (type) => `<button class="menu-item" data-role="quick-add" data-kind="${type.id}" data-column="${columnIndex}">
+        Add ${type.label.toLowerCase()} note
+      </button>`,
+        )
+        .join("")}
+      ${
+        hasCharacter
+          ? `<button class="menu-item" data-role="toggle-character-submenu">
         Add character note ▸
-      </button>
+      </button>`
+          : ""
+      }
       <div class="submenu hidden" data-role="character-submenu">
         <div class="submenu-title">Choose archetype</div>
         ${archetypes
@@ -151,6 +152,9 @@ export function columnMenuTemplate(columnIndex, archetypes) {
           ✨ Define custom archetype...
         </button>
       </div>
+      <button class="menu-item" data-role="define-custom-note-type" data-column="${columnIndex}">
+        🏷️ Define custom note type...
+      </button>
     </div>
   `;
 }

@@ -23,12 +23,18 @@ The web version keeps your work private in your browser `localStorage`: no user 
 - Structure-driven boards with variable phase count
 - Quick-add note menu on each phase
 - Character notes with archetype selection
-- Drag-and-drop notes across columns and within the same column
+- Drag-and-drop notes across columns and within the same column (via drag handle)
+- Drag-and-drop phase reordering per board (via drag handle)
+- Live drag preview with visible drop placeholders for both notes and phases
+- Reset phase order to the original structure order
 - Open a board by clicking its tile (desktop and mobile)
+- Rename board from dashboard board actions
 - Export a board to JSON and import saved boards from JSON
+- Note collapse/expand with one-line preview (double click header), including persisted collapsed state
 - Options menu:
   - Resize all columns with a slider
   - Toggle wrapped columns (multi-row) vs horizontal scroll
+  - Reset phase order
 - Persistence via `localStorage`
 
 ## Pre-Built Structures
@@ -116,6 +122,8 @@ No backend is currently used.
 - Added board rename action from dashboard board actions modal.
 - Added note collapse/expand with single-line preview and persisted collapsed state.
 - Included collapsed state in board import/export payloads.
+- Added phase drag-and-drop reordering per board with reset-to-default action.
+- Added drag handles for notes/phases and clearer live drop placeholders during dragging.
 
 **1.2.0**
 - Reorganized project structure by introducing `src/` entrypoints (`/src/main.js`, `/src/styles.css`).

@@ -1,8 +1,10 @@
 import { prepare, layout } from "@chenglou/pretext";
 import {
+  BUILTIN_NOTE_TYPES,
   BUILTIN_ARCHETYPES,
   BUILTIN_STRUCTURES,
   CUSTOM_ARCHETYPES_KEY,
+  CUSTOM_NOTE_TYPES_KEY,
   CUSTOM_STRUCTURES_KEY,
   DEFAULT_COLUMN_WIDTH,
   DEV_RESET_FLAG_KEY,
@@ -14,10 +16,12 @@ import { DEMO_BOARD_DATA } from "./demo-boards";
 import {
   clearKeys,
   isFlagEnabled,
+  loadJsonItem,
   loadBoards as loadBoardsFromStorage,
   loadCustomArchetypes as loadCustomArchetypesFromStorage,
   loadCustomStructures as loadCustomStructuresFromStorage,
   loadSettings as loadSettingsFromStorage,
+  saveJsonItem,
   saveBoards as saveBoardsToStorage,
   saveCustomArchetypes as saveCustomArchetypesToStorage,
   saveCustomStructures as saveCustomStructuresToStorage,
@@ -26,7 +30,6 @@ import {
 import {
   boardCardTemplate,
   columnMenuTemplate,
-  kindLabel,
   noteTemplate,
   renderStructureOptionsHtml,
   structurePhaseRowTemplate,
@@ -37,10 +40,15 @@ let boards = loadedBoards || [];
 let currentBoardId = null;
 let draggedNoteId = null;
 let draggedPhaseIndex = null;
+let armedNoteDragId = null;
+let noteDropPreview = null;
+let phaseDropPreviewIndex = null;
 let resizingNoteId = null;
 let boardActionsModalBoardId = null;
 let customStructures = loadCustomStructures();
 let customArchetypes = loadCustomArchetypes();
+let customNoteTypes = loadCustomNoteTypes();
+let pendingNoteTypeColorResolve = null;
 const initialSettings = loadSettings();
 let columnMinWidth = initialSettings.columnMinWidth ?? DEFAULT_COLUMN_WIDTH;
 let wrapColumns = initialSettings.wrapColumns ?? true;
@@ -78,6 +86,9 @@ const resizeModalOverlay = document.querySelector("#resize-modal-overlay");
 const closeResizeModalBtn = document.querySelector("#close-resize-modal");
 const columnWidthSlider = document.querySelector("#column-width-slider");
 const columnWidthValue = document.querySelector("#column-width-value");
+const noteTypeColorModalOverlay = document.querySelector("#note-type-color-modal-overlay");
+const noteTypeColorGrid = document.querySelector("#note-type-color-grid");
+const cancelNoteTypeColorBtn = document.querySelector("#cancel-note-type-color");
 const goDashboardBtn = document.querySelector("#go-dashboard");
 
 const boardEl = document.querySelector("#board");
@@ -129,6 +140,104 @@ function getAllStructureList() {
 
 function getAllArchetypes() {
   return [...BUILTIN_ARCHETYPES, ...customArchetypes];
+}
+
+function loadCustomNoteTypes() {
+  const parsed = loadJsonItem(CUSTOM_NOTE_TYPES_KEY, []);
+  if (!Array.isArray(parsed)) return [];
+  return parsed.filter(
+    (item) =>
+      item &&
+      typeof item.id === "string" &&
+      typeof item.label === "string" &&
+      typeof item.color === "string",
+  );
+}
+
+function saveCustomNoteTypes() {
+  saveJsonItem(CUSTOM_NOTE_TYPES_KEY, customNoteTypes);
+}
+
+function getAllNoteTypes() {
+  return [...BUILTIN_NOTE_TYPES, ...customNoteTypes];
+}
+
+function noteTypeById(id) {
+  return (
+    getAllNoteTypes().find((item) => item.id === id) || {
+      id,
+      label: String(id || "note")
+        .replace(/_/g, " ")
+        .replace(/\b\w/g, (c) => c.toUpperCase()),
+      color: "#f3f4f6",
+    }
+  );
+}
+
+function getNoteTypeColorPalette() {
+  return [
+    "#fde68a",
+    "#fecaca",
+    "#c7d2fe",
+    "#bbf7d0",
+    "#fed7aa",
+    "#fbcfe8",
+    "#d9f99d",
+    "#bae6fd",
+    "#e9d5ff",
+    "#f5d0fe",
+    "#fdba74",
+    "#a7f3d0",
+  ];
+}
+
+function getUsedNoteTypeColors() {
+  return new Set(getAllNoteTypes().map((item) => String(item.color || "").toLowerCase()));
+}
+
+function createCustomNoteType(label, color) {
+  const trimmed = label.trim();
+  if (!trimmed) return null;
+  const baseId = `custom_${slugifyTitle(trimmed)}`;
+  let id = baseId;
+  let suffix = 2;
+  while (getAllNoteTypes().some((item) => item.id === id)) {
+    id = `${baseId}_${suffix}`;
+    suffix += 1;
+  }
+  const noteType = {
+    id,
+    label: trimmed,
+    color: color || "#f3f4f6",
+  };
+  customNoteTypes.push(noteType);
+  saveCustomNoteTypes();
+  return noteType;
+}
+
+function openNoteTypeColorPicker() {
+  if (!noteTypeColorModalOverlay || !noteTypeColorGrid) return Promise.resolve(null);
+  const palette = getNoteTypeColorPalette();
+  const used = getUsedNoteTypeColors();
+  const available = palette.filter((color) => !used.has(color.toLowerCase()));
+  const choices = available.length > 0 ? available : palette;
+  noteTypeColorGrid.innerHTML = choices
+    .map(
+      (color, index) => `<button
+      type="button"
+      class="color-swatch ${index === 0 ? "selected" : ""}"
+      data-role="pick-note-type-color"
+      data-color="${color}"
+      aria-label="Choose color ${color}"
+      title="${color}"
+      style="background:${color};"
+    ></button>`,
+    )
+    .join("");
+  noteTypeColorModalOverlay.classList.remove("hidden");
+  return new Promise((resolve) => {
+    pendingNoteTypeColorResolve = resolve;
+  });
 }
 
 function isDevResetEnabled() {
@@ -333,6 +442,7 @@ function renderEditor() {
   const structure = getStructureConfig(board.structureId);
   const phases = getBoardPhases(board);
   const archetypes = getAllArchetypes();
+  const noteTypes = getAllNoteTypes();
 
   editorTitle.textContent = board.title;
   structureNameEl.textContent = structure.name;
@@ -347,10 +457,12 @@ function renderEditor() {
             <h2 class="phase-title">${formatPhaseTitle(phase)}</h2>
           </div>
           <button class="phase-add" data-role="open-column-menu" title="Add note">+</button>
-          ${columnMenuTemplate(columnIndex, archetypes)}
+          ${columnMenuTemplate(columnIndex, archetypes, noteTypes)}
         </div>
         <div class="notes">${noteItems
-          .map((note) => noteTemplate(note, archetypes, archetypeById(note.archetype || "none")))
+          .map((note) =>
+            noteTemplate(note, archetypes, archetypeById(note.archetype || "none"), noteTypeById(note.kind)),
+          )
           .join("")}</div>
       </section>
     `;
@@ -383,9 +495,9 @@ function renderInsights(note) {
       ? `Archetype: ${archetypeById(note.archetype || "none").label}`
       : "Archetype: -";
 
-  insightsEl.textContent = `Note #${note.id} | Type: ${kindLabel(
-    note.kind,
-  )} | Estimated lines: ${metrics.lineCount} | Estimated height: ${Math.round(
+  insightsEl.textContent = `Note #${note.id} | Type: ${noteTypeById(note.kind).label} | Estimated lines: ${
+    metrics.lineCount
+  } | Estimated height: ${Math.round(
     metrics.height,
   )}px | ${archetypeText}`;
 }
@@ -483,6 +595,7 @@ function boardToExportPayload(board) {
     title: board.title,
     structure: structure.name,
     phaseOrder: getBoardPhaseOrder(board),
+    noteTypes: getAllNoteTypes(),
     notes: [...board.notes]
       .sort((a, b) => (a.column - b.column) || ((a.order || 0) - (b.order || 0)))
       .map((note) => ({
@@ -530,6 +643,17 @@ function importBoardFromJson(rawText) {
 
   const structureEntry = getAllStructureList().find((item) => item.name === parsed.structure);
   const structure = structureEntry || BUILTIN_STRUCTURES.hero_journey;
+  if (Array.isArray(parsed.noteTypes)) {
+    parsed.noteTypes.forEach((type) => {
+      if (!type || typeof type.id !== "string" || typeof type.label !== "string" || typeof type.color !== "string") {
+        return;
+      }
+      if (BUILTIN_NOTE_TYPES.some((item) => item.id === type.id)) return;
+      if (customNoteTypes.some((item) => item.id === type.id)) return;
+      customNoteTypes.push({ id: type.id, label: type.label, color: type.color });
+    });
+    saveCustomNoteTypes();
+  }
   const title = typeof parsed.title === "string" && parsed.title.trim() ? parsed.title.trim() : "Imported Board";
   const phaseCount = structure.phases.length;
   const notes = parsed.notes.map((note, index) => {
@@ -637,6 +761,48 @@ function getDropIndex(notesContainer, pointerY) {
     if (pointerY < rect.top + rect.height / 2) return index;
   }
   return candidateNotes.length;
+}
+
+function clearNoteDropPreview() {
+  noteDropPreview = null;
+  boardEl.querySelectorAll(".note-drop-placeholder").forEach((el) => el.remove());
+}
+
+function renderNoteDropPreview(columnEl, targetIndex) {
+  const notesContainer = columnEl.querySelector(".notes");
+  if (!notesContainer) return;
+  notesContainer.querySelectorAll(".note-drop-placeholder").forEach((el) => el.remove());
+  const placeholder = document.createElement("div");
+  placeholder.className = "note-drop-placeholder";
+  const noteNodes = [...notesContainer.querySelectorAll(".note")].filter(
+    (noteEl) => Number(noteEl.dataset.id) !== draggedNoteId,
+  );
+  if (targetIndex >= noteNodes.length) {
+    notesContainer.appendChild(placeholder);
+  } else {
+    notesContainer.insertBefore(placeholder, noteNodes[targetIndex]);
+  }
+}
+
+function clearPhaseDropPreview() {
+  phaseDropPreviewIndex = null;
+  const placeholder = boardEl.querySelector(".phase-drop-placeholder");
+  if (placeholder) placeholder.remove();
+}
+
+function renderPhaseDropPreview(insertionIndex) {
+  const realColumns = [...boardEl.querySelectorAll(".column")];
+  let placeholder = boardEl.querySelector(".phase-drop-placeholder");
+  if (!placeholder) {
+    placeholder = document.createElement("section");
+    placeholder.className = "phase-drop-placeholder";
+  }
+  const cappedIndex = Math.max(0, Math.min(insertionIndex, realColumns.length));
+  if (cappedIndex >= realColumns.length) {
+    boardEl.appendChild(placeholder);
+  } else {
+    boardEl.insertBefore(placeholder, realColumns[cappedIndex]);
+  }
 }
 
 function moveNote(noteId, targetColumn, targetIndex) {
@@ -782,6 +948,29 @@ importBoardInput.addEventListener("change", async (event) => {
   }
 });
 
+if (noteTypeColorGrid) {
+  noteTypeColorGrid.addEventListener("click", (event) => {
+    const btn = event.target.closest('[data-role="pick-note-type-color"]');
+    if (!btn || !pendingNoteTypeColorResolve) return;
+    const picked = btn.dataset.color;
+    noteTypeColorModalOverlay.classList.add("hidden");
+    const resolve = pendingNoteTypeColorResolve;
+    pendingNoteTypeColorResolve = null;
+    resolve(picked);
+  });
+}
+
+if (cancelNoteTypeColorBtn) {
+  cancelNoteTypeColorBtn.addEventListener("click", () => {
+    noteTypeColorModalOverlay.classList.add("hidden");
+    if (pendingNoteTypeColorResolve) {
+      const resolve = pendingNoteTypeColorResolve;
+      pendingNoteTypeColorResolve = null;
+      resolve(null);
+    }
+  });
+}
+
 closeBoardActionsModalBtn.addEventListener("click", () => {
   closeBoardActionsModal();
 });
@@ -866,7 +1055,7 @@ resetAppDataBtn.addEventListener("click", () => {
   );
   if (!confirmed) return;
 
-  clearKeys([STORAGE_KEY, SETTINGS_KEY, CUSTOM_STRUCTURES_KEY, CUSTOM_ARCHETYPES_KEY]);
+  clearKeys([STORAGE_KEY, SETTINGS_KEY, CUSTOM_STRUCTURES_KEY, CUSTOM_ARCHETYPES_KEY, CUSTOM_NOTE_TYPES_KEY]);
   window.location.assign(HOME_ROUTE);
 });
 
@@ -961,6 +1150,19 @@ boardEl.addEventListener("click", (event) => {
     return;
   }
 
+  if (target.dataset.role === "define-custom-note-type") {
+    const newName = window.prompt("Custom note type name:");
+    if (!newName) return;
+    openNoteTypeColorPicker().then((pickedColor) => {
+      if (!pickedColor) return;
+      const createdType = createCustomNoteType(newName, pickedColor);
+      if (!createdType) return;
+      addNote(createdType.id, Number(target.dataset.column));
+    });
+    closeAllColumnMenus();
+    return;
+  }
+
   const noteEl = target.closest(".note");
   const board = getCurrentBoard();
   if (!noteEl || !board) return;
@@ -968,14 +1170,6 @@ boardEl.addEventListener("click", (event) => {
   const id = Number(noteEl.dataset.id);
   const note = board.notes.find((item) => item.id === id);
   if (!note) return;
-
-  if (target.dataset.role === "toggle-collapse") {
-    note.collapsed = !note.collapsed;
-    touchBoard(board);
-    renderEditor();
-    renderInsights(note);
-    return;
-  }
 
   if (target.dataset.role === "delete") {
     board.notes = board.notes.filter((item) => item.id !== id);
@@ -1014,6 +1208,19 @@ boardEl.addEventListener("dragstart", (event) => {
     event.dataTransfer.setData("text/plain", `phase:${draggedPhaseIndex}`);
     return;
   }
+  if (target.closest(".note")) {
+    const noteEl = target.closest(".note");
+    const noteId = Number(noteEl?.dataset.id);
+    if (Number.isInteger(noteId) && armedNoteDragId === noteId) {
+      draggedNoteId = noteId;
+      noteEl.classList.add("is-dragging");
+      event.dataTransfer.effectAllowed = "move";
+      event.dataTransfer.setData("text/plain", String(draggedNoteId));
+      return;
+    }
+    event.preventDefault();
+    return;
+  }
   if (target.closest("textarea, input, select, button")) {
     event.preventDefault();
     return;
@@ -1030,9 +1237,18 @@ boardEl.addEventListener("dragstart", (event) => {
 boardEl.addEventListener("dragover", (event) => {
   if (draggedPhaseIndex !== null) {
     const columnEl = event.target.closest(".column");
-    if (!columnEl) return;
+    const placeholderEl = event.target.closest(".phase-drop-placeholder");
+    if (!columnEl && !placeholderEl) return;
     event.preventDefault();
     event.dataTransfer.dropEffect = "move";
+    if (!columnEl) return;
+    const rect = columnEl.getBoundingClientRect();
+    const targetColumn = Number(columnEl.dataset.column);
+    const insertionIndex = targetColumn + (event.clientX > rect.left + rect.width / 2 ? 1 : 0);
+    if (phaseDropPreviewIndex !== insertionIndex) {
+      phaseDropPreviewIndex = insertionIndex;
+      renderPhaseDropPreview(insertionIndex);
+    }
     return;
   }
   if (draggedNoteId === null) return;
@@ -1040,18 +1256,38 @@ boardEl.addEventListener("dragover", (event) => {
   if (!columnEl) return;
   event.preventDefault();
   event.dataTransfer.dropEffect = "move";
+  const notesContainer = columnEl.querySelector(".notes");
+  if (!notesContainer) return;
+  const targetIndex = getDropIndex(notesContainer, event.clientY);
+  const targetColumn = Number(columnEl.dataset.column);
+  if (
+    !noteDropPreview ||
+    noteDropPreview.column !== targetColumn ||
+    noteDropPreview.index !== targetIndex
+  ) {
+    noteDropPreview = { column: targetColumn, index: targetIndex };
+    renderNoteDropPreview(columnEl, targetIndex);
+  }
 });
 
 boardEl.addEventListener("drop", (event) => {
   if (draggedPhaseIndex !== null) {
     const columnEl = event.target.closest(".column");
-    if (!columnEl) return;
+    const placeholderEl = event.target.closest(".phase-drop-placeholder");
+    if (!columnEl && !placeholderEl) return;
     event.preventDefault();
-    const targetColumn = Number(columnEl.dataset.column);
+    const structure = getStructureConfig(getCurrentBoard()?.structureId || "hero_journey");
+    const phaseCount = structure.phases.length;
+    const insertionIndex =
+      phaseDropPreviewIndex === null
+        ? Number(columnEl?.dataset.column || 0)
+        : phaseDropPreviewIndex;
+    const targetColumn = insertionIndex > draggedPhaseIndex ? insertionIndex - 1 : insertionIndex;
     const board = getCurrentBoard();
     if (!board) return;
-    reorderPhaseAndNotes(board, draggedPhaseIndex, targetColumn);
+    reorderPhaseAndNotes(board, draggedPhaseIndex, Math.max(0, Math.min(targetColumn, phaseCount - 1)));
     draggedPhaseIndex = null;
+    clearPhaseDropPreview();
     touchBoard(board);
     renderEditor();
     renderInsights(null);
@@ -1064,13 +1300,14 @@ boardEl.addEventListener("drop", (event) => {
   if (!notesContainer) return;
   event.preventDefault();
 
-  const targetColumn = Number(columnEl.dataset.column);
-  const targetIndex = getDropIndex(notesContainer, event.clientY);
+  const targetColumn = noteDropPreview ? noteDropPreview.column : Number(columnEl.dataset.column);
+  const targetIndex = noteDropPreview ? noteDropPreview.index : getDropIndex(notesContainer, event.clientY);
   moveNote(draggedNoteId, targetColumn, targetIndex);
 
   const board = getCurrentBoard();
   const movedNote = board ? board.notes.find((note) => note.id === draggedNoteId) : null;
   draggedNoteId = null;
+  clearNoteDropPreview();
   if (board) touchBoard(board);
   renderEditor();
   renderInsights(movedNote || null);
@@ -1079,11 +1316,20 @@ boardEl.addEventListener("drop", (event) => {
 boardEl.addEventListener("dragend", () => {
   draggedNoteId = null;
   draggedPhaseIndex = null;
+  armedNoteDragId = null;
+  clearNoteDropPreview();
+  clearPhaseDropPreview();
   boardEl.querySelectorAll(".note.is-dragging").forEach((note) => note.classList.remove("is-dragging"));
 });
 
 boardEl.addEventListener("mousedown", (event) => {
   const target = event.target;
+  if (target.closest('[data-role="note-drag-handle"]')) {
+    const noteEl = target.closest(".note");
+    armedNoteDragId = Number(noteEl?.dataset.id);
+  } else {
+    armedNoteDragId = null;
+  }
   if (target.matches('textarea[data-role="text"]')) {
     resizingNoteId = Number(target.dataset.noteId);
   }
@@ -1112,6 +1358,7 @@ document.addEventListener("click", (event) => {
 
 document.addEventListener("mouseup", () => {
   resizingNoteId = null;
+  armedNoteDragId = null;
 });
 
 resizeModalOverlay.addEventListener("click", (event) => {
