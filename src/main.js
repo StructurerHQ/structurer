@@ -760,13 +760,13 @@ function groupCardTemplate(group) {
       ? `<ul class="group-board-list">${boardTitles
           .map((title) => `<li class="group-board-list-item">${escapeHtml(title)}</li>`)
           .join("")}</ul>`
-      : `<div class="board-meta-line">No boards yet</div>`;
+      : `<div class="board-meta-line">No stories yet</div>`;
   return `
     <article class="board-card" data-group-id="${group.id}" role="button" tabindex="0" aria-label="Open group ${group.title}">
       <div>
         <strong>${group.title}</strong>
         <div class="board-meta">
-          <div class="board-meta-line">Group • ${group.boardIds.length} boards</div>
+          <div class="board-meta-line">Group • ${group.boardIds.length} stories</div>
           ${boardListHtml}
           <div class="board-meta-line">Updated ${formatDate(group.updatedAt)}</div>
         </div>
@@ -983,7 +983,7 @@ function renderGroup() {
   if (!group) return;
   const groupBoards = group.boardIds.map((id) => boards.find((board) => board.id === id)).filter(Boolean);
   groupTitleEl.textContent = group.title;
-  groupSubtitleEl.textContent = `${groupBoards.length} boards`;
+  groupSubtitleEl.textContent = `${groupBoards.length} stories`;
   groupBoardStackEl.innerHTML = groupBoards
     .map((board) => {
       const structure = getStructureConfig(board.structureId);
@@ -996,7 +996,7 @@ function renderGroup() {
             <p class="subtitle">${structure.name}</p>
           </div>
           <div class="group-board-head-actions">
-            <button class="ghost-button" data-role="open-board-from-group" data-board-id="${board.id}" type="button">Edit board</button>
+            <button class="ghost-button" data-role="open-board-from-group" data-board-id="${board.id}" type="button">Edit story</button>
           </div>
         </header>
         <section class="board wrap-columns group-board-preview">
@@ -1139,7 +1139,7 @@ function createDemoBoardFromJson(demoData) {
   return {
     id: crypto.randomUUID(),
     uid: typeof demoData.uid === "string" ? demoData.uid : generateUniqueUid(),
-    title: demoData.title || "Demo Board",
+    title: demoData.title || "Demo Story",
     slug: ensureUniqueSlug(slugifyTitle(demoData.title || "demo_board")),
     structureId: structure.id,
     structure: structure.name,
@@ -1244,7 +1244,7 @@ function downloadBoard(board) {
   const payload = boardToExportPayload(board);
   const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
   const url = URL.createObjectURL(blob);
-  const filename = `${slugifyTitle(board.title || "board")}.json`;
+  const filename = `${slugifyTitle(board.title || "story")}.json`;
   const link = document.createElement("a");
   link.href = url;
   link.download = filename;
@@ -1275,7 +1275,7 @@ function openBoardActionsModal(boardId) {
     if (groups.length === 0) {
       modalAddBoardToGroupBtn.title = "Create a group first";
     } else if (eligible.length === 0) {
-      modalAddBoardToGroupBtn.title = "This board is already in every group";
+      modalAddBoardToGroupBtn.title = "This story is already in every group";
     } else {
       modalAddBoardToGroupBtn.title = "";
     }
@@ -1316,7 +1316,7 @@ function openAddBoardToGroupModal(boardId) {
     if (introEl) introEl.classList.add("hidden");
     if (emptyEl) {
       emptyEl.textContent =
-        "This board is already in every group. Create a new group from the dashboard, or remove the board from a group first.";
+        "This story is already in every group. Create a new group from the dashboard, or remove the story from a group first.";
       emptyEl.classList.remove("hidden");
     }
   } else {
@@ -1328,7 +1328,7 @@ function openAddBoardToGroupModal(boardId) {
       .map(
         (group) => `
     <button type="button" class="ghost-button group-picker-item" data-group-id="${group.id}">
-      ${escapeHtml(group.title)} <span class="board-meta">(${group.boardIds.length} boards)</span>
+      ${escapeHtml(group.title)} <span class="board-meta">(${group.boardIds.length} stories)</span>
     </button>`,
       )
       .join("");
@@ -1364,12 +1364,12 @@ function openPhaseOrderConflictModal(payload) {
       })
       .join("");
 
-  phaseOrderConflictTitleEl.textContent = payload?.boardTitle ? `Board: ${payload.boardTitle}` : "";
+  phaseOrderConflictTitleEl.textContent = payload?.boardTitle ? `Story: ${payload.boardTitle}` : "";
   phaseOrderCurrentListEl.innerHTML = renderList(currentOrder, firstMismatchIndex);
   phaseOrderImportedListEl.innerHTML = renderList(importedOrder, firstMismatchIndex);
   if (phaseOrderConflictHintEl) {
     phaseOrderConflictHintEl.textContent =
-      "Please manually align the current board phase order, then repeat the import.";
+      "Please manually align the current story phase order, then repeat the import.";
   }
   phaseOrderConflictModalOverlay.classList.remove("hidden");
 }
@@ -1377,7 +1377,7 @@ function openPhaseOrderConflictModal(payload) {
 function importBoardFromJson(rawText) {
   const parsed = JSON.parse(rawText);
   if (!parsed || typeof parsed !== "object" || !Array.isArray(parsed.notes)) {
-    throw new Error("Invalid board JSON format.");
+    throw new Error("Invalid story JSON format.");
   }
 
   const normalizeKey = (value) => String(value || "").trim().toLowerCase().replace(/\s+/g, " ");
@@ -1458,7 +1458,8 @@ function importBoardFromJson(rawText) {
       saveCustomArchetypes();
     }
   }
-  const title = typeof parsed.title === "string" && parsed.title.trim() ? parsed.title.trim() : "Imported Board";
+  const title =
+    typeof parsed.title === "string" && parsed.title.trim() ? parsed.title.trim() : "Imported Story";
   const importedBoardUpdatedAt = Number.isFinite(parsed.updatedAt) ? parsed.updatedAt : Date.now();
   const phaseCount = structure.phases.length;
   const importedPhaseOrder = isValidPhaseOrder(parsed.phaseOrder, structure.phases.length)
@@ -1491,7 +1492,7 @@ function importBoardFromJson(rawText) {
     const existingPhaseOrder = getBoardPhaseOrder(existingByUid);
     if (existingByUid.structureId !== structure.id) {
       throw new Error(
-        `Cannot merge board "${existingByUid.title}": structure mismatch (${existingByUid.structure} vs ${structure.name}).`,
+        `Cannot merge story "${existingByUid.title}": structure mismatch (${existingByUid.structure} vs ${structure.name}).`,
       );
     }
     const sameOrder =
@@ -1499,7 +1500,7 @@ function importBoardFromJson(rawText) {
       existingPhaseOrder.every((value, index) => value === importedPhaseOrder[index]);
     if (!sameOrder) {
       const structurePhases = getStructureConfig(existingByUid.structureId).phases;
-      const error = new Error(`Cannot merge board "${existingByUid.title}" because phase order differs.`);
+      const error = new Error(`Cannot merge story "${existingByUid.title}" because phase order differs.`);
       error.code = "PHASE_ORDER_CONFLICT";
       error.phaseOrderConflict = {
         boardTitle: existingByUid.title,
@@ -1755,12 +1756,16 @@ importBoardInput.addEventListener("change", async (event) => {
   try {
     const text = await file.text();
     importBoardFromJson(text);
-    window.alert("Board imported successfully.");
+    window.alert("Story imported successfully.");
   } catch (error) {
     if (error instanceof Error && error.code === "PHASE_ORDER_CONFLICT" && error.phaseOrderConflict) {
       openPhaseOrderConflictModal(error.phaseOrderConflict);
     } else {
-      window.alert(error instanceof Error ? error.message : "Import failed. Please use a valid Structurer board JSON.");
+      window.alert(
+        error instanceof Error
+          ? error.message
+          : "Import failed. Please use a valid Structurer story JSON.",
+      );
     }
   } finally {
     importBoardInput.value = "";
@@ -1907,7 +1912,7 @@ if (modalRenameBoardBtn) {
   modalRenameBoardBtn.addEventListener("click", () => {
     const board = boards.find((item) => item.id === boardActionsModalBoardId);
     if (!board) return;
-    const nextTitle = window.prompt("Rename board:", board.title);
+    const nextTitle = window.prompt("Rename story:", board.title);
     if (nextTitle === null) return;
     const trimmed = nextTitle.trim();
     if (!trimmed) return;
@@ -2006,7 +2011,7 @@ if (createGroupForm && createGroupNameInput) {
       (input) => input.value,
     );
     if (checkedIds.length === 0) {
-      window.alert("Select at least one board to include.");
+      window.alert("Select at least one story to include.");
       return;
     }
     const group = {
@@ -2028,7 +2033,7 @@ if (createGroupForm && createGroupNameInput) {
 modalDeleteBoardBtn.addEventListener("click", () => {
   const board = boards.find((item) => item.id === boardActionsModalBoardId);
   if (!board) return;
-  const confirmed = window.confirm(`Delete board "${board.title}"? This action cannot be undone.`);
+  const confirmed = window.confirm(`Delete story "${board.title}"? This action cannot be undone.`);
   if (!confirmed) return;
   const deletedId = board.id;
   boards = boards.filter((item) => item.id !== deletedId);
@@ -2094,7 +2099,7 @@ if (groupViewActionsBtn) {
 resetAppDataBtn.addEventListener("click", () => {
   closeOptionsMenu();
   const confirmed = window.confirm(
-    "Reset all app data? This will delete all boards and settings, then reload the app.",
+    "Reset all app data? This will delete all stories and settings, then reload the app.",
   );
   if (!confirmed) return;
 
@@ -2115,7 +2120,7 @@ if (resetDemoDataBtn) {
   resetDemoDataBtn.addEventListener("click", () => {
     closeOptionsMenu();
     const confirmed = window.confirm(
-      "Reset demo boards only? Your personal boards and custom settings/types/archetypes will be kept.",
+      "Reset demo stories only? Your personal stories and custom settings/types/archetypes will be kept.",
     );
     if (!confirmed) return;
     replaceDemoBoardsOnly();

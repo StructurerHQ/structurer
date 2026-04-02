@@ -1,5 +1,8 @@
 # History
 
+**1.10.0**
+- Renamed Boards to Stories in the user-facing UI (FAQ, dashboard, modals, and commands).
+
 **1.9.4**
 - **Empty phases:** columns with no notes use the same white background as filled columns (instead of a grey fill), and phase titles are no longer muted—so new boards and sparse grids read brighter in the editor and in group preview.
 - **Demo boards:** sample notes using **Subplot**, **Detail**, and **Other** (plus existing plot/character/theme) were added to the Matrix, Odyssey, Finding Nemo, and Jurassic Park demos so new installs and “reset demos” show the expanded palette; **Todo** is omitted there since it models the writer’s own tasks, not in-world story beats.

@@ -2,34 +2,34 @@
 
 Structurer is a lightweight web app to build stories using multiple narrative structures.
 
-It gives you a visual board where phase columns depend on the selected structure, and where you can create, edit, and move color-coded notes (plot, character, theme).
+It gives you a visual story where phase columns depend on the selected structure, and where you can create, edit, and move color-coded notes (plot, character, theme).
 
 ## Use It Online (Private by Design)
 
 If you prefer, you can use Structurer directly online at [structurer.sullo.co](https://structurer.sullo.co/).
 
-The web version keeps your work private in your browser `localStorage`: no user accounts, no server-side database, and no cookies required for board data.
+The web version keeps your work private in your browser `localStorage`: no user accounts, no server-side database, and no cookies required for story data.
 
 ## Current Features
 
 - Landing page with product overview, privacy note, and demo map by structure
-- Dashboard with board list and empty state
-- Create and open multiple boards
-- Choose structure per board at creation time
+- Dashboard with story list and empty state
+- Create and open multiple stories
+- Choose structure per story at creation time
 - Create custom structures (saved locally) with user-defined phase rows
-- Board routes by slug (example: `/gatti_come_spine`)
+- Story routes by slug (example: `/gatti_come_spine`)
 - Home route at `/` (landing)
 - Dashboard route at `/dashboard`
-- Structure-driven boards with variable phase count
+- Structure-driven stories with variable phase count
 - Quick-add note menu on each phase
 - Character notes with archetype selection
 - Drag-and-drop notes across columns and within the same column (via drag handle)
-- Drag-and-drop phase reordering per board (via drag handle)
+- Drag-and-drop phase reordering per story (via drag handle)
 - Live drag preview with visible drop placeholders for both notes and phases
 - Reset phase order to the original structure order
-- Open a board by clicking its tile (desktop and mobile)
-- Rename board from dashboard board actions
-- Export a board to JSON and import saved boards from JSON
+- Open a story by clicking its tile (desktop and mobile)
+- Rename story from dashboard story actions
+- Export a story to JSON and import saved stories from JSON
 - Note collapse/expand with one-line preview (double click header), including persisted collapsed state
 - Options menu:
   - Resize all columns with a slider
@@ -104,7 +104,7 @@ npm run preview
 
 All data is stored in browser `localStorage`:
 
-- boards: `structurer.boards.v1`
+- stories (technical key: `structurer.boards.v1`)
 - UI settings (column width, wrap mode): `structurer.settings.v1`
 - custom structures: `structurer.customStructures.v1`
 - optional dev reset flag: `activate.reset`

@@ -36,7 +36,7 @@ export function boardCardTemplate(board, structureName, updatedAtText) {
         </div>
       </div>
       <div class="board-actions">
-        <button type="button" class="action-button" data-role="board-actions" aria-label="Board actions">
+        <button type="button" class="action-button" data-role="board-actions" aria-label="Story actions">
           <span class="action-icon" aria-hidden="true">⋯</span>
           <span class="action-label">Actions</span>
         </button>

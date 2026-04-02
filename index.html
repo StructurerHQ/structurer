@@ -12,14 +12,14 @@
         <header class="topbar landing-topbar">
           <div class="landing-brand">
             <h1>Structurer</h1>
-            <p class="subtitle">Shape stories with visual narrative boards</p>
+            <p class="subtitle">Shape stories with visual narrative planning maps</p>
           </div>
         </header>
 
         <section class="landing-hero">
           <h2>A private workspace for story structure</h2>
           <p>
-            Structurer helps writers build stories with visual boards, color-coded notes, characters, and narrative
+            Structurer helps writers build stories with visual planning maps, color-coded notes, characters, and narrative
             phases across built-in and custom structures.
           </p>
           <div class="landing-hero-actions">
@@ -38,9 +38,9 @@
               </p>
             </article>
             <article class="landing-card card-neutral">
-              <h3>Portable boards</h3>
+              <h3>Portable stories</h3>
               <p>
-                Export any board as JSON and import it in another browser or computer. Your format is consistent
+                Export any story as JSON and import it in another browser or computer. Your format is consistent
                 across instances of Structurer.
               </p>
             </article>
@@ -82,7 +82,7 @@
         </header>
 
         <section id="empty-state" class="empty-state">
-          <p>No boards yet. Create your first board to start mapping your story.</p>
+          <p>No stories yet. Create your first story to start mapping your story.</p>
         </section>
 
         <section class="dashboard-section">
@@ -90,7 +90,7 @@
           <section id="groups-list" class="boards-list"></section>
         </section>
         <section class="dashboard-section">
-          <h2 id="dashboard-boards-heading" class="dashboard-section-title">Boards</h2>
+          <h2 id="dashboard-boards-heading" class="dashboard-section-title">Stories</h2>
           <section id="boards-list" class="boards-list"></section>
         </section>
         <div class="home-list-controls">
@@ -99,12 +99,12 @@
 
         <details class="home-create collapsible-panel">
           <summary>
-            <h2>Create a new board</h2>
+            <h2>Create a new story</h2>
           </summary>
           <form id="create-board-form" class="create-board-form">
-            <input id="board-title" type="text" maxlength="80" placeholder="Board name" required />
+            <input id="board-title" type="text" maxlength="80" placeholder="Story name" required />
             <select id="board-structure" aria-label="Story structure"></select>
-            <button type="submit">Create board</button>
+            <button type="submit">Create story</button>
           </form>
         </details>
 
@@ -112,7 +112,7 @@
           <summary>
             <h2>Add a structure not listed</h2>
           </summary>
-          <p class="subtitle">Each row is one phase/column in the board.</p>
+          <p class="subtitle">Each row is one phase/column in the story.</p>
           <form id="create-structure-form" class="create-structure-form">
             <input id="structure-name-input" type="text" maxlength="80" placeholder="Structure name" required />
             <div id="structure-phases-list" class="structure-phases-list"></div>
@@ -125,11 +125,11 @@
 
         <details class="home-import collapsible-panel">
           <summary>
-            <h2>Import/merge a saved board</h2>
+            <h2>Import/merge a saved story</h2>
           </summary>
-          <p class="subtitle">Load a board JSON exported from Structurer.</p>
+          <p class="subtitle">Load a story JSON exported from Structurer.</p>
           <div class="import-actions">
-            <button id="import-board-button" class="ghost-button" type="button">Import board</button>
+            <button id="import-board-button" class="ghost-button" type="button">Import story</button>
             <input id="import-board-input" type="file" accept="application/json,.json" hidden />
           </div>
         </details>
@@ -138,14 +138,14 @@
           <summary>
             <h2>Create group</h2>
           </summary>
-          <p class="subtitle">Name the group and select which boards to include.</p>
+          <p class="subtitle">Name the group and select which stories to include.</p>
           <form id="create-group-form" class="create-group-form">
             <label class="create-group-name-label" for="create-group-name">Group name</label>
             <input id="create-group-name" type="text" maxlength="80" placeholder="Group name" required />
             <fieldset class="create-group-boards-fieldset">
-              <legend>Boards to include</legend>
+              <legend>Stories to include</legend>
               <div id="create-group-boards-list" class="create-group-boards-list"></div>
-              <p id="create-group-boards-empty" class="subtitle hidden">No boards yet. Create a board first.</p>
+              <p id="create-group-boards-empty" class="subtitle hidden">No stories yet. Create a story first.</p>
             </fieldset>
             <button class="ghost-button" type="submit">Create group</button>
           </form>
@@ -175,15 +175,15 @@
           <p class="subtitle">Click a question to expand the answer.</p>
 
           <details class="help-faq-item" open>
-            <summary>What is a board?</summary>
+            <summary>What is a story?</summary>
             <div class="help-faq-content">
               <p>
-                A board is your main story workspace. Every board uses one narrative structure (for example Hero's
+                A story is your main planning workspace. Every story uses one narrative structure (for example Hero's
                 Journey, Story Circle, or a custom structure) and renders each phase as a column.
               </p>
               <p>
-                You can think of a board as a visual planning canvas: you place notes inside phases, reorder phases
-                when needed, and refine the story over time. A board also stores its own phase order, notes, and update
+                You can think of a story as a visual planning canvas: you place notes inside phases, reorder phases
+                when needed, and refine the story over time. A story also stores its own phase order, notes, and update
                 history used for merge operations during import.
               </p>
             </div>
@@ -279,7 +279,7 @@
             <summary>How do I create a note?</summary>
             <div class="help-faq-content">
               <p>
-                In the board editor, click <strong>+</strong> in the phase header. Then select the note type from the
+                In the story editor, click <strong>+</strong> in the phase header. Then select the note type from the
                 menu. Character notes open from the character submenu so you can choose an archetype immediately.
               </p>
               <p>
@@ -292,7 +292,7 @@
             <summary>My note is long — can I collapse it?</summary>
             <div class="help-faq-content">
               <p>
-                Yes. Double-click the note header. The card collapses to a one-line preview so you can scan the board
+                Yes. Double-click the note header. The card collapses to a one-line preview so you can scan the story
                 quickly; double-click again to expand.
               </p>
             </div>
@@ -309,7 +309,7 @@
                 <li><strong>Define custom archetype...</strong> inside the character submenu to add a new archetype.</li>
               </ul>
               <p>
-                These custom definitions are saved in your browser and become reusable across boards.
+                These custom definitions are saved in your browser and become reusable across stories.
               </p>
             </div>
           </details>
@@ -319,7 +319,7 @@
             <div class="help-faq-content">
               <p>
                 Go to dashboard and open <strong>Add a structure not listed</strong>. Add one phase per row, save, and
-                the new structure will appear in the board creation selector.
+                the new structure will appear in the story creation selector.
               </p>
               <p>
                 For example, if you want to follow a structure like <em>Freytag's Pyramid</em> (which is not included
@@ -332,12 +332,12 @@
             <summary>How do export, import, and merge work?</summary>
             <div class="help-faq-content">
               <p>
-                Export a board from dashboard board actions. Import from <strong>Import/merge a saved board</strong> in
+                Export a story from dashboard story actions. Import from <strong>Import/merge a saved story</strong> in
                 dashboard.
               </p>
               <ul>
-                <li>If the imported board UID is new, Structurer creates a new board.</li>
-                <li>If the imported board UID already exists, Structurer merges notes by note UID.</li>
+                <li>If the imported story UID is new, Structurer creates a new story.</li>
+                <li>If the imported story UID already exists, Structurer merges notes by note UID.</li>
                 <li>When both sides changed, the most recent update wins.</li>
               </ul>
               <p>
@@ -346,7 +346,7 @@
               </p>
               <p>
                 If phase order differs between the two versions, merge is blocked and Structurer shows a side-by-side
-                conflict modal so you can align the board manually and retry.
+                conflict modal so you can align the story manually and retry.
               </p>
             </div>
           </details>
@@ -355,13 +355,13 @@
             <summary>What are groups and when should I use them?</summary>
             <div class="help-faq-content">
               <p>
-                Groups let you organize multiple boards into a sequence. This is useful for multi-arc projects,
+                Groups let you organize multiple stories into a sequence. This is useful for multi-arc projects,
                 series planning, or alternate structure explorations of the same story.
               </p>
               <p>
-                Use <strong>Create group</strong> in the dashboard to name a group and pick boards with checkboxes.
-                To add an existing board to a group later, open that board’s actions and choose
-                <strong>Add board to group</strong> (available once you have at least one group), then pick the group
+                Use <strong>Create group</strong> in the dashboard to name a group and pick stories with checkboxes.
+                To add an existing story to a group later, open that story’s actions and choose
+                <strong>Add story to group</strong> (available once you have at least one group), then pick the group
                 from the list. Manage order and membership from group actions on the dashboard.
               </p>
             </div>
@@ -394,11 +394,11 @@
             <button id="go-dashboard-from-board" class="ghost-button back-arrow-button" type="button" aria-label="Back to dashboard">←</button>
           </div>
           <div class="editor-topbar-center">
-            <h1 id="editor-title">Hero's Journey Board</h1>
+            <h1 id="editor-title">Hero's Journey Story</h1>
             <p id="structure-name" class="subtitle">Hero's Journey</p>
           </div>
           <div class="editor-topbar-right editor-topbar-actions">
-            <button id="editor-board-actions-btn" type="button" class="ghost-button board-actions-trigger" aria-label="Board actions">
+            <button id="editor-board-actions-btn" type="button" class="ghost-button board-actions-trigger" aria-label="Story actions">
               <span aria-hidden="true">⋯</span>
               <span class="board-actions-trigger-label">Actions</span>
             </button>
@@ -415,7 +415,7 @@
           </div>
         </header>
 
-        <section id="board" class="board" aria-label="Hero's journey board"></section>
+        <section id="board" class="board" aria-label="Hero's journey story"></section>
       </section>
 
       <div id="resize-modal-overlay" class="modal-overlay hidden">
@@ -454,15 +454,15 @@
 
       <!-- Global modals: must stay outside .view so they work when home/group/editor help are hidden -->
       <div id="board-actions-modal-overlay" class="modal-overlay hidden">
-        <div class="modal board-actions-modal" role="dialog" aria-modal="true" aria-label="Board actions">
-          <h2>Board actions</h2>
+        <div class="modal board-actions-modal" role="dialog" aria-modal="true" aria-label="Story actions">
+          <h2>Story actions</h2>
           <div class="board-actions-modal-list">
-            <button id="modal-rename-board" class="ghost-button" type="button">Rename board</button>
-            <button id="modal-add-board-to-group" class="ghost-button" type="button">Add board to group</button>
-            <button id="modal-export-board" class="ghost-button" type="button">Export the board</button>
+            <button id="modal-rename-board" class="ghost-button" type="button">Rename story</button>
+            <button id="modal-add-board-to-group" class="ghost-button" type="button">Add story to group</button>
+            <button id="modal-export-board" class="ghost-button" type="button">Export the story</button>
             <button id="modal-edit-note-types" class="ghost-button" type="button">Edit note types</button>
             <button id="modal-reset-phase-order" class="ghost-button" type="button">Reset phase order</button>
-            <button id="modal-delete-board" class="ghost-button danger-menu-item" type="button">Delete the board</button>
+            <button id="modal-delete-board" class="ghost-button danger-menu-item" type="button">Delete the story</button>
           </div>
           <div class="modal-actions">
             <button id="close-board-actions-modal" class="ghost-button" type="button">Close</button>
@@ -472,7 +472,7 @@
       <div id="add-board-to-group-modal-overlay" class="modal-overlay hidden">
         <div class="modal board-actions-modal" role="dialog" aria-modal="true" aria-labelledby="add-board-to-group-title">
           <h2 id="add-board-to-group-title">Add to group</h2>
-          <p class="subtitle add-board-to-group-intro">Choose a group. The board will be added to the end of that group.</p>
+          <p class="subtitle add-board-to-group-intro">Choose a group. The story will be added to the end of that group.</p>
           <p id="add-board-to-group-empty" class="subtitle add-board-to-group-empty hidden" role="status"></p>
           <div id="add-board-to-group-list" class="board-actions-modal-list add-board-to-group-list"></div>
           <div class="modal-actions">
@@ -484,8 +484,8 @@
         <div class="modal board-actions-modal" role="dialog" aria-modal="true" aria-label="Group actions">
           <h2>Group actions</h2>
           <div class="board-actions-modal-list">
-            <button id="modal-reorder-group-boards" class="ghost-button" type="button">Reorder boards</button>
-            <button id="modal-remove-board-from-group" class="ghost-button danger-menu-item" type="button">Remove board</button>
+            <button id="modal-reorder-group-boards" class="ghost-button" type="button">Reorder stories</button>
+            <button id="modal-remove-board-from-group" class="ghost-button danger-menu-item" type="button">Remove story</button>
             <button id="modal-delete-group" class="ghost-button danger-menu-item" type="button">Delete group</button>
           </div>
           <div class="modal-actions">
@@ -494,9 +494,9 @@
         </div>
       </div>
       <div id="group-reorder-modal-overlay" class="modal-overlay hidden">
-        <div class="modal board-actions-modal" role="dialog" aria-modal="true" aria-label="Reorder boards">
-          <h2>Reorder boards</h2>
-          <p class="subtitle">Drag boards to change their order in this group.</p>
+        <div class="modal board-actions-modal" role="dialog" aria-modal="true" aria-label="Reorder stories">
+          <h2>Reorder stories</h2>
+          <p class="subtitle">Drag stories to change their order in this group.</p>
           <div id="group-reorder-list" class="reorder-list"></div>
           <p id="group-reorder-status" class="reorder-status" aria-live="polite"></p>
           <div class="modal-actions">
@@ -519,7 +519,7 @@
             </section>
           </div>
           <p id="phase-order-conflict-hint" class="phase-order-conflict-hint">
-            Please manually align the current board phase order, then repeat the import.
+            Please manually align the current story phase order, then repeat the import.
           </p>
           <div class="modal-actions">
             <button id="close-phase-order-conflict-modal" class="ghost-button" type="button">Close</button>
