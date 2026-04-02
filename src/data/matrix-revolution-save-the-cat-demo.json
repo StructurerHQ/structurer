@@ -1,0 +1,39 @@
+{
+  "title": "The Matrix Revolution",
+  "structure": "Save the Cat",
+  "notes": [
+    { "kind": "plot", "column": 0, "order": 0, "text": "Opening Image: the world feels like ash and aftermath—war continues, but hope is something you have to earn again." },
+    { "kind": "theme", "column": 1, "order": 0, "text": "Theme stated: liberation and sacrifice are inseparable; refusing sacrifice keeps the cycle alive." },
+
+    { "kind": "plot", "column": 2, "order": 0, "text": "Set-Up: Neo and the team regroup, planning the next phase of resistance with urgency and exhaustion." },
+    { "kind": "character", "column": 2, "order": 1, "characterName": "Neo", "archetype": "hero", "text": "He is burdened by what he knows—his courage becomes the decision to keep moving anyway." },
+
+    { "kind": "plot", "column": 3, "order": 0, "text": "Catalyst: the city is attacked; the plan stops being hypothetical and becomes a fight for survival." },
+    { "kind": "character", "column": 3, "order": 1, "characterName": "Trinity", "archetype": "ally", "text": "She refuses to retreat—her bravery becomes the emotional engine for the crew." },
+
+    { "kind": "plot", "column": 4, "order": 0, "text": "Debate: the team argues between speed and safety, between doing 'enough' and doing 'right'." },
+    { "kind": "plot", "column": 5, "order": 0, "text": "Break into Two: the resistance commits to a full push, choosing risk over controlled timing." },
+
+    { "kind": "character", "column": 6, "order": 0, "characterName": "Niobe", "archetype": "ally", "text": "Her B-story thread keeps the story grounded—logistics, leadership, and ethics under fire." },
+    { "kind": "subplot", "column": 7, "order": 0, "text": "Fun and Games (in darker form): brief momentum before the next wave arrives—small wins that keep morale from collapsing." },
+
+    { "kind": "plot", "column": 8, "order": 0, "text": "Midpoint: the conflict turns personal; a betrayal or irreversible step changes what victory would even mean." },
+    { "kind": "character", "column": 8, "order": 1, "characterName": "Agent Smith", "archetype": "shadow", "text": "He tightens the net—his threat becomes less about destruction and more about controlling outcomes." },
+
+    { "kind": "plot", "column": 9, "order": 0, "text": "Bad Guys Close In: the resistance is compressed, forced into hard choices with no clean escape route." },
+
+    { "kind": "plot", "column": 10, "order": 0, "text": "All Is Lost: the mission fails in the most painful way, leaving the team with only one remaining path forward." },
+    { "kind": "character", "column": 10, "order": 1, "characterName": "Morpheus", "archetype": "mentor", "text": "His role becomes a final lesson—steady guidance when the world goes quiet." },
+
+    { "kind": "theme", "column": 11, "order": 0, "text": "Dark Night of the Soul: grief and responsibility converge; the hero confronts what it means to continue." },
+    { "kind": "plot", "column": 11, "order": 1, "text": "Neo is captured / cornered (choose your exact beat): the story forces helplessness before the breakthrough." },
+
+    { "kind": "plot", "column": 12, "order": 0, "text": "Break into Three: the hero chooses sacrifice not as defeat, but as a strategy for transformation." },
+    { "kind": "subplot", "column": 13, "order": 0, "text": "Finale: multiple threads collide; pay off the emotional reversal with visible action and hard consequence." },
+    { "kind": "other", "column": 13, "order": 1, "text": "Optional structure note: pick the single most 'rewriting the rules' moment and expand it in your draft." },
+
+    { "kind": "plot", "column": 14, "order": 0, "text": "Final Image: a fragile new dawn—proof that change is possible even after the cost is paid." },
+    { "kind": "theme", "column": 14, "order": 1, "text": "Resolution theme: liberation becomes responsibility, not just survival." }
+  ]
+}
+

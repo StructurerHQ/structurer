@@ -1,0 +1,33 @@
+{
+  "title": "The Matrix Reloaded",
+  "structure": "Three-Act Structure",
+  "notes": [
+    { "kind": "plot", "column": 0, "order": 0, "text": "Neo is pulled back into the Matrix to confront a new shift in the war—his instincts saying the stakes have changed again." },
+    { "kind": "character", "column": 0, "order": 1, "characterName": "Neo", "archetype": "hero", "text": "He is resolute, but the path forward feels unstable—less like a prophecy and more like a choice under pressure." },
+    { "kind": "theme", "column": 0, "order": 2, "text": "The theme tightens: transformation requires action even when the mission is unclear." },
+
+    { "kind": "plot", "column": 1, "order": 0, "text": "Inciting incident: a new message and a new target pull Neo's team toward a deeper layer of conflict." },
+    { "kind": "character", "column": 1, "order": 1, "characterName": "Morpheus", "archetype": "mentor", "text": "He frames the next move as a test of faith—guidance that demands commitment, not comfort." },
+
+    { "kind": "subplot", "column": 2, "order": 0, "text": "Complications spread beyond one objective: alliances strain, loyalties are questioned, and timing becomes its own enemy." },
+    { "kind": "character", "column": 2, "order": 1, "characterName": "Niobe", "archetype": "ally", "text": "She keeps the crew moving through logistics and moral clarity when the plan starts to wobble." },
+    { "kind": "plot", "column": 2, "order": 2, "text": "The team enters dangerous territory, where progress depends on both strategy and survival." },
+
+    { "kind": "plot", "column": 3, "order": 0, "text": "Midpoint: revelations force a re-evaluation—what Neo thought was the real battle turns out to be only part of the map." },
+    { "kind": "theme", "column": 3, "order": 1, "text": "Hope is shown as fragile: it can exist, but it must be defended and re-chosen." },
+
+    { "kind": "plot", "column": 4, "order": 0, "text": "Crisis: the plan collapses in the middle of a decisive push, splitting the team and raising immediate peril." },
+    { "kind": "character", "column": 4, "order": 1, "characterName": "Agent Smith", "archetype": "shadow", "text": "He escalates from antagonist to spreading threat—control that multiplies faster than they can contain it." },
+
+    { "kind": "plot", "column": 5, "order": 0, "text": "Break into Act III: Neo refuses the idea of waiting for rescue and commits to a final approach that costs comfort and certainty." },
+    { "kind": "theme", "column": 5, "order": 1, "text": "The theme becomes action over explanation: growth happens in the moment of choosing." },
+
+    { "kind": "plot", "column": 6, "order": 0, "text": "Climax: a high-stakes convergence of forces—battles and decisions collide, turning belief into a visible outcome." },
+    { "kind": "character", "column": 6, "order": 1, "characterName": "Trinity", "archetype": "ally", "text": "Her loyalty is practical and brave: she anchors resolve when the plan turns chaotic." },
+    { "kind": "other", "column": 6, "order": 2, "text": "Use this phase for production notes: identify which set-piece is the biggest emotional reversal." },
+
+    { "kind": "plot", "column": 7, "order": 0, "text": "Resolution: the team escapes immediate defeat, but the world now feels closer to a final reckoning." },
+    { "kind": "theme", "column": 7, "order": 1, "text": "Transformation isn't a victory lap—it is the ignition for the next evolution." }
+  ]
+}
+

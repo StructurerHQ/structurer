@@ -1200,6 +1200,60 @@ function replaceDemoBoardsOnly() {
   saveBoards();
 }
 
+function ensureMatrixTrilogySeriesDemo() {
+  const normalize = (value) => String(value || "").trim().toLowerCase();
+  const trilogyTitle = "The Matrix Trilogy";
+  const matrixTitle = "The Matrix";
+  const reloadedTitle = "The Matrix Reloaded";
+  const revolutionTitle = "The Matrix Revolution";
+
+  const getDemoStoryIdByTitle = (title) =>
+    boards.find((b) => b.title === title && demoBoardIds.includes(b.id))?.id || null;
+
+  const matrixId = getDemoStoryIdByTitle(matrixTitle);
+  const reloadedId = getDemoStoryIdByTitle(reloadedTitle);
+  const revolutionId = getDemoStoryIdByTitle(revolutionTitle);
+  if (!matrixId || !reloadedId || !revolutionId) return;
+
+  const desiredOrder = [matrixId, reloadedId, revolutionId];
+  let series = groups.find((g) => normalize(g.title) === normalize(trilogyTitle)) || null;
+  if (!series) {
+    series = {
+      id: crypto.randomUUID(),
+      uid: generateUniqueUid(),
+      title: trilogyTitle,
+      slug: slugifyTitle(trilogyTitle),
+      boardIds: [...desiredOrder],
+      updatedAt: Date.now(),
+    };
+    groups.push(series);
+    saveGroups();
+    return;
+  }
+
+  const currentIds = series.boardIds || [];
+  const currentSet = new Set(currentIds);
+  const allCurrentIdsAreDemo = currentIds.length > 0 && currentIds.every((id) => demoBoardIds.includes(id));
+
+  let changed = false;
+  if (allCurrentIdsAreDemo) {
+    if (currentIds.join("|") !== desiredOrder.join("|")) {
+      series.boardIds = [...desiredOrder];
+      changed = true;
+    }
+  } else {
+    const missingInOrder = desiredOrder.filter((id) => !currentSet.has(id));
+    if (missingInOrder.length > 0) {
+      series.boardIds = [...currentIds, ...missingInOrder];
+      changed = true;
+    }
+  }
+
+  if (!changed) return;
+  series.updatedAt = Date.now();
+  saveGroups();
+}
+
 function boardToExportPayload(board) {
   const structure = getStructureConfig(board.structureId);
   const usedNoteTypeIds = new Set(board.notes.map((note) => note.kind || "plot"));
@@ -2124,6 +2178,7 @@ if (resetDemoDataBtn) {
     );
     if (!confirmed) return;
     replaceDemoBoardsOnly();
+    ensureMatrixTrilogySeriesDemo();
     openHome();
   });
 }
@@ -2240,6 +2295,9 @@ if (loadedBoards === null) {
   demoBoardIds = boards.filter((board) => isLikelyDemoBoard(board)).map((board) => board.id);
   saveDemoBoardIds();
 }
+
+ensureMatrixTrilogySeriesDemo();
+
 boards.forEach((board) => {
   const baseSlug = slugifyTitle(board.title || "board");
   board.slug = ensureUniqueSlug(board.slug || baseSlug, board.id);

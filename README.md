@@ -54,8 +54,10 @@ You can also create and save your own custom structures directly in the dashboar
 
 - Hero's Journey -> The Matrix
 - Hero with a Thousand Faces -> The Odyssey
+- Three-Act Structure -> The Matrix Reloaded
 - Three-Act Structure -> Jurassic Park
 - Save the Cat -> Back to the Future
+- Save the Cat -> The Matrix Revolution
 - Story Circle -> Finding Nemo
 - 7-Point Story Structure -> Harry Potter and the Sorcerer's Stone
 - Romancing the Beat -> Pride and Prejudice
