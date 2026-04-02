@@ -14,7 +14,7 @@ export function createNavigationController({
   applyColumnWidth,
   applyWrapColumns,
 }) {
-  const { landingView, homeView, groupView, editorView, helpView } = views;
+  const { landingView, homeView, groupView, editorView, helpView, privacyView, termsView } = views;
 
   function normalizePathname(pathname) {
     if (!pathname || pathname === "/") return "/";
@@ -40,6 +40,8 @@ export function createNavigationController({
     groupView.classList.add("hidden");
     editorView.classList.add("hidden");
     helpView.classList.add("hidden");
+    if (privacyView) privacyView.classList.add("hidden");
+    if (termsView) termsView.classList.add("hidden");
     renderHome();
   }
 
@@ -51,6 +53,8 @@ export function createNavigationController({
     groupView.classList.add("hidden");
     editorView.classList.add("hidden");
     helpView.classList.add("hidden");
+    if (privacyView) privacyView.classList.add("hidden");
+    if (termsView) termsView.classList.add("hidden");
   }
 
   function showHelp() {
@@ -61,6 +65,30 @@ export function createNavigationController({
     groupView.classList.add("hidden");
     editorView.classList.add("hidden");
     helpView.classList.remove("hidden");
+    if (privacyView) privacyView.classList.add("hidden");
+    if (termsView) termsView.classList.add("hidden");
+  }
+
+  function showPrivacy() {
+    setCurrentBoardId(null);
+    setCurrentGroupId(null);
+    landingView.classList.add("hidden");
+    homeView.classList.add("hidden");
+    groupView.classList.add("hidden");
+    editorView.classList.add("hidden");
+    helpView.classList.add("hidden");
+    privacyView.classList.remove("hidden");
+  }
+
+  function showTerms() {
+    setCurrentBoardId(null);
+    setCurrentGroupId(null);
+    landingView.classList.add("hidden");
+    homeView.classList.add("hidden");
+    groupView.classList.add("hidden");
+    editorView.classList.add("hidden");
+    helpView.classList.add("hidden");
+    termsView.classList.remove("hidden");
   }
 
   function showBoard(boardId) {
@@ -77,6 +105,8 @@ export function createNavigationController({
     groupView.classList.add("hidden");
     editorView.classList.remove("hidden");
     helpView.classList.add("hidden");
+    if (privacyView) privacyView.classList.add("hidden");
+    if (termsView) termsView.classList.add("hidden");
     renderEditor();
     applyColumnWidth();
     applyWrapColumns();
@@ -98,6 +128,8 @@ export function createNavigationController({
     groupView.classList.remove("hidden");
     editorView.classList.add("hidden");
     helpView.classList.add("hidden");
+    if (privacyView) privacyView.classList.add("hidden");
+    if (termsView) termsView.classList.add("hidden");
     renderGroup();
   }
 
@@ -137,6 +169,18 @@ export function createNavigationController({
     showHelp();
   }
 
+  function openPrivacy(replaceRoute = false) {
+    setBoardBackGroupId(null);
+    navigateTo("/privacy", replaceRoute);
+    showPrivacy();
+  }
+
+  function openTerms(replaceRoute = false) {
+    setBoardBackGroupId(null);
+    navigateTo("/terms", replaceRoute);
+    showTerms();
+  }
+
   function syncRouteToState(replaceRoute = true) {
     const path = normalizePathname(window.location.pathname);
     if (path === "/") {
@@ -149,6 +193,14 @@ export function createNavigationController({
     }
     if (path === "/help") {
       showHelp();
+      return;
+    }
+    if (path === "/privacy") {
+      showPrivacy();
+      return;
+    }
+    if (path === "/terms") {
+      showTerms();
       return;
     }
     if (path.startsWith("/group/")) {
@@ -175,12 +227,16 @@ export function createNavigationController({
     showHome,
     showLanding,
     showHelp,
+    showPrivacy,
+    showTerms,
     showBoard,
     showGroup,
     openBoard,
     openHome,
     openLanding,
     openHelp,
+    openPrivacy,
+    openTerms,
     openGroup,
     syncRouteToState,
   };

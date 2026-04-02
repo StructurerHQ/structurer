@@ -12,14 +12,18 @@ The web version keeps your work private in your browser `localStorage`: no user 
 
 ## Current Features
 
-- Landing page with product overview, privacy note, and demo map by structure
+- Landing page with product overview, privacy note, and demo map (including series demo)
 - Dashboard with story list and empty state
+- Dashboard top-level `... Actions` modal for creation/import/reset workflows
 - Create and open multiple stories
 - Choose structure per story at creation time
 - Create custom structures (saved locally) with user-defined phase rows
 - Story routes by slug (example: `/gatti_come_spine`)
 - Home route at `/` (landing)
 - Dashboard route at `/dashboard`
+- Help route at `/help`
+- Privacy route at `/privacy`
+- Terms route at `/terms`
 - Structure-driven stories with variable phase count
 - Quick-add note menu on each phase
 - Character notes with archetype selection
@@ -30,11 +34,14 @@ The web version keeps your work private in your browser `localStorage`: no user 
 - Open a story by clicking its tile (desktop and mobile)
 - Rename story from dashboard story actions
 - Export a story to JSON and import saved stories from JSON
+- Create series and manage membership/order from series actions
+- Reset demos only or factory reset app data from dashboard actions
 - Note collapse/expand with one-line preview (double click header), including persisted collapsed state
 - Options menu:
   - Resize all columns with a slider
   - Toggle wrapped columns (multi-row) vs horizontal scroll
   - Reset phase order
+- Hide demos control (hides demo stories and demo-only series)
 - Persistence via `localStorage`
 
 ## Pre-Built Structures
@@ -62,6 +69,7 @@ You can also create and save your own custom structures directly in the dashboar
 - 7-Point Story Structure -> Harry Potter and the Sorcerer's Stone
 - Romancing the Beat -> Pride and Prejudice
 - MICE Quotient -> Inception
+- Series demo -> The Matrix Trilogy (The Matrix -> The Matrix Reloaded -> The Matrix Revolution)
 
 ## Tech Stack
 
@@ -109,7 +117,6 @@ All data is stored in browser `localStorage`:
 - stories (technical key: `structurer.boards.v1`)
 - UI settings (column width, wrap mode): `structurer.settings.v1`
 - custom structures: `structurer.customStructures.v1`
-- optional dev reset flag: `activate.reset`
 
 No backend is currently used.
 

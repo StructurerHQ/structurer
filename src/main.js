@@ -7,7 +7,6 @@ import {
   NOTE_TYPE_OVERRIDES_KEY,
   CUSTOM_STRUCTURES_KEY,
   DEFAULT_COLUMN_WIDTH,
-  DEV_RESET_FLAG_KEY,
   HOME_ROUTE,
   SETTINGS_KEY,
   STORAGE_KEY,
@@ -15,7 +14,6 @@ import {
 import { DEMO_BOARD_DATA } from "./demo-boards";
 import {
   clearKeys,
-  isFlagEnabled,
   loadJsonItem,
   loadBoards as loadBoardsFromStorage,
   loadCustomArchetypes as loadCustomArchetypesFromStorage,
@@ -64,6 +62,8 @@ let showDemoBoards = initialSettings.showDemoBoards ?? true;
 const landingView = document.querySelector("#landing-view");
 const homeView = document.querySelector("#home-view");
 const helpView = document.querySelector("#help-view");
+const privacyView = document.querySelector("#privacy-view");
+const termsView = document.querySelector("#terms-view");
 const groupView = document.querySelector("#group-view");
 const editorView = document.querySelector("#editor-view");
 const groupsList = document.querySelector("#groups-list");
@@ -108,12 +108,38 @@ const phaseOrderConflictTitleEl = document.querySelector("#phase-order-conflict-
 const phaseOrderCurrentListEl = document.querySelector("#phase-order-current-list");
 const phaseOrderImportedListEl = document.querySelector("#phase-order-imported-list");
 const phaseOrderConflictHintEl = document.querySelector("#phase-order-conflict-hint");
+const factoryResetModalOverlay = document.querySelector("#factory-reset-modal-overlay");
+const cancelFactoryResetBtn = document.querySelector("#cancel-factory-reset");
+const confirmFactoryResetBtn = document.querySelector("#confirm-factory-reset");
+const factoryResetConfirmCheckbox = document.querySelector("#factory-reset-confirm-checkbox");
+const dashboardActionsBtn = document.querySelector("#dashboard-actions-btn");
+const dashboardActionsModalOverlay = document.querySelector("#dashboard-actions-modal-overlay");
+const closeDashboardActionsModalBtn = document.querySelector("#close-dashboard-actions-modal");
+const openCreateStoryActionBtn = document.querySelector("#open-create-story-action");
+const dashboardCreateStoryModalOverlay = document.querySelector("#dashboard-create-story-modal-overlay");
+const closeDashboardCreateStoryModalBtn = document.querySelector("#close-dashboard-create-story-modal");
+const openCreateStructureActionBtn = document.querySelector("#open-create-structure-action");
+const dashboardCreateStructureModalOverlay = document.querySelector("#dashboard-create-structure-modal-overlay");
+const closeDashboardCreateStructureModalBtn = document.querySelector("#close-dashboard-create-structure-modal");
+const dashboardResetDemoActionBtn = document.querySelector("#dashboard-reset-demo-action");
+const dashboardFactoryResetActionBtn = document.querySelector("#dashboard-factory-reset-action");
+const openImportStoryActionBtn = document.querySelector("#open-import-story-action");
+const dashboardImportModalOverlay = document.querySelector("#dashboard-import-modal-overlay");
+const closeDashboardImportModalBtn = document.querySelector("#close-dashboard-import-modal");
+const openCreateSeriesActionBtn = document.querySelector("#open-create-series-action");
+const dashboardCreateSeriesModalOverlay = document.querySelector("#dashboard-create-series-modal-overlay");
+const closeDashboardCreateSeriesModalBtn = document.querySelector("#close-dashboard-create-series-modal");
 const goLandingFromDashboardBtn = document.querySelector("#go-landing-from-dashboard");
 const goHelpBtn = document.querySelector("#go-help");
 const goHelpFromDashboardBtn = document.querySelector("#go-help-from-dashboard");
 const goDashboardFromHelpBtn = document.querySelector("#go-dashboard-from-help");
+const goDashboardFromPrivacyBtn = document.querySelector("#go-dashboard-from-privacy");
+const goDashboardFromTermsBtn = document.querySelector("#go-dashboard-from-terms");
 const goDashboardFromBoardBtn = document.querySelector("#go-dashboard-from-board");
 const goDashboardFromGroupBtn = document.querySelector("#go-dashboard-from-group");
+const goPrivacyFromFooterBtn = document.querySelector("#go-privacy-from-footer");
+const goTermsFromFooterBtn = document.querySelector("#go-terms-from-footer");
+const goHelpFromFooterBtn = document.querySelector("#go-help-from-footer");
 const editorTitle = document.querySelector("#editor-title");
 const structureNameEl = document.querySelector("#structure-name");
 const groupTitleEl = document.querySelector("#group-title");
@@ -404,14 +430,8 @@ function openNoteTypeColorPicker() {
   });
 }
 
-function isDevResetEnabled() {
-  return isFlagEnabled(DEV_RESET_FLAG_KEY) || isFlagEnabled("activate-reset");
-}
-
 function applyDevFlags() {
-  const visible = isDevResetEnabled() ? "inline-block" : "none";
-  if (resetAppDataBtn) resetAppDataBtn.style.display = visible;
-  if (resetDemoDataBtn) resetDemoDataBtn.style.display = visible;
+  // Reset commands are now always available from the dashboard.
 }
 
 function applyColumnWidth() {
@@ -774,7 +794,6 @@ function groupCardTemplate(group) {
       <div class="board-actions">
         <button type="button" class="action-button" data-role="group-actions" aria-label="Series actions">
           <span class="action-icon" aria-hidden="true">⋯</span>
-          <span class="action-label">Actions</span>
         </button>
       </div>
     </article>
@@ -853,7 +872,14 @@ function renderHome() {
   });
   saveGroups();
 
-  const sortedGroups = [...groups].sort((a, b) => b.updatedAt - a.updatedAt);
+  const demoBoardIdSet = new Set(demoBoardIds);
+  const sortedGroups = [...groups]
+    .filter((group) => {
+      // When demos are hidden, also hide demo-only series (series made exclusively of demo stories).
+      if (showDemoBoards) return true;
+      return !group.boardIds.every((id) => demoBoardIdSet.has(id));
+    })
+    .sort((a, b) => b.updatedAt - a.updatedAt);
   groupsList.innerHTML = sortedGroups.map(groupCardTemplate).join("");
   groupsList.style.display = sortedGroups.length > 0 ? "grid" : "none";
 
@@ -938,7 +964,7 @@ function autoResizeTextareas() {
 }
 
 const navigation = createNavigationController({
-  views: { landingView, homeView, helpView, groupView, editorView },
+  views: { landingView, homeView, helpView, privacyView, termsView, groupView, editorView },
   homeRoute: HOME_ROUTE,
   getBoards: () => boards,
   getGroups: () => groups,
@@ -1638,6 +1664,14 @@ function openHelp(replaceRoute = false) {
   navigation.openHelp(replaceRoute);
 }
 
+function openPrivacy(replaceRoute = false) {
+  navigation.openPrivacy(replaceRoute);
+}
+
+function openTerms(replaceRoute = false) {
+  navigation.openTerms(replaceRoute);
+}
+
 function openGroup(groupId, replaceRoute = false) {
   navigation.openGroup(groupId, replaceRoute);
 }
@@ -1666,6 +1700,8 @@ createBoardForm.addEventListener("submit", (event) => {
   if (!title) return;
   createBoard(title, boardStructureSelect.value);
   boardTitleInput.value = "";
+  closeDashboardCreateStoryModal();
+  closeDashboardActionsModal();
 });
 
 addStructurePhaseBtn.addEventListener("click", () => {
@@ -1682,6 +1718,10 @@ structurePhasesList.addEventListener("click", (event) => {
   removeButton.closest(".structure-phase-row").remove();
   const values = [...structurePhasesList.querySelectorAll('[data-role="phase-input"]')].map((input) => input.value);
   renderStructurePhaseRows(values);
+});
+
+structurePhasesList.addEventListener("input", () => {
+  // Keep list in sync; no additional actions needed.
 });
 
 createStructureForm.addEventListener("submit", (event) => {
@@ -1718,6 +1758,8 @@ createStructureForm.addEventListener("submit", (event) => {
   structureNameInput.value = "";
   renderStructurePhaseRows(["", "", ""]);
   window.alert(`Structure "${name}" saved.`);
+  closeDashboardCreateStructureModal();
+  closeDashboardActionsModal();
 });
 
 boardsList.addEventListener("click", (event) => {
@@ -1784,6 +1826,36 @@ if (goDashboardFromHelpBtn) {
   });
 }
 
+if (goDashboardFromPrivacyBtn) {
+  goDashboardFromPrivacyBtn.addEventListener("click", () => {
+    openHome();
+  });
+}
+
+if (goDashboardFromTermsBtn) {
+  goDashboardFromTermsBtn.addEventListener("click", () => {
+    openHome();
+  });
+}
+
+if (goPrivacyFromFooterBtn) {
+  goPrivacyFromFooterBtn.addEventListener("click", () => {
+    openPrivacy();
+  });
+}
+
+if (goTermsFromFooterBtn) {
+  goTermsFromFooterBtn.addEventListener("click", () => {
+    openTerms();
+  });
+}
+
+if (goHelpFromFooterBtn) {
+  goHelpFromFooterBtn.addEventListener("click", () => {
+    openHelp();
+  });
+}
+
 goDashboardFromBoardBtn.addEventListener("click", () => {
   if (boardBackGroupId && groups.some((group) => group.id === boardBackGroupId)) {
     openGroup(boardBackGroupId);
@@ -1810,9 +1882,12 @@ importBoardInput.addEventListener("change", async (event) => {
   try {
     const text = await file.text();
     importBoardFromJson(text);
+    closeDashboardImportModal();
+    closeDashboardActionsModal();
     window.alert("Story imported successfully.");
   } catch (error) {
     if (error instanceof Error && error.code === "PHASE_ORDER_CONFLICT" && error.phaseOrderConflict) {
+      // Keep the import modal open so the user can retry if needed.
       openPhaseOrderConflictModal(error.phaseOrderConflict);
     } else {
       window.alert(
@@ -2080,6 +2155,8 @@ if (createGroupForm && createGroupNameInput) {
     saveGroups();
     createGroupForm.reset();
     renderHome();
+    closeDashboardCreateSeriesModal();
+    closeDashboardActionsModal();
     openGroup(group.id);
   });
 }
@@ -2108,6 +2185,69 @@ modalDeleteBoardBtn.addEventListener("click", () => {
 
 function closeOptionsMenu() {
   optionsMenu.classList.add("hidden");
+}
+
+function closeDashboardActionsModal() {
+  if (!dashboardActionsModalOverlay) return;
+  dashboardActionsModalOverlay.classList.add("hidden");
+}
+
+function closeDashboardCreateStoryModal() {
+  if (!dashboardCreateStoryModalOverlay) return;
+  dashboardCreateStoryModalOverlay.classList.add("hidden");
+}
+
+function closeDashboardCreateStructureModal() {
+  if (!dashboardCreateStructureModalOverlay) return;
+  dashboardCreateStructureModalOverlay.classList.add("hidden");
+}
+
+function closeDashboardImportModal() {
+  if (!dashboardImportModalOverlay) return;
+  dashboardImportModalOverlay.classList.add("hidden");
+}
+
+function closeDashboardCreateSeriesModal() {
+  if (!dashboardCreateSeriesModalOverlay) return;
+  dashboardCreateSeriesModalOverlay.classList.add("hidden");
+}
+
+function openDashboardActionsModal() {
+  if (!dashboardActionsModalOverlay) return;
+  closeOptionsMenu();
+  closeDashboardCreateStoryModal();
+  closeDashboardCreateStructureModal();
+  closeDashboardImportModal();
+  closeDashboardCreateSeriesModal();
+  dashboardActionsModalOverlay.classList.remove("hidden");
+}
+
+function openDashboardCreateStoryModal() {
+  if (!dashboardCreateStoryModalOverlay) return;
+  closeDashboardActionsModal();
+  dashboardCreateStoryModalOverlay.classList.remove("hidden");
+  // Focus for faster input.
+  if (boardTitleInput) boardTitleInput.focus();
+}
+
+function openDashboardCreateStructureModal() {
+  if (!dashboardCreateStructureModalOverlay) return;
+  closeDashboardActionsModal();
+  dashboardCreateStructureModalOverlay.classList.remove("hidden");
+  // Focus for faster input.
+  if (structureNameInput) structureNameInput.focus();
+}
+
+function openDashboardImportModal() {
+  if (!dashboardImportModalOverlay) return;
+  closeDashboardActionsModal();
+  dashboardImportModalOverlay.classList.remove("hidden");
+}
+
+function openDashboardCreateSeriesModal() {
+  if (!dashboardCreateSeriesModalOverlay) return;
+  closeDashboardActionsModal();
+  dashboardCreateSeriesModalOverlay.classList.remove("hidden");
 }
 
 function openResizeModal() {
@@ -2150,36 +2290,228 @@ if (groupViewActionsBtn) {
   });
 }
 
-resetAppDataBtn.addEventListener("click", () => {
-  closeOptionsMenu();
-  const confirmed = window.confirm(
-    "Reset all app data? This will delete all stories and settings, then reload the app.",
-  );
-  if (!confirmed) return;
+if (dashboardActionsBtn) {
+  dashboardActionsBtn.addEventListener("click", () => {
+    openDashboardActionsModal();
+  });
+}
 
-  clearKeys([
-    STORAGE_KEY,
-    SETTINGS_KEY,
-    CUSTOM_STRUCTURES_KEY,
-    CUSTOM_ARCHETYPES_KEY,
-    CUSTOM_NOTE_TYPES_KEY,
-    NOTE_TYPE_OVERRIDES_KEY,
-    GROUPS_KEY,
-    DEMO_BOARD_IDS_KEY,
-  ]);
-  window.location.assign(HOME_ROUTE);
+if (closeDashboardActionsModalBtn) {
+  closeDashboardActionsModalBtn.addEventListener("click", () => {
+    closeDashboardActionsModal();
+  });
+}
+
+if (openCreateStoryActionBtn) {
+  openCreateStoryActionBtn.addEventListener("click", () => {
+    openDashboardCreateStoryModal();
+  });
+}
+
+if (closeDashboardCreateStoryModalBtn) {
+  closeDashboardCreateStoryModalBtn.addEventListener("click", () => {
+    closeDashboardCreateStoryModal();
+  });
+}
+
+if (openCreateStructureActionBtn) {
+  openCreateStructureActionBtn.addEventListener("click", () => {
+    openDashboardCreateStructureModal();
+  });
+}
+
+if (closeDashboardCreateStructureModalBtn) {
+  closeDashboardCreateStructureModalBtn.addEventListener("click", () => {
+    closeDashboardCreateStructureModal();
+  });
+}
+
+if (openImportStoryActionBtn) {
+  openImportStoryActionBtn.addEventListener("click", () => {
+    openDashboardImportModal();
+  });
+}
+
+if (openCreateSeriesActionBtn) {
+  openCreateSeriesActionBtn.addEventListener("click", () => {
+    openDashboardCreateSeriesModal();
+  });
+}
+
+if (closeDashboardImportModalBtn) {
+  closeDashboardImportModalBtn.addEventListener("click", () => {
+    closeDashboardImportModal();
+  });
+}
+
+if (closeDashboardCreateSeriesModalBtn) {
+  closeDashboardCreateSeriesModalBtn.addEventListener("click", () => {
+    closeDashboardCreateSeriesModal();
+  });
+}
+
+if (dashboardActionsModalOverlay) {
+  dashboardActionsModalOverlay.addEventListener("click", (event) => {
+    if (event.target === dashboardActionsModalOverlay) closeDashboardActionsModal();
+  });
+}
+
+if (dashboardCreateStoryModalOverlay) {
+  dashboardCreateStoryModalOverlay.addEventListener("click", (event) => {
+    if (event.target === dashboardCreateStoryModalOverlay) closeDashboardCreateStoryModal();
+  });
+}
+
+if (dashboardCreateStructureModalOverlay) {
+  dashboardCreateStructureModalOverlay.addEventListener("click", (event) => {
+    if (event.target === dashboardCreateStructureModalOverlay) closeDashboardCreateStructureModal();
+  });
+}
+
+if (dashboardImportModalOverlay) {
+  dashboardImportModalOverlay.addEventListener("click", (event) => {
+    if (event.target === dashboardImportModalOverlay) closeDashboardImportModal();
+  });
+}
+
+if (dashboardCreateSeriesModalOverlay) {
+  dashboardCreateSeriesModalOverlay.addEventListener("click", (event) => {
+    if (event.target === dashboardCreateSeriesModalOverlay) closeDashboardCreateSeriesModal();
+  });
+}
+
+function openFactoryResetModal() {
+  if (!factoryResetModalOverlay) return;
+
+  closeOptionsMenu();
+  factoryResetModalOverlay.classList.remove("hidden");
+
+  if (factoryResetConfirmCheckbox) {
+    factoryResetConfirmCheckbox.checked = false;
+  }
+  if (confirmFactoryResetBtn) {
+    confirmFactoryResetBtn.disabled = true;
+  }
+
+  // Small accessibility improvement: focus the first action.
+  if (cancelFactoryResetBtn) {
+    cancelFactoryResetBtn.focus();
+  }
+}
+
+function closeFactoryResetModal() {
+  if (!factoryResetModalOverlay) return;
+  factoryResetModalOverlay.classList.add("hidden");
+}
+
+if (factoryResetConfirmCheckbox && confirmFactoryResetBtn) {
+  factoryResetConfirmCheckbox.addEventListener("change", () => {
+    confirmFactoryResetBtn.disabled = !factoryResetConfirmCheckbox.checked;
+  });
+}
+
+if (cancelFactoryResetBtn) {
+  cancelFactoryResetBtn.addEventListener("click", () => {
+    closeFactoryResetModal();
+  });
+}
+
+if (factoryResetModalOverlay) {
+  factoryResetModalOverlay.addEventListener("click", (event) => {
+    // Click outside the modal closes it.
+    if (event.target === factoryResetModalOverlay) {
+      closeFactoryResetModal();
+    }
+  });
+}
+
+if (confirmFactoryResetBtn) {
+  confirmFactoryResetBtn.addEventListener("click", () => {
+    if (!confirmFactoryResetBtn || confirmFactoryResetBtn.disabled) return;
+
+    closeFactoryResetModal();
+    clearKeys([
+      STORAGE_KEY,
+      SETTINGS_KEY,
+      CUSTOM_STRUCTURES_KEY,
+      CUSTOM_ARCHETYPES_KEY,
+      CUSTOM_NOTE_TYPES_KEY,
+      NOTE_TYPE_OVERRIDES_KEY,
+      GROUPS_KEY,
+      DEMO_BOARD_IDS_KEY,
+    ]);
+    window.location.assign(HOME_ROUTE);
+  });
+}
+
+// Close with Escape when the modal is open.
+document.addEventListener("keydown", (event) => {
+  if (event.key !== "Escape") return;
+  if (factoryResetModalOverlay && !factoryResetModalOverlay.classList.contains("hidden")) {
+    closeFactoryResetModal();
+    return;
+  }
+  if (dashboardCreateStoryModalOverlay && !dashboardCreateStoryModalOverlay.classList.contains("hidden")) {
+    closeDashboardCreateStoryModal();
+    return;
+  }
+  if (dashboardCreateStructureModalOverlay && !dashboardCreateStructureModalOverlay.classList.contains("hidden")) {
+    closeDashboardCreateStructureModal();
+    return;
+  }
+  if (dashboardImportModalOverlay && !dashboardImportModalOverlay.classList.contains("hidden")) {
+    closeDashboardImportModal();
+    return;
+  }
+  if (dashboardCreateSeriesModalOverlay && !dashboardCreateSeriesModalOverlay.classList.contains("hidden")) {
+    closeDashboardCreateSeriesModal();
+    return;
+  }
+  if (dashboardActionsModalOverlay && !dashboardActionsModalOverlay.classList.contains("hidden")) {
+    closeDashboardActionsModal();
+  }
 });
+
+if (resetAppDataBtn) {
+  resetAppDataBtn.addEventListener("click", () => {
+    openFactoryResetModal();
+  });
+}
 
 if (resetDemoDataBtn) {
   resetDemoDataBtn.addEventListener("click", () => {
-    closeOptionsMenu();
-    const confirmed = window.confirm(
-      "Reset demo stories only? Your personal stories and custom settings/types/archetypes will be kept.",
-    );
-    if (!confirmed) return;
-    replaceDemoBoardsOnly();
-    ensureMatrixTrilogySeriesDemo();
-    openHome();
+    // For consistency, share the same logic also used by the dashboard Actions modal.
+    resetDemoData();
+  });
+}
+
+function resetDemoData() {
+  closeOptionsMenu();
+  const confirmed = window.confirm(
+    "Reset demo stories only? Your personal stories and custom settings/types/archetypes will be kept.",
+  );
+  if (!confirmed) return;
+  closeDashboardActionsModal();
+  closeDashboardCreateStoryModal();
+  closeDashboardCreateStructureModal();
+  replaceDemoBoardsOnly();
+  ensureMatrixTrilogySeriesDemo();
+  openHome();
+}
+
+if (dashboardResetDemoActionBtn) {
+  dashboardResetDemoActionBtn.addEventListener("click", () => {
+    resetDemoData();
+  });
+}
+
+if (dashboardFactoryResetActionBtn) {
+  dashboardFactoryResetActionBtn.addEventListener("click", () => {
+    // Close any open dashboard modals first, then open the irreversible confirmation modal.
+    closeDashboardActionsModal();
+    closeDashboardCreateStoryModal();
+    closeDashboardCreateStructureModal();
+    openFactoryResetModal();
   });
 }
 
