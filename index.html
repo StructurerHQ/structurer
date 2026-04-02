@@ -82,11 +82,11 @@
         </header>
 
         <section id="empty-state" class="empty-state">
-          <p>No stories yet. Create your first story to start mapping your story.</p>
+          <p>No stories yet. Create your first story to begin planning.</p>
         </section>
 
         <section class="dashboard-section">
-          <h2 id="dashboard-groups-heading" class="dashboard-section-title">Groups</h2>
+          <h2 id="dashboard-groups-heading" class="dashboard-section-title">Series</h2>
           <section id="groups-list" class="boards-list"></section>
         </section>
         <section class="dashboard-section">
@@ -136,18 +136,18 @@
 
         <details class="home-create-group collapsible-panel">
           <summary>
-            <h2>Create group</h2>
+            <h2>Create series</h2>
           </summary>
-          <p class="subtitle">Name the group and select which stories to include.</p>
+          <p class="subtitle">Name the series and select which stories to include.</p>
           <form id="create-group-form" class="create-group-form">
-            <label class="create-group-name-label" for="create-group-name">Group name</label>
-            <input id="create-group-name" type="text" maxlength="80" placeholder="Group name" required />
+            <label class="create-group-name-label" for="create-group-name">Series name</label>
+            <input id="create-group-name" type="text" maxlength="80" placeholder="Series name" required />
             <fieldset class="create-group-boards-fieldset">
               <legend>Stories to include</legend>
               <div id="create-group-boards-list" class="create-group-boards-list"></div>
               <p id="create-group-boards-empty" class="subtitle hidden">No stories yet. Create a story first.</p>
             </fieldset>
-            <button class="ghost-button" type="submit">Create group</button>
+            <button class="ghost-button" type="submit">Create series</button>
           </form>
         </details>
 
@@ -352,16 +352,16 @@
           </details>
 
           <details class="help-faq-item">
-            <summary>What are groups and when should I use them?</summary>
+            <summary>What are series and when should I use them?</summary>
             <div class="help-faq-content">
               <p>
-                Groups let you organize multiple stories into a sequence. This is useful for multi-arc projects,
+                Series let you organize multiple stories into a sequence. This is useful for multi-arc projects,
                 series planning, or alternate structure explorations of the same story.
               </p>
               <p>
-                Use <strong>Create group</strong> in the dashboard to name a group and pick stories with checkboxes.
-                To add an existing story to a group later, open that story’s actions and choose
-                <strong>Add story to group</strong> (available once you have at least one group), then pick the group
+                Use <strong>Create series</strong> in the dashboard to name a series and pick stories with checkboxes.
+                To add an existing story to a series later, open that story’s actions and choose
+                <strong>Add story to series</strong> (available once you have at least one series), then pick the series
                 from the list. Manage order and membership from group actions on the dashboard.
               </p>
             </div>
@@ -375,11 +375,11 @@
             <button id="go-dashboard-from-group" class="ghost-button back-arrow-button" type="button" aria-label="Back to dashboard">←</button>
           </div>
           <div class="editor-topbar-center">
-            <h1 id="group-title">Group</h1>
+            <h1 id="group-title">Series</h1>
             <p id="group-subtitle" class="subtitle"></p>
           </div>
           <div class="editor-topbar-right editor-topbar-actions">
-            <button id="group-view-actions-btn" type="button" class="ghost-button board-actions-trigger" aria-label="Group actions">
+            <button id="group-view-actions-btn" type="button" class="ghost-button board-actions-trigger" aria-label="Series actions">
               <span aria-hidden="true">⋯</span>
               <span class="board-actions-trigger-label">Actions</span>
             </button>
@@ -458,7 +458,7 @@
           <h2>Story actions</h2>
           <div class="board-actions-modal-list">
             <button id="modal-rename-board" class="ghost-button" type="button">Rename story</button>
-            <button id="modal-add-board-to-group" class="ghost-button" type="button">Add story to group</button>
+            <button id="modal-add-board-to-group" class="ghost-button" type="button">Add story to series</button>
             <button id="modal-export-board" class="ghost-button" type="button">Export the story</button>
             <button id="modal-edit-note-types" class="ghost-button" type="button">Edit note types</button>
             <button id="modal-reset-phase-order" class="ghost-button" type="button">Reset phase order</button>
@@ -471,8 +471,8 @@
       </div>
       <div id="add-board-to-group-modal-overlay" class="modal-overlay hidden">
         <div class="modal board-actions-modal" role="dialog" aria-modal="true" aria-labelledby="add-board-to-group-title">
-          <h2 id="add-board-to-group-title">Add to group</h2>
-          <p class="subtitle add-board-to-group-intro">Choose a group. The story will be added to the end of that group.</p>
+          <h2 id="add-board-to-group-title">Add to series</h2>
+          <p class="subtitle add-board-to-group-intro">Choose a series. The story will be added to the end of that series.</p>
           <p id="add-board-to-group-empty" class="subtitle add-board-to-group-empty hidden" role="status"></p>
           <div id="add-board-to-group-list" class="board-actions-modal-list add-board-to-group-list"></div>
           <div class="modal-actions">
@@ -481,12 +481,12 @@
         </div>
       </div>
       <div id="group-actions-modal-overlay" class="modal-overlay hidden">
-        <div class="modal board-actions-modal" role="dialog" aria-modal="true" aria-label="Group actions">
-          <h2>Group actions</h2>
+        <div class="modal board-actions-modal" role="dialog" aria-modal="true" aria-label="Series actions">
+          <h2>Series actions</h2>
           <div class="board-actions-modal-list">
             <button id="modal-reorder-group-boards" class="ghost-button" type="button">Reorder stories</button>
             <button id="modal-remove-board-from-group" class="ghost-button danger-menu-item" type="button">Remove story</button>
-            <button id="modal-delete-group" class="ghost-button danger-menu-item" type="button">Delete group</button>
+            <button id="modal-delete-group" class="ghost-button danger-menu-item" type="button">Delete series</button>
           </div>
           <div class="modal-actions">
             <button id="close-group-actions-modal" class="ghost-button" type="button">Close</button>
@@ -496,7 +496,7 @@
       <div id="group-reorder-modal-overlay" class="modal-overlay hidden">
         <div class="modal board-actions-modal" role="dialog" aria-modal="true" aria-label="Reorder stories">
           <h2>Reorder stories</h2>
-          <p class="subtitle">Drag stories to change their order in this group.</p>
+          <p class="subtitle">Drag stories to change their order in this series.</p>
           <div id="group-reorder-list" class="reorder-list"></div>
           <p id="group-reorder-status" class="reorder-status" aria-live="polite"></p>
           <div class="modal-actions">

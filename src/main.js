@@ -762,17 +762,17 @@ function groupCardTemplate(group) {
           .join("")}</ul>`
       : `<div class="board-meta-line">No stories yet</div>`;
   return `
-    <article class="board-card" data-group-id="${group.id}" role="button" tabindex="0" aria-label="Open group ${group.title}">
+    <article class="board-card" data-group-id="${group.id}" role="button" tabindex="0" aria-label="Open series ${group.title}">
       <div>
         <strong>${group.title}</strong>
         <div class="board-meta">
-          <div class="board-meta-line">Group • ${group.boardIds.length} stories</div>
+          <div class="board-meta-line">Series • ${group.boardIds.length} stories</div>
           ${boardListHtml}
           <div class="board-meta-line">Updated ${formatDate(group.updatedAt)}</div>
         </div>
       </div>
       <div class="board-actions">
-        <button type="button" class="action-button" data-role="group-actions" aria-label="Group actions">
+        <button type="button" class="action-button" data-role="group-actions" aria-label="Series actions">
           <span class="action-icon" aria-hidden="true">⋯</span>
           <span class="action-label">Actions</span>
         </button>
@@ -1273,9 +1273,9 @@ function openBoardActionsModal(boardId) {
     const eligible = groupsEligibleForBoard(boardId);
     modalAddBoardToGroupBtn.disabled = groups.length === 0 || eligible.length === 0;
     if (groups.length === 0) {
-      modalAddBoardToGroupBtn.title = "Create a group first";
+    modalAddBoardToGroupBtn.title = "Create a series first";
     } else if (eligible.length === 0) {
-      modalAddBoardToGroupBtn.title = "This story is already in every group";
+    modalAddBoardToGroupBtn.title = "This story is already in every series";
     } else {
       modalAddBoardToGroupBtn.title = "";
     }
@@ -1316,7 +1316,7 @@ function openAddBoardToGroupModal(boardId) {
     if (introEl) introEl.classList.add("hidden");
     if (emptyEl) {
       emptyEl.textContent =
-        "This story is already in every group. Create a new group from the dashboard, or remove the story from a group first.";
+        "This story is already in every series. Create a new series from the dashboard, or remove the story from a series first.";
       emptyEl.classList.remove("hidden");
     }
   } else {
