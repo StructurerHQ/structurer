@@ -130,7 +130,7 @@ export function createGroupModalController({
       const group = getGroups().find((item) => item.id === groupActionsModalGroupId);
       if (!group) return;
       if (group.boardIds.length < 2) {
-        window.alert("Reorder is available when the group has at least 2 boards.");
+        window.alert("Reorder is available when the series has at least 2 stories.");
         return;
       }
       openGroupReorderModal(group);
@@ -151,7 +151,7 @@ export function createGroupModalController({
         })
         .filter(Boolean)
         .join("\n");
-      const selectedInput = window.prompt(`Remove which board?\n${choices}`);
+      const selectedInput = window.prompt(`Remove which story?\n${choices}`);
       if (!selectedInput) return;
       const selected = Number(selectedInput) - 1;
       if (!Number.isInteger(selected) || selected < 0 || selected >= group.boardIds.length) return;
@@ -175,7 +175,9 @@ export function createGroupModalController({
       const groups = getGroups();
       const group = groups.find((item) => item.id === groupActionsModalGroupId);
       if (!group) return;
-      const confirmed = window.confirm(`Delete group "${group.title}"? This action cannot be undone.`);
+      const confirmed = window.confirm(
+        `Delete series "${group.title}"? This action cannot be undone.`,
+      );
       if (!confirmed) return;
       const nextGroups = groups.filter((item) => item.id !== group.id);
       setGroups(nextGroups);

@@ -69,6 +69,12 @@ body {
   text-align: center;
 }
 
+.landing-brand h1 {
+  font-size: 2rem;
+  font-weight: 750;
+  line-height: 1.2;
+}
+
 .dashboard-topbar {
   display: grid;
   grid-template-columns: 1fr auto 1fr;
@@ -145,6 +151,16 @@ h1 {
   color: var(--muted);
 }
 
+.link-crimson,
+a,
+a:visited {
+  color: crimson;
+}
+
+a:hover {
+  color: darkred;
+}
+
 .toolbar {
   display: flex;
   align-items: center;
@@ -156,7 +172,8 @@ h1 {
 .empty-state,
 .home-import,
 .home-custom-structure,
-.home-create-group {
+.home-create-group,
+.home-reset-panel {
   background: #fff;
   border: 1px solid var(--line);
   border-radius: 12px;
@@ -174,6 +191,9 @@ h1 {
 
 .landing-hero h2 {
   margin: 0 0 8px;
+  font-size: 1.2rem;
+  font-weight: 750;
+  line-height: 1.2;
 }
 
 .landing-hero p {
@@ -349,7 +369,7 @@ h1 {
   display: flex;
   justify-content: flex-end;
   gap: 8px;
-  margin-bottom: 14px;
+  margin: 0;
 }
 
 .create-board-form input {
@@ -376,6 +396,22 @@ h1 {
   font-size: 0.92rem;
   background: #f0f5f8;
   cursor: pointer;
+}
+
+.ghost-button:hover:not(:disabled):not(.danger-menu-item) {
+  background: #e5edf5;
+}
+
+.action-button:hover:not(:disabled) {
+  background: #e5edf5;
+}
+
+.phase-add:hover:not(:disabled) {
+  background: #e5edf5;
+}
+
+.board-actions-trigger:hover:not(:disabled) {
+  background: #e5edf5;
 }
 
 .app-nav {
@@ -410,7 +446,7 @@ h1 {
 .link-button {
   border: 0;
   background: transparent;
-  color: #2563eb;
+  color: crimson;
   font: inherit;
   font-size: 0.9rem;
   padding: 0;
@@ -420,7 +456,7 @@ h1 {
 }
 
 .link-button:hover {
-  color: #1d4ed8;
+  color: darkred;
 }
 
 .link-button:focus-visible {
@@ -637,6 +673,10 @@ h1 {
   margin-top: 10px;
 }
 
+.home-reset-panel .home-dev-reset .ghost-button {
+  margin-top: 10px;
+}
+
 .home-create-group .create-group-form {
   display: grid;
   gap: 10px;
@@ -722,6 +762,11 @@ h1 {
   cursor: not-allowed;
 }
 
+.modal .ghost-button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
 .create-structure-form {
   display: grid;
   gap: 10px;
@@ -785,9 +830,9 @@ h1 {
 }
 
 .board-card button {
-  border: 1px solid #16a34a;
-  background: #f0f5f8;
-  color: #166534;
+  border: 1px solid var(--line);
+  background: #f8f8f8;
+  color: var(--ink);
   border-radius: 8px;
   padding: 6px 10px;
   cursor: pointer;
@@ -1271,6 +1316,19 @@ h1 {
   margin-top: 10px;
 }
 
+.factory-reset-confirm-checkbox {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-top: 10px;
+  color: #374151;
+  font-size: 0.95rem;
+}
+
+.factory-reset-confirm-checkbox input[type="checkbox"] {
+  margin-top: 3px;
+}
+
 .color-grid {
   margin-top: 12px;
   display: grid;
@@ -1395,9 +1453,17 @@ h1 {
   margin: 0;
 }
 
+.app-footer-links {
+  margin: 0 0 6px;
+}
+
 .app-footer a {
-  color: inherit;
+  color: var(--muted);
   text-decoration: underline;
+}
+
+.app-footer a:hover {
+  color: #4b5563;
 }
 
 .app-footer-version {
@@ -1427,6 +1493,14 @@ h1 {
 
   .landing-hero {
     padding: 16px;
+  }
+
+  .landing-hero h2 {
+    font-size: 1.35rem;
+  }
+
+  .landing-brand h1 {
+    font-size: 1.6rem;
   }
 
   .landing-grid,

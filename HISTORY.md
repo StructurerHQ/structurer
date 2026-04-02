@@ -1,5 +1,17 @@
 # History
 
+**1.10.0**
+- Renamed Boards to Stories in the user-facing UI (FAQ, dashboard, modals, and commands).
+- Renamed Groups to Series in the user-facing UI (dashboard, modals, and FAQ).
+- Added footer utility links (`Privacy Policy — Terms and conditions — Help`) and new SPA routes/pages for `/privacy` and `/terms`.
+- Added a dedicated, irreversible Factory Reset confirmation modal with explicit warning text and required acknowledgement checkbox before enabling reset.
+- Expanded and reordered Help FAQ content (including demo-edit guidance and local data reset guidance) for a clearer learning path.
+- Added dashboard-level `... Actions` control and migrated dashboard creation/import/series/reset workflows into modal-driven flows (command list + detail modals).
+- Improved dashboard command consistency by removing legacy bottom expandable panels for import/create series/reset.
+- Improved dashboard demo filtering: `Hide demos` now hides both demo stories and demo-only series.
+- Polished interaction feedback and visual consistency: broader hover states across app buttons and updated link color strategy (crimson links with footer github link exception).
+- Updated landing/demo communication to include the Series demo entry (`The Matrix Trilogy`) in the demo map.
+
 **1.9.4**
 - **Empty phases:** columns with no notes use the same white background as filled columns (instead of a grey fill), and phase titles are no longer muted—so new boards and sparse grids read brighter in the editor and in group preview.
 - **Demo boards:** sample notes using **Subplot**, **Detail**, and **Other** (plus existing plot/character/theme) were added to the Matrix, Odyssey, Finding Nemo, and Jurassic Park demos so new installs and “reset demos” show the expanded palette; **Todo** is omitted there since it models the writer’s own tasks, not in-world story beats.
