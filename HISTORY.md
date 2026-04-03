@@ -1,6 +1,6 @@
 # History
 
-**1.13.2** - 2026-04-04
+**1.13.2** - 2026-04-03
 - **Custom structures** (`structurer.custom-structures`): **export** now sets **`schemaVersion`: `2`** (was `1`) so the file format matches optional structure-level **`description`** and **`author`** introduced in 1.13.1; the `structures` array contract is unchanged.
 - **Import** now **validates `schemaVersion`**: **`1`**, **`2`**, or **omitted** (legacy files) are accepted; any other value fails with a clear error. Older exports without the field or with `1` continue to import as before.
 
