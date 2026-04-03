@@ -1264,7 +1264,7 @@ a:hover {
 }
 
 .dashboard-actions-section[open] summary.dashboard-actions-section-summary {
-  /*border-bottom: 1px solid var(--line);*/
+  border-bottom: 1px solid var(--line);
 }
 
 .dashboard-actions-section summary.dashboard-actions-section-summary::-webkit-details-marker {
@@ -1483,6 +1483,10 @@ a:hover {
 }
 
 .phase-title-toggle {
+  display: inline-flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 5px;
   border: 0;
   background: transparent;
   padding: 0;
@@ -1496,6 +1500,14 @@ a:hover {
   text-align: left;
   flex: 1 1 auto;
   min-width: 0;
+}
+
+.phase-description-indicator {
+  flex-shrink: 0;
+  font-size: 0.85em;
+  font-weight: 600;
+  color: #6b7280;
+  line-height: 1;
 }
 
 .phase-help-panel {

@@ -1213,7 +1213,7 @@ function renderEditor() {
       const helpOpen = phaseDesc && phaseHelpOpenColumns.has(columnIndex);
       const phaseTitleLabel = escapeHtml(formatPhaseTitle(phase));
       const phaseTitleHtml = phaseDesc
-        ? `<button type="button" class="phase-title phase-title-toggle" data-role="phase-description-toggle" data-column="${columnIndex}" aria-expanded="${Boolean(helpOpen)}"${helpOpen ? ` aria-controls="phase-help-${columnIndex}"` : ""} aria-label="${helpOpen ? "Hide" : "Show"} phase description" title="Show or hide phase description">${phaseTitleLabel}</button>`
+        ? `<button type="button" class="phase-title phase-title-toggle" data-role="phase-description-toggle" data-column="${columnIndex}" aria-expanded="${Boolean(helpOpen)}"${helpOpen ? ` aria-controls="phase-help-${columnIndex}"` : ""} aria-label="${helpOpen ? "Hide" : "Show"} phase description" title="Show or hide phase description">${phaseTitleLabel}<span class="phase-description-indicator" aria-hidden="true">ⓘ</span></button>`
         : `<h2 class="phase-title">${phaseTitleLabel}</h2>`;
       const helpPanel =
         phaseDesc && helpOpen
@@ -1374,10 +1374,15 @@ function renderGroup() {
             .map((phase, columnIndex) => {
               const noteItems = getColumnNotes(board.notes, columnIndex);
               const emptyClass = noteItems.length === 0 ? " column-empty" : "";
+              const phaseDescPreview = getPhaseDescription(phase);
+              const phaseIndicator =
+                phaseDescPreview.length > 0
+                  ? `<span class="phase-description-indicator" aria-hidden="true">ⓘ</span>`
+                  : "";
               return `
               <section class="column${emptyClass}">
                 <div class="phase-head">
-                  <h2 class="phase-title">${formatPhaseTitle(phase)}</h2>
+                  <h2 class="phase-title">${escapeHtml(formatPhaseTitle(phase))}${phaseIndicator}</h2>
                 </div>
                 <div class="notes">
                   ${noteItems
