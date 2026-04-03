@@ -2,16 +2,28 @@
   "title": "Finding Nemo",
   "structure": "Story Circle",
   "notes": [
-    { "kind": "plot", "column": 0, "order": 0, "text": "Marlin lives in anxious routine, overprotecting Nemo after traumatic loss." },
-    { "kind": "other", "column": 0, "order": 1, "text": "Pixar story discipline: every reef joke should also reinforce Marlin's fear or Nemo's need for agency." },
-    { "kind": "plot", "column": 1, "order": 0, "text": "Nemo is taken by divers, forcing Marlin to confront his deepest fear." },
-    { "kind": "plot", "column": 2, "order": 0, "text": "Marlin leaves safety and crosses the ocean with Dory to find Nemo." },
-    { "kind": "plot", "column": 3, "order": 0, "text": "They face sharks, jellyfish, and uncertain clues while learning to trust others." },
-    { "kind": "detail", "column": 3, "order": 1, "text": "East Australian Current + sea turtle ride: visual breath before the story tightens again." },
-    { "kind": "plot", "column": 4, "order": 0, "text": "Marlin finds a path toward Nemo's location and Nemo finds agency in the fish tank." },
-    { "kind": "subplot", "column": 4, "order": 1, "text": "Tank gang's escape plan mirrors Marlin's ocean crossing—two paths toward reunion." },
-    { "kind": "theme", "column": 5, "order": 0, "text": "The cost: Marlin must release control and risk loss to truly connect." },
-    { "kind": "plot", "column": 6, "order": 0, "text": "Marlin returns to Nemo and together they face the net crisis." },
-    { "kind": "plot", "column": 7, "order": 0, "text": "Marlin changes: he trusts Nemo's capability, becoming a more open and resilient father." }
+    { "kind": "plot", "column": 0, "order": 0, "text": "YOU: After losing his mate and eggs, Marlin raises Nemo in anxious routine, policing every small risk on the reef." },
+    { "kind": "character", "column": 0, "order": 1, "characterName": "Marlin", "archetype": "hero", "text": "Overprotective father whose fear of loss blocks both his and Nemo's growth." },
+
+    { "kind": "plot", "column": 1, "order": 0, "text": "NEED: Nemo rebels and touches the boat; divers capture him in front of Marlin, exposing how fear failed to keep him safe." },
+    { "kind": "theme", "column": 1, "order": 1, "text": "Trying to control everything doesn't prevent loss—it can make it worse." },
+
+    { "kind": "plot", "column": 2, "order": 0, "text": "GO: Marlin leaves the safety of the reef and teams up with Dory to cross the open ocean in search of Nemo." },
+    { "kind": "character", "column": 2, "order": 1, "characterName": "Dory", "archetype": "ally", "text": "Optimistic but forgetful partner who forces Marlin to improvise instead of hiding." },
+
+    { "kind": "plot", "column": 3, "order": 0, "text": "SEARCH: Sharks, jellyfish, and cryptic clues push Marlin to rely on others and face his panic repeatedly." },
+    { "kind": "detail", "column": 3, "order": 1, "text": "East Australian Current + sea turtle ride: a breath of wonder showing a wider world than Marlin's tiny reef." },
+
+    { "kind": "plot", "column": 4, "order": 0, "text": "FIND: Word of 'a clownfish looking for his son' spreads; Marlin gets a real lead to Sydney while Nemo tests himself in the dentist's tank." },
+    { "kind": "subplot", "column": 4, "order": 1, "text": "Tank gang's escape plan mirrors Marlin's arc—Nemo learns to solve problems without his father." },
+
+    { "kind": "theme", "column": 5, "order": 0, "text": "TAKE: Marlin must accept that loving Nemo means trusting him to take risks, even if it scares him." },
+    { "kind": "plot", "column": 5, "order": 1, "text": "Misunderstandings about Nemo's fate break Marlin for a moment, but Dory and the story of his search keep hope alive." },
+
+    { "kind": "plot", "column": 6, "order": 0, "text": "RETURN: Marlin and Nemo finally reunite, only to face the last danger of the fishing net together." },
+    { "kind": "character", "column": 6, "order": 1, "characterName": "Nemo", "archetype": "ally", "text": "Steps into active problem-solver, asking his dad to trust him to save the school of fish." },
+
+    { "kind": "plot", "column": 7, "order": 0, "text": "CHANGE: Back home, Marlin lets Nemo explore and go to school with new freedom, their relationship transformed." },
+    { "kind": "theme", "column": 7, "order": 1, "text": "True safety comes from connection and courage, not from never leaving the anemone." }
   ]
 }

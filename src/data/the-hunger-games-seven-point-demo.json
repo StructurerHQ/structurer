@@ -1,0 +1,31 @@
+{
+  "title": "The Hunger Games",
+  "structure": "7-Point Story Structure",
+  "notes": [
+    { "kind": "plot", "column": 0, "order": 0, "text": "Hook: Katniss survives in District 12 by hunting illegally and protecting her family under a brutal political system." },
+    { "kind": "character", "column": 0, "order": 1, "characterName": "Katniss Everdeen", "archetype": "hero", "text": "Resourceful survivor whose first priority is family, not revolution." },
+    { "kind": "theme", "column": 0, "order": 2, "text": "Personal survival and political oppression are inseparable in Panem." },
+
+    { "kind": "plot", "column": 1, "order": 0, "text": "Plot Turn 1: Prim is reaped; Katniss volunteers and enters the Games, crossing from local hardship to national spectacle." },
+    { "kind": "character", "column": 1, "order": 1, "characterName": "Prim", "archetype": "ally", "text": "Her vulnerability defines Katniss's core motivation and moral line." },
+
+    { "kind": "plot", "column": 2, "order": 0, "text": "Pinch Point 1: In training and interviews, the Capitol's control and the lethal nature of the arena become undeniable." },
+    { "kind": "character", "column": 2, "order": 1, "characterName": "Haymitch", "archetype": "mentor", "text": "Teaches performance strategy: in the Games, image and sponsors can be as important as combat skill." },
+    { "kind": "subplot", "column": 2, "order": 2, "text": "Peeta's public declaration of love reframes Katniss's strategy around narrative and audience perception." },
+
+    { "kind": "plot", "column": 3, "order": 0, "text": "Midpoint: Inside the arena, Katniss chooses alliance and compassion (Rue, medicine plan) instead of pure self-preservation." },
+    { "kind": "character", "column": 3, "order": 1, "characterName": "Rue", "archetype": "ally", "text": "Her partnership and death transform Katniss's arc from survival to moral resistance." },
+    { "kind": "theme", "column": 3, "order": 2, "text": "Human solidarity becomes an act of rebellion against dehumanizing spectacle." },
+
+    { "kind": "plot", "column": 4, "order": 0, "text": "Pinch Point 2: Rule changes and arena manipulations intensify pressure; the Capitol repeatedly rewrites conditions to maintain control." },
+    { "kind": "subplot", "column": 4, "order": 1, "text": "Katniss and Peeta's 'star-crossed lovers' performance becomes both tactical shield and emotional complication." },
+    { "kind": "character", "column": 4, "order": 2, "characterName": "President Snow (off-screen force)", "archetype": "shadow", "text": "Represents the system's insistence that every human relationship be turned into control or spectacle." },
+
+    { "kind": "plot", "column": 5, "order": 0, "text": "Plot Turn 2: Final confrontation narrows to Katniss and Peeta versus Cato and engineered threats; the endgame is explicit and unavoidable." },
+    { "kind": "detail", "column": 5, "order": 1, "text": "Mutts and final arena sequencing visualize the Capitol's willingness to script violence to the last second." },
+
+    { "kind": "plot", "column": 6, "order": 0, "text": "Resolution: Faced with being forced to kill each other, Katniss and Peeta threaten double suicide with nightlock, forcing a political retreat." },
+    { "kind": "theme", "column": 6, "order": 1, "text": "Katniss wins by refusing the moral premise of the Games, not just by out-fighting opponents." },
+    { "kind": "subplot", "column": 6, "order": 2, "text": "After victory, uncertainty remains: private feelings, public narrative, and Capitol retaliation set up the longer saga arc." }
+  ]
+}

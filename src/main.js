@@ -98,6 +98,7 @@ const createGroupNameInput = document.querySelector("#create-group-name");
 const createGroupBoardsListEl = document.querySelector("#create-group-boards-list");
 const createGroupBoardsEmptyEl = document.querySelector("#create-group-boards-empty");
 const modalExportBoardBtn = document.querySelector("#modal-export-board");
+const modalResetDemoBoardBtn = document.querySelector("#modal-reset-demo-board");
 const modalDeleteBoardBtn = document.querySelector("#modal-delete-board");
 const groupActionsModalOverlay = document.querySelector("#group-actions-modal-overlay");
 const closeGroupActionsModalBtn = document.querySelector("#close-group-actions-modal");
@@ -1388,6 +1389,36 @@ function isDemoBoard(board) {
   return isLikelyDemoBoard(board);
 }
 
+function resetSingleDemoBoard(board) {
+  if (!board) return;
+  const boardSlug = board.slug || slugifyTitle(board.title || "");
+  let demoData = DEMO_BOARD_DATA.find((demo) => {
+    const demoSlug = slugifyTitle(demo.title || "");
+    return demoSlug === boardSlug && demo.structure === board.structure;
+  });
+  if (!demoData) {
+    // Fallback for renamed demo stories: if this board is flagged as demo, match by unique structure.
+    const sameStructure = DEMO_BOARD_DATA.filter((demo) => demo.structure === board.structure);
+    if (isDemoBoard(board) && sameStructure.length === 1) {
+      demoData = sameStructure[0];
+    }
+  }
+  if (!demoData) return;
+  const fresh = createDemoBoardFromJson(demoData);
+  board.structureId = fresh.structureId;
+  board.structure = fresh.structure;
+  board.phaseOrder = fresh.phaseOrder;
+  board.phaseUids = fresh.phaseUids;
+  board.nextNoteId = fresh.nextNoteId;
+  board.nextCommentId = fresh.nextCommentId;
+  board.notes = fresh.notes;
+  board.phaseComments = fresh.phaseComments;
+  board.phaseCommentsVersion = fresh.phaseCommentsVersion;
+  board.isDemo = true;
+  board.updatedAt = Date.now();
+  saveBoards();
+}
+
 function applyDemoVisibilityControl() {
   if (!toggleDemoVisibilityBtn) return;
   toggleDemoVisibilityBtn.textContent = showDemoBoards ? "Hide demos" : "Show demos";
@@ -1839,6 +1870,12 @@ function openBoardActionsModal(boardId) {
     const canReset = Boolean(board && isPhaseOrderModified(board));
     modalResetPhaseOrderBtn.disabled = !canReset;
     modalResetPhaseOrderBtn.title = canReset ? "" : "Phase order already matches the structure";
+  }
+  if (modalResetDemoBoardBtn) {
+    const isDemo = Boolean(board && isDemoBoard(board));
+    modalResetDemoBoardBtn.classList.toggle("hidden", !isDemo);
+    modalResetDemoBoardBtn.disabled = !isDemo;
+    modalResetDemoBoardBtn.title = isDemo ? "Restore this demo story to its original notes" : "";
   }
 }
 
@@ -2824,12 +2861,31 @@ if (phaseOrderConflictModalOverlay) {
   });
 }
 
-modalExportBoardBtn.addEventListener("click", () => {
-  const board = boards.find((item) => item.id === boardActionsModalBoardId);
-  if (!board) return;
-  downloadBoard(board);
-  closeBoardActionsModal();
-});
+if (modalExportBoardBtn) {
+  modalExportBoardBtn.addEventListener("click", () => {
+    const board = boards.find((item) => item.id === boardActionsModalBoardId);
+    if (!board) return;
+    downloadBoard(board);
+    closeBoardActionsModal();
+  });
+}
+
+if (modalResetDemoBoardBtn) {
+  modalResetDemoBoardBtn.addEventListener("click", () => {
+    if (!boardActionsModalBoardId) return;
+    const board = boards.find((item) => item.id === boardActionsModalBoardId);
+    if (!board || !isDemoBoard(board)) return;
+    const confirmed = window.confirm("Reset this demo story to its original notes?");
+    if (!confirmed) return;
+    resetSingleDemoBoard(board);
+    ensureMatrixTrilogySeriesDemo();
+    renderHome();
+    if (currentBoardId === board.id) {
+      renderEditor();
+    }
+    closeBoardActionsModal();
+  });
+}
 
 if (modalRenameBoardBtn) {
   modalRenameBoardBtn.addEventListener("click", () => {

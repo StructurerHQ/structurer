@@ -852,6 +852,7 @@ a:hover {
   gap: 8px;
   align-items: start;
   cursor: pointer;
+  transition: background-color 120ms ease-out, border-color 120ms ease-out;
 }
 
 .board-card > div:first-child {
@@ -861,6 +862,15 @@ a:hover {
 .board-card:focus-visible {
   outline: 2px solid #2563eb;
   outline-offset: 2px;
+}
+
+.board-card:hover {
+  background: #fffaf4;
+  border-color: #fed7aa;
+}
+
+.board-card:hover strong {
+  color: crimson;
 }
 
 .board-actions {

@@ -2,6 +2,16 @@
 
 **1.12.2** - 2026-04-02
 - Removed the previous 1000-character limit on phase comments (add form and inline edit); character count is still shown as a live length without a cap.
+- Upgraded demo content to better showcase rich use of structures:
+  - Back to the Future (Save the Cat) now includes more granular beats, character notes with archetypes, and explicit theme/subplot notes around family and destiny.
+  - Finding Nemo (Story Circle) emphasizes Marlin/Dory/Nemo character arcs per ring, plus tank-gang subplot and thematic notes on control vs trust.
+  - Harry Potter and the Sorcerer's Stone now appears as a Hero with a Thousand Faces demo (alongside The Odyssey) with expanded notes across Campbell phases.
+  - Pride and Prejudice (Romancing the Beat) maps key romance beats with character/theme/subplot notes for Elizabeth/Darcy and ensemble.
+  - Inception (MICE Quotient) separates Milieu/Idea/Character/Event threads with clearer notes per strand.
+  - The Odyssey (Hero with a Thousand Faces) gains additional notes for crew, Nausicaa, Sirens/Scylla/Charybdis, and the Argos/Telemachus/home-restoration cluster.
+- Changed the 7-Point Story Structure demo from Harry Potter to The Hunger Games, which follows a clearer seven-point arc; Harry Potter remains as an alternative mapping under Hero with a Thousand Faces.
+- Added a per-story **Reset this demo story** action in Story actions (⋯) that restores only that demo from its JSON template when applicable.
+- Improved dashboard hover feedback: story/series cards now warm-highlight on hover and their titles adopt the link color, making them feel more obviously clickable without changing layout.
 
 **1.12.1** - 2026-04-02
 - Help: added FAQ *I don't speak English. Where can I find structures in my language?* (built-in presets are in English; non-English structures come from imported extensions, with a pointer to the following FAQ on extensions and import).

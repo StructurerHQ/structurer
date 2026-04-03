@@ -2,20 +2,49 @@
   "title": "Back to the Future",
   "structure": "Save the Cat",
   "notes": [
-    { "kind": "plot", "column": 0, "order": 0, "text": "Marty McFly is introduced as a bright but unfocused teen in a restless small-town life." },
-    { "kind": "theme", "column": 1, "order": 0, "text": "Doc hints that choices can reshape destiny, not just inherit it." },
-    { "kind": "plot", "column": 2, "order": 0, "text": "Marty's family dynamic and school frustrations establish what he wants to escape." },
-    { "kind": "plot", "column": 3, "order": 0, "text": "Doc's DeLorean experiment goes wrong when Marty is forced to flee in the time machine." },
-    { "kind": "plot", "column": 4, "order": 0, "text": "Marty realizes he is trapped in 1955 and must navigate unfamiliar rules." },
-    { "kind": "plot", "column": 5, "order": 0, "text": "Marty commits to getting back to 1985 by teaming up with younger Doc." },
-    { "kind": "character", "column": 6, "order": 0, "characterName": "George McFly", "archetype": "ally", "text": "B-story thread: helping his father become confident and win Lorraine authentically." },
-    { "kind": "plot", "column": 7, "order": 0, "text": "Comic and emotional set-pieces around school, romance, and Biff build momentum." },
-    { "kind": "plot", "column": 8, "order": 0, "text": "At the dance, timing and romance collide: Marty nearly erases himself before correcting the timeline." },
-    { "kind": "plot", "column": 9, "order": 0, "text": "Storm, sabotage, and last-minute failures threaten both the lightning plan and timeline repair." },
-    { "kind": "plot", "column": 10, "order": 0, "text": "Marty appears to lose Doc and his chance to return, with stakes at maximum." },
-    { "kind": "theme", "column": 11, "order": 0, "text": "Dark reflection: maybe the future is fixed and he cannot save anyone." },
-    { "kind": "plot", "column": 12, "order": 0, "text": "Marty executes the final plan and returns to 1985 with hard-earned clarity." },
-    { "kind": "plot", "column": 13, "order": 0, "text": "Doc survives, the family timeline improves, and Marty sees change is possible." },
-    { "kind": "plot", "column": 14, "order": 0, "text": "Final image mirrors the opening life but transformed: confidence, momentum, and new possibility." }
+    { "kind": "plot", "column": 0, "order": 0, "text": "Opening skate sequence and giant amplifier: Marty is a talented but unfocused teen, already out of sync with his small-town life." },
+    { "kind": "detail", "column": 0, "order": 1, "text": "Opening image contrast: cluttered McFly house, broken car, and George's posture quietly sell 'stuck future' before we talk about time travel." },
+
+    { "kind": "theme", "column": 1, "order": 0, "text": "Doc hints that the future isn't written yet; choices (not fate) define who you become." },
+    { "kind": "character", "column": 1, "order": 1, "characterName": "Marty", "archetype": "hero", "text": "Wants music and independence but secretly fears he'll repeat his parents' failures." },
+
+    { "kind": "plot", "column": 2, "order": 0, "text": "Set-up at home and school: George is bullied by Biff; Lorraine is bitter; Marty's band is rejected." },
+    { "kind": "subplot", "column": 2, "order": 1, "text": "Marty's fear that 'no McFly ever amounted to anything' becomes the emotional engine under every decision." },
+
+    { "kind": "plot", "column": 3, "order": 0, "text": "At Twin Pines Mall, the DeLorean reveal escalates quickly when Libyans arrive and Marty flees in the time machine." },
+    { "kind": "character", "column": 3, "order": 1, "characterName": "Doc Brown", "archetype": "mentor", "text": "Eccentric scientist whose belief in possibility contrasts with Marty's self-doubt." },
+
+    { "kind": "plot", "column": 4, "order": 0, "text": "Marty lands in 1955, disrupts George and Lorraine's meet-cute, and realizes he has accidentally erased his own future." },
+    { "kind": "theme", "column": 4, "order": 1, "text": "The past is fragile: small choices ripple into massive consequences." },
+
+    { "kind": "plot", "column": 5, "order": 0, "text": "Marty commits to fixing both the timeline and his ride home by convincing 1955 Doc and repairing the clock tower plan." },
+    { "kind": "character", "column": 5, "order": 1, "characterName": "Doc Brown (1955)", "archetype": "mentor", "text": "Young Doc is skeptical but inspired by Marty's proof; their partnership anchors the second act." },
+
+    { "kind": "character", "column": 6, "order": 0, "characterName": "George McFly", "archetype": "ally", "text": "B-story: Marty must coach George into standing up to Biff and genuinely winning Lorraine's heart." },
+    { "kind": "plot", "column": 6, "order": 1, "text": "Plan: fake an assault so George can 'rescue' Lorraine at the dance and rewrite his own story." },
+
+    { "kind": "plot", "column": 7, "order": 0, "text": "Fun and Games: fish-out-of-water comedy at school, 'Calvin Klein' romance, and Biff's escalating intimidation." },
+    { "kind": "subplot", "column": 7, "order": 1, "text": "Lorraine's crush on Marty complicates the plan and heightens the paradox tension." },
+
+    { "kind": "plot", "column": 8, "order": 0, "text": "Midpoint: under the sea dance. Marty nearly fades out of existence as the photo disappears, until George finally punches Biff and kisses Lorraine." },
+    { "kind": "theme", "column": 8, "order": 1, "text": "Act of courage rewrites destiny: George's single choice changes the entire McFly line." },
+
+    { "kind": "plot", "column": 9, "order": 0, "text": "Bad Guys Close In: storm, broken cable, and Biff's crew closing in create overlapping threats around the clock tower and the dance." },
+    { "kind": "detail", "column": 9, "order": 1, "text": "Ticking clock visual: repeated cuts to the clock face and lightning clouds keep the Save the Cat 'deadline' front and center." },
+
+    { "kind": "plot", "column": 10, "order": 0, "text": "All Is Lost: Marty believes Doc will be shot in 1985 no matter what he does; the letter is torn up in his face." },
+    { "kind": "theme", "column": 10, "order": 1, "text": "Apparent proof that the future might be fixed and sacrifice is unavoidable." },
+
+    { "kind": "plot", "column": 11, "order": 0, "text": "Dark Night: Marty records his goodbye on camera and prepares to risk everything on the clock tower plan anyway." },
+    { "kind": "character", "column": 11, "order": 1, "characterName": "Marty", "archetype": "hero", "text": "Chooses action over fear, even if it means returning to a future where Doc dies." },
+
+    { "kind": "plot", "column": 12, "order": 0, "text": "Break into Three: lightning strike, repaired cable, and the DeLorean hit 88 mph at the last second—Marty returns to 1985." },
+    { "kind": "subplot", "column": 12, "order": 1, "text": "Callback: Twin Pines becomes Lone Pine Mall—visual proof that timelines and details really change." },
+
+    { "kind": "plot", "column": 13, "order": 0, "text": "Finale: Doc survives thanks to the saved letter; the improved McFly family and George's success reveal a better present." },
+    { "kind": "theme", "column": 13, "order": 1, "text": "You can rewrite the story you inherit—courage and care change family legacy." },
+
+    { "kind": "plot", "column": 14, "order": 0, "text": "Final Image: Marty has the truck, the girlfriend, and a revitalized family—but now knows his choices matter." },
+    { "kind": "detail", "column": 14, "order": 1, "text": "Doc returns from the future in a re-upgraded DeLorean, teasing more adventures while closing this arc cleanly." }
   ]
 }
