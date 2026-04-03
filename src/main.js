@@ -206,6 +206,7 @@ const savePhaseCommentBtn = document.querySelector("#save-phase-comment-btn");
 const boardEl = document.querySelector("#board");
 const groupBoardStackEl = document.querySelector("#group-board-stack");
 const homeListControlsEl = document.querySelector(".home-list-controls");
+const dashboardSectionDividerEl = document.querySelector(".dashboard-section-divider");
 const toggleDemoVisibilityBtn = document.querySelector("#toggle-demo-visibility");
 const homeCollapsiblePanels = [...document.querySelectorAll("#home-view .collapsible-panel")];
 let addBoardToGroupTargetBoardId = null;
@@ -917,6 +918,7 @@ function renderCreateGroupBoardCheckboxes() {
 }
 
 function groupCardTemplate(group) {
+  const isDemoSeries = group.boardIds.length > 0 && group.boardIds.every((id) => isDemoBoard(boards.find((board) => board.id === id)));
   const boardTitles = group.boardIds
     .map((id) => boards.find((board) => board.id === id)?.title)
     .filter(Boolean);
@@ -929,7 +931,7 @@ function groupCardTemplate(group) {
   return `
     <article class="board-card" data-group-id="${group.id}" role="button" tabindex="0" aria-label="Open series ${group.title}">
       <div>
-        <strong>${group.title}</strong>
+        <strong>${isDemoSeries ? '<span class="demo-label">Demo</span> ' : ""}${group.title}</strong>
         <div class="board-meta">
           <div class="board-meta-line">Series • ${group.boardIds.length} stories</div>
           ${boardListHtml}
@@ -1034,11 +1036,14 @@ function renderHome() {
   boardsList.innerHTML = sortedBoards
     .map((board) => {
       const structure = getStructureConfig(board.structureId);
-      return boardCardTemplate(board, structure.name, formatDate(board.updatedAt));
+      return boardCardTemplate(board, structure.name, formatDate(board.updatedAt), isDemoBoard(board));
     })
     .join("");
   if (homeListControlsEl) {
-    boardsList.appendChild(homeListControlsEl);
+    groupsList.insertAdjacentElement("afterend", homeListControlsEl);
+  }
+  if (dashboardSectionDividerEl && homeListControlsEl) {
+    homeListControlsEl.insertAdjacentElement("afterend", dashboardSectionDividerEl);
   }
   if (dashboardStructuresList) {
     const oneHourMs = 60 * 60 * 1000;
@@ -1083,7 +1088,7 @@ function renderEditor() {
   const editingId = editingNoteId;
   const isModifiedOrder = isPhaseOrderModified(board);
 
-  editorTitle.textContent = board.title;
+  editorTitle.innerHTML = `${isDemoBoard(board) ? '<span class="demo-label">Demo</span> ' : ""}${escapeHtml(board.title)}`;
   structureNameEl.textContent = isModifiedOrder ? `${structure.name} (modified)` : structure.name;
   boardEl.innerHTML = phases
     .map((phase, columnIndex) => {

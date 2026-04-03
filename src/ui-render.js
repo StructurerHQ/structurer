@@ -24,12 +24,12 @@ export function structurePhaseRowTemplate(index, value = "") {
   `;
 }
 
-export function boardCardTemplate(board, structureName, updatedAtText) {
+export function boardCardTemplate(board, structureName, updatedAtText, isDemo = false) {
   const noteCount = board.notes.length;
   return `
     <article class="board-card" data-board-id="${board.id}" role="button" tabindex="0" aria-label="Open ${board.title}">
       <div>
-        <strong>${board.title}</strong>
+        <strong>${isDemo ? '<span class="demo-label">Demo</span> ' : ""}${board.title}</strong>
         <div class="board-meta">
           <div class="board-meta-line">${structureName} • ${noteCount} notes</div>
           <div class="board-meta-line">Updated ${updatedAtText}</div>
