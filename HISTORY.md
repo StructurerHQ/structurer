@@ -1,5 +1,12 @@
 # History
 
+**1.12.5** - 2026-04-03
+- Updated repository links from `StructurerHQ` to `sullof` across app docs and in-app links.
+- Reordered dashboard sections for clearer flow: **Stories** first, then **Series**; moved `Hide demos` below series.
+- Improved dashboard structure section: renamed it to **Available structures**, added a link to the extensions catalog, and introduced a subtle visual divider for readability.
+- Added a **Demo** label for demo stories (dashboard cards and story page title) and demo-only series cards.
+- Refined dashboard card typography: slightly increased separation between title and metadata and tuned the demo badge size for better readability.
+
 **1.12.4** - 2026-04-03
 - Refreshed the landing hero styling: the **Open dashboard** button now uses a soft green pill design instead of dark black, and home cards use flat pastels derived from note colors instead of cool gradients.
 - Renamed landing card CSS classes to semantic content-based names (`card-privacy`, `card-portable`, `card-about-demos`, `card-demo-map`) for clearer styling intent and easier maintenance.
