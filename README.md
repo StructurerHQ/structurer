@@ -68,13 +68,13 @@ You can also create and save your own custom structures directly in the dashboar
 ## Included Demos
 
 - Hero's Journey -> The Matrix
-- Hero with a Thousand Faces -> The Odyssey
+- Hero with a Thousand Faces -> The Odyssey (and Harry Potter and the Sorcerer's Stone as an alternative mapping)
 - Three-Act Structure -> The Matrix Reloaded
 - Three-Act Structure -> Jurassic Park
 - Save the Cat -> Back to the Future
 - Save the Cat -> The Matrix Revolution
 - Story Circle -> Finding Nemo
-- 7-Point Story Structure -> Harry Potter and the Sorcerer's Stone
+- 7-Point Story Structure -> The Hunger Games
 - Romancing the Beat -> Pride and Prejudice
 - MICE Quotient -> Inception
 - Series demo -> The Matrix Trilogy (The Matrix -> The Matrix Reloaded -> The Matrix Revolution)

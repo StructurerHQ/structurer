@@ -1,0 +1,56 @@
+{
+  "title": "Harry Potter and the Sorcerer's Stone",
+  "structure": "Hero with a Thousand Faces",
+  "notes": [
+    { "kind": "plot", "column": 0, "order": 0, "text": "Call to Adventure: Hogwarts letters begin arriving, breaking the Dursleys' control over Harry's life." },
+    { "kind": "character", "column": 0, "order": 1, "characterName": "Harry", "archetype": "hero", "text": "Yearns for belonging and identity but still sees himself as powerless." },
+
+    { "kind": "plot", "column": 1, "order": 0, "text": "Refusal of the Call: The Dursleys isolate Harry and destroy letters, trying to force him back into normalcy." },
+    { "kind": "theme", "column": 1, "order": 1, "text": "The refusal comes from external oppression, not from Harry's lack of desire." },
+
+    { "kind": "plot", "column": 2, "order": 0, "text": "Supernatural Aid: Hagrid arrives, tells Harry the truth, and opens the door to the wizarding world." },
+    { "kind": "character", "column": 2, "order": 1, "characterName": "Hagrid", "archetype": "mentor", "text": "Bridge figure who offers warmth, truth, and practical guidance." },
+
+    { "kind": "plot", "column": 3, "order": 0, "text": "Crossing the First Threshold: Platform 9 3/4 and the Hogwarts Express mark Harry's full entry into a new reality." },
+    { "kind": "detail", "column": 3, "order": 1, "text": "Sorting ceremony commits him to Gryffindor, symbolically choosing courage over status." },
+
+    { "kind": "plot", "column": 4, "order": 0, "text": "Belly of the Whale: Hogwarts becomes total immersion - new rules, houses, rivalries, and hidden dangers." },
+    { "kind": "subplot", "column": 4, "order": 1, "text": "Draco conflict and Snape suspicion establish that this world is not merely wondrous but contested." },
+
+    { "kind": "plot", "column": 5, "order": 0, "text": "Road of Trials: Troll attack, Quidditch sabotage, and forbidden-corridor mystery test Harry's courage and judgment." },
+    { "kind": "character", "column": 5, "order": 1, "characterName": "Ron & Hermione", "archetype": "ally", "text": "Friendship forms through shared risk and complementary skills." },
+
+    { "kind": "plot", "column": 6, "order": 0, "text": "Meeting with the Goddess: Harry experiences deep emotional longing in the Mirror of Erised and confronts what he truly wants." },
+    { "kind": "theme", "column": 6, "order": 1, "text": "Desire for family becomes the emotional center that later guides his moral choices." },
+
+    { "kind": "plot", "column": 7, "order": 0, "text": "Woman as Temptress: The temptation is not romantic but psychological - to live in comforting illusion (Mirror) rather than reality." },
+    { "kind": "detail", "column": 7, "order": 1, "text": "Dumbledore's warning reframes temptation as fixation on fantasy." },
+
+    { "kind": "plot", "column": 8, "order": 0, "text": "Atonement with the Father: Harry confronts authority, legacy, and fear through Dumbledore's guidance and the looming shadow of Voldemort." },
+    { "kind": "character", "column": 8, "order": 1, "characterName": "Dumbledore", "archetype": "mentor", "text": "Father-like moral authority who teaches Harry that choices matter more than ability." },
+
+    { "kind": "plot", "column": 9, "order": 0, "text": "Apotheosis: Harry realizes he must actively protect the Stone; he is no longer a passive student waiting for adults." },
+    { "kind": "theme", "column": 9, "order": 1, "text": "Maturity begins when responsibility overrides fear." },
+
+    { "kind": "plot", "column": 10, "order": 0, "text": "The Ultimate Boon: At the Mirror in the chamber, Harry obtains the Stone because he seeks to protect it, not possess it." },
+    { "kind": "detail", "column": 10, "order": 1, "text": "This is the key ideological beat: selfless intent unlocks power." },
+
+    { "kind": "plot", "column": 11, "order": 0, "text": "Refusal of the Return: Harry is drawn toward the intensity of the magical world and the heroic confrontation rather than a simple child life." },
+    { "kind": "subplot", "column": 11, "order": 1, "text": "The story hints he now belongs to a larger war, not just a school-year mystery." },
+
+    { "kind": "plot", "column": 12, "order": 0, "text": "The Magic Flight: After facing Quirrell/Voldemort, Harry is rescued back from danger and loss of consciousness." },
+    { "kind": "character", "column": 12, "order": 1, "characterName": "Voldemort (through Quirrell)", "archetype": "shadow", "text": "Embodies hunger for power without love - Harry's ethical opposite." },
+
+    { "kind": "plot", "column": 13, "order": 0, "text": "Rescue from Without: Dumbledore and the school's protection framework preserve Harry after the confrontation." },
+    { "kind": "theme", "column": 13, "order": 1, "text": "The hero still needs community; individual courage works within a network of care." },
+
+    { "kind": "plot", "column": 14, "order": 0, "text": "Crossing of the Return Threshold: House Cup and term ending reintegrate Harry into ordinary school life with a transformed status." },
+    { "kind": "subplot", "column": 14, "order": 1, "text": "Public recognition of Gryffindor reframes Harry from outsider to valued member of a house and community." },
+
+    { "kind": "plot", "column": 15, "order": 0, "text": "Master of Two Worlds: Harry can now move between Muggle and magical identities with awareness of who he is in both." },
+    { "kind": "character", "column": 15, "order": 1, "characterName": "Harry", "archetype": "hero", "text": "No longer defined by the cupboard or by fame alone - he has chosen his values." },
+
+    { "kind": "plot", "column": 16, "order": 0, "text": "Freedom to Live: Harry returns for summer changed, carrying friendship, purpose, and a future that is no longer dictated by the Dursleys." },
+    { "kind": "theme", "column": 16, "order": 1, "text": "Love, loyalty, and moral choice provide the freedom that power alone cannot." }
+  ]
+}
