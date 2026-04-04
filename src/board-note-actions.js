@@ -109,7 +109,8 @@ export function createBoardNoteActionsController({
     const note = board.notes.find((item) => item.id === id);
     if (!note) return;
 
-    if (target.dataset.role === "delete") {
+    // Clicks on the trash SVG often hit <path>/<svg>, not the <button> (no data-role on descendants).
+    if (target.closest?.('[data-role="delete"]')) {
       board.notes = board.notes.filter((item) => item.id !== id);
       if (getEditingNoteId() === id) setEditingNoteId(null);
       normalizeOrders(board.notes, board.structureId);
