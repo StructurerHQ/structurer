@@ -149,3 +149,5 @@ Version history is maintained in [HISTORY.md](HISTORY.md).
 
 2026 Francesco Sullo <francesco@sullo.co> — Built with Cursor AI.   
 I chose to do so because I didn't want to waste too much time on it, preferring to focus on writing. The side effect is that Cursor has generated a code that is far from being optimized or efficient, and, most likely, in the future I will have to rewrite it entirely :-(
+
+Released under the [GNU General Public License v3.0](LICENSE.md).
