@@ -44,8 +44,9 @@
                 across instances of Structurer.
               </p>
               <p>
-                You can also import community extension packs (custom structures) from the dashboard actions to expand
-                your available structure library.
+                You can also import community extension packs (custom structures) from the dashboard
+                <strong>⋯ Actions → Structure</strong> (<strong>Import/merge a custom structure</strong> or
+                <strong>Import/merge pasting JSON</strong>) to expand your available structure library.
               </p>
             </article>
             <article class="landing-card card-about-demos">
@@ -64,7 +65,7 @@
               <li><strong>Hero with a Thousand Faces:</strong> The Odyssey (plus Harry Potter as an alternative mapping)</li>
               <li><strong>Three-Act Structure:</strong> The Matrix Reloaded</li>
               <li><strong>Three-Act Structure:</strong> Jurassic Park</li>
-              <li><strong>Save the Cat:</strong> Back to the Future</li>
+              <li><strong>Save the Cat:</strong> Blade Runner</li>
               <li><strong>Save the Cat:</strong> The Matrix Revolution</li>
               <li><strong>Story Circle:</strong> Finding Nemo</li>
               <li><strong>7-Point Story Structure:</strong> The Hunger Games</li>
@@ -78,9 +79,21 @@
 
       <section id="home-view" class="view hidden">
         <header class="topbar dashboard-topbar">
-          <nav class="dashboard-topbar-left app-nav" aria-label="Dashboard navigation">
+          <div class="dashboard-topbar-left app-nav">
+            <button type="button" class="ghost-button app-history-back-btn" aria-label="Back in browsing history">Back</button>
+            <nav class="app-breadcrumb" aria-label="Breadcrumb">
+              <ol class="app-breadcrumb-list">
+                <li class="app-breadcrumb-item">
+                  <button type="button" class="link-button app-breadcrumb-link app-breadcrumb-home">Home</button>
+                </li>
+                <li class="app-breadcrumb-sep" aria-hidden="true">&gt;</li>
+                <li class="app-breadcrumb-item">
+                  <span class="app-breadcrumb-current" aria-current="page">Dashboard</span>
+                </li>
+              </ol>
+            </nav>
             <button id="go-landing-from-dashboard" class="ghost-button back-arrow-button" type="button" aria-label="Back to home">←</button>
-          </nav>
+          </div>
           <div class="dashboard-topbar-center">
             <h1>Dashboard</h1>
           </div>
@@ -137,11 +150,27 @@
 
       <section id="help-view" class="view hidden">
         <header class="topbar dashboard-topbar">
-          <nav class="dashboard-topbar-left app-nav" aria-label="Help navigation">
+          <div class="dashboard-topbar-left app-nav">
+            <button type="button" class="ghost-button app-history-back-btn" aria-label="Back in browsing history">Back</button>
+            <nav class="app-breadcrumb" aria-label="Breadcrumb">
+              <ol class="app-breadcrumb-list">
+                <li class="app-breadcrumb-item">
+                  <button type="button" class="link-button app-breadcrumb-link app-breadcrumb-home">Home</button>
+                </li>
+                <li class="app-breadcrumb-sep" aria-hidden="true">&gt;</li>
+                <li class="app-breadcrumb-item">
+                  <button type="button" class="link-button app-breadcrumb-link app-breadcrumb-dashboard">Dashboard</button>
+                </li>
+                <li class="app-breadcrumb-sep" aria-hidden="true">&gt;</li>
+                <li class="app-breadcrumb-item">
+                  <span class="app-breadcrumb-current" aria-current="page">Help</span>
+                </li>
+              </ol>
+            </nav>
             <button id="go-dashboard-from-help" class="ghost-button back-arrow-button" type="button" aria-label="Back to dashboard">
               ←
             </button>
-          </nav>
+          </div>
           <div class="dashboard-topbar-center">
             <h1>Help</h1>
           </div>
@@ -227,6 +256,11 @@
               <p>
                 If you ever want to restore the demos, go to the dashboard and run <strong>Reset demos</strong>.
                 Your personal stories and settings will be kept.
+              </p>
+              <p>
+                <strong>Hide demos</strong> can also read <strong>Hide demos and AI analyses</strong> when you have stories
+                imported from the <strong>Build AI import prompt</strong> flow (JSON with <code>aiAnalysisImport: true</code>).
+                That toggle hides built-in demos and those AI-tagged boards together.
               </p>
             </div>
           </details>
@@ -354,8 +388,8 @@
                 by default), you can add its phases manually and save it as your own reusable structure.
               </p>
               <p>
-                You can also import ready-made custom structure packs from dashboard actions using
-                <strong>Import custom structure</strong>.
+                You can also import ready-made custom structure packs from dashboard
+                <strong>⋯ Actions → Structure</strong> using <strong>Import/merge a custom structure</strong>.
               </p>
             </div>
           </details>
@@ -383,9 +417,9 @@
                 frameworks (including non-English variants) without changing the built-in defaults.
               </p>
               <p>
-                To use one: download a JSON file from the extensions catalog, open dashboard <strong>... Actions</strong>,
-                click <strong>Import custom structure</strong> and select the file, or use
-                <strong>Import custom structure (paste JSON)</strong> to paste JSON directly.
+                To use one: download a JSON file from the extensions catalog, open dashboard
+                <strong>⋯ Actions → Structure</strong>, click <strong>Import/merge a custom structure</strong> and select
+                the file, or use <strong>Import/merge pasting JSON</strong> to paste JSON directly.
               </p>
               <p>
                 See the catalog in
@@ -410,14 +444,10 @@
             <summary>The work I want to analyze is not in the demos. How do I map it to a structure?</summary>
             <div class="help-faq-content">
               <p>
-                Demos are only examples. For any film, novel, or show, you can build a similar board by generating a
-                ready-made prompt for an AI assistant (ChatGPT, Claude, etc.), then importing the JSON it returns.
-              </p>
-              <p>
-                Open <strong>Build AI import prompt</strong> (below), pick the narrative structure and enter the work’s
-                title. Copy the generated prompt into your AI tool, ask it to reply with <strong>only valid JSON</strong>,
-                then in the dashboard use <strong>… Actions → Import/merge a saved story → Paste story JSON</strong> (or
-                the same from the import dialog) to paste that JSON into Structurer.
+                Demos are only examples. On the dashboard, open the last card under <strong>Stories</strong> (“Want analyses
+                that aren’t in the demos?”) or use <strong>Build AI import prompt</strong> below: you get a ready-made
+                prompt for an AI assistant; full steps for importing the JSON are on that page after you generate the
+                prompt.
               </p>
               <p>
                 <button id="go-ai-analysis-prompt-from-help" type="button" class="ghost-button help-inline-action">
@@ -435,8 +465,10 @@
             <summary>How do export, import, and merge work?</summary>
             <div class="help-faq-content">
               <p>
-                Export a story from dashboard story actions. Import from <strong>Import/merge a saved story</strong> in
-                dashboard (choose <strong>Import story (file)</strong> or <strong>Paste story JSON</strong>).
+                Export a story from dashboard story actions. Import from <strong>⋯ Actions → Story</strong>:
+                <strong>Import/merge a saved story</strong> (then <strong>Import story (file)</strong> or
+                <strong>Paste story JSON</strong> in the dialog), or open <strong>Import/merge pasting JSON</strong>
+                directly.
               </p>
               <ul>
                 <li>If the imported story UID is new, Structurer creates a new story.</li>
@@ -496,7 +528,23 @@
 
       <section id="ai-analysis-prompt-view" class="view hidden">
         <header class="topbar dashboard-topbar">
-          <nav class="dashboard-topbar-left app-nav" aria-label="AI prompt navigation">
+          <div class="dashboard-topbar-left app-nav">
+            <button type="button" class="ghost-button app-history-back-btn" aria-label="Back in browsing history">Back</button>
+            <nav class="app-breadcrumb" aria-label="Breadcrumb">
+              <ol class="app-breadcrumb-list">
+                <li class="app-breadcrumb-item">
+                  <button type="button" class="link-button app-breadcrumb-link app-breadcrumb-home">Home</button>
+                </li>
+                <li class="app-breadcrumb-sep" aria-hidden="true">&gt;</li>
+                <li class="app-breadcrumb-item">
+                  <button type="button" class="link-button app-breadcrumb-link app-breadcrumb-dashboard">Dashboard</button>
+                </li>
+                <li class="app-breadcrumb-sep" aria-hidden="true">&gt;</li>
+                <li class="app-breadcrumb-item">
+                  <span class="app-breadcrumb-current" aria-current="page">Build AI import prompt</span>
+                </li>
+              </ol>
+            </nav>
             <button
               id="go-help-from-ai-analysis-prompt"
               class="ghost-button back-arrow-button"
@@ -505,7 +553,7 @@
             >
               ←
             </button>
-          </nav>
+          </div>
           <div class="dashboard-topbar-center">
             <h1>Build AI import prompt</h1>
           </div>
@@ -516,10 +564,8 @@
 
         <section class="help-card ai-analysis-prompt-card">
           <p class="subtitle">
-            Choose a structure and the work you are studying. Structurer builds a single block of text you can paste into
-            ChatGPT, Claude, or another LLM. The model should answer with <strong>only</strong> JSON that matches
-            Structurer’s story import format (like the built-in demos). Then import that JSON with
-            <strong>Paste story JSON</strong> from the dashboard.
+            Pick a structure template and the work’s title. Structurer builds one block of text to paste into ChatGPT,
+            Claude, or another LLM—ask it to reply with <strong>only</strong> valid JSON in Structurer’s import shape.
           </p>
 
           <form id="ai-analysis-prompt-form" class="ai-analysis-prompt-form">
@@ -532,7 +578,7 @@
               class="ai-prompt-input"
               type="text"
               maxlength="120"
-              placeholder="e.g. Casablanca, Blade Runner"
+              placeholder="e.g. Casablanca, Forrest Gump"
               required
               aria-label="Film or book title"
             />
@@ -545,7 +591,6 @@
               <option value="TV series">TV series</option>
               <option value="short story">Short story</option>
               <option value="play">Play / stage</option>
-              <option value="other">Other</option>
             </select>
 
             <div class="ai-prompt-output-wrap">
@@ -557,12 +602,53 @@
               <button id="copy-ai-prompt-btn" type="button" class="ghost-button">Copy prompt</button>
             </div>
           </form>
+
+          <section class="ai-prompt-json-followup" aria-labelledby="ai-prompt-json-followup-heading">
+            <h2 id="ai-prompt-json-followup-heading" class="ai-prompt-json-followup-title">After the AI returns JSON</h2>
+            <ol class="ai-prompt-json-followup-steps">
+              <li>Copy the model’s answer as plain JSON (strip markdown code fences if it wrapped the payload).</li>
+              <li>
+                The built-in prompt asks for root <code>"aiAnalysisImport": true</code>. Keep that field so Structurer tags
+                the board as <strong>AI analysis</strong>, shows an <strong>AI analysis</strong> badge, and includes it when
+                you use <strong>Hide demos and AI analyses</strong> on the dashboard. If the model omits it, the import is
+                treated like a normal story.
+              </li>
+              <li>
+                On the dashboard, open <strong>⋯ Actions → Story → Import/merge pasting JSON</strong> and paste the JSON
+                into Structurer.
+              </li>
+              <li>
+                If the imported story UID is new, Structurer creates a board. If that UID already exists, Structurer merges
+                notes by note UID (see the import FAQ for conflicts).
+              </li>
+            </ol>
+            <p class="subtitle ai-prompt-json-followup-note">
+              AI output can contain mistakes; review notes after import. Use imports for personal study only and respect the
+              work’s copyright.
+            </p>
+          </section>
         </section>
       </section>
 
       <section id="privacy-view" class="view hidden">
         <header class="topbar dashboard-topbar">
-          <nav class="dashboard-topbar-left app-nav" aria-label="Privacy navigation">
+          <div class="dashboard-topbar-left app-nav">
+            <button type="button" class="ghost-button app-history-back-btn" aria-label="Back in browsing history">Back</button>
+            <nav class="app-breadcrumb" aria-label="Breadcrumb">
+              <ol class="app-breadcrumb-list">
+                <li class="app-breadcrumb-item">
+                  <button type="button" class="link-button app-breadcrumb-link app-breadcrumb-home">Home</button>
+                </li>
+                <li class="app-breadcrumb-sep" aria-hidden="true">&gt;</li>
+                <li class="app-breadcrumb-item">
+                  <button type="button" class="link-button app-breadcrumb-link app-breadcrumb-dashboard">Dashboard</button>
+                </li>
+                <li class="app-breadcrumb-sep" aria-hidden="true">&gt;</li>
+                <li class="app-breadcrumb-item">
+                  <span class="app-breadcrumb-current" aria-current="page">Privacy Policy</span>
+                </li>
+              </ol>
+            </nav>
             <button
               id="go-dashboard-from-privacy"
               class="ghost-button back-arrow-button"
@@ -571,7 +657,7 @@
             >
               ←
             </button>
-          </nav>
+          </div>
           <div class="dashboard-topbar-center">
             <h1>Privacy Policy</h1>
           </div>
@@ -598,7 +684,23 @@
 
       <section id="terms-view" class="view hidden">
         <header class="topbar dashboard-topbar">
-          <nav class="dashboard-topbar-left app-nav" aria-label="Terms navigation">
+          <div class="dashboard-topbar-left app-nav">
+            <button type="button" class="ghost-button app-history-back-btn" aria-label="Back in browsing history">Back</button>
+            <nav class="app-breadcrumb" aria-label="Breadcrumb">
+              <ol class="app-breadcrumb-list">
+                <li class="app-breadcrumb-item">
+                  <button type="button" class="link-button app-breadcrumb-link app-breadcrumb-home">Home</button>
+                </li>
+                <li class="app-breadcrumb-sep" aria-hidden="true">&gt;</li>
+                <li class="app-breadcrumb-item">
+                  <button type="button" class="link-button app-breadcrumb-link app-breadcrumb-dashboard">Dashboard</button>
+                </li>
+                <li class="app-breadcrumb-sep" aria-hidden="true">&gt;</li>
+                <li class="app-breadcrumb-item">
+                  <span class="app-breadcrumb-current" aria-current="page">Terms and conditions</span>
+                </li>
+              </ol>
+            </nav>
             <button
               id="go-dashboard-from-terms"
               class="ghost-button back-arrow-button"
@@ -607,7 +709,7 @@
             >
               ←
             </button>
-          </nav>
+          </div>
           <div class="dashboard-topbar-center">
             <h1>Terms and conditions</h1>
           </div>
@@ -649,6 +751,22 @@
       <section id="group-view" class="view hidden">
         <header class="topbar editor-topbar">
           <div class="editor-topbar-left">
+            <button type="button" class="ghost-button app-history-back-btn" aria-label="Back in browsing history">Back</button>
+            <nav class="app-breadcrumb" aria-label="Breadcrumb">
+              <ol class="app-breadcrumb-list">
+                <li class="app-breadcrumb-item">
+                  <button type="button" class="link-button app-breadcrumb-link app-breadcrumb-home">Home</button>
+                </li>
+                <li class="app-breadcrumb-sep" aria-hidden="true">&gt;</li>
+                <li class="app-breadcrumb-item">
+                  <button type="button" class="link-button app-breadcrumb-link app-breadcrumb-dashboard">Dashboard</button>
+                </li>
+                <li class="app-breadcrumb-sep" aria-hidden="true">&gt;</li>
+                <li class="app-breadcrumb-item">
+                  <span class="app-breadcrumb-current" id="group-breadcrumb-current" aria-current="page">Series</span>
+                </li>
+              </ol>
+            </nav>
             <button id="go-dashboard-from-group" class="ghost-button back-arrow-button" type="button" aria-label="Back to dashboard">←</button>
           </div>
           <div class="editor-topbar-center">
@@ -683,6 +801,22 @@
 
         <header class="topbar editor-topbar">
           <div class="editor-topbar-left">
+            <button type="button" class="ghost-button app-history-back-btn" aria-label="Back in browsing history">Back</button>
+            <nav class="app-breadcrumb" aria-label="Breadcrumb">
+              <ol class="app-breadcrumb-list">
+                <li class="app-breadcrumb-item">
+                  <button type="button" class="link-button app-breadcrumb-link app-breadcrumb-home">Home</button>
+                </li>
+                <li class="app-breadcrumb-sep" aria-hidden="true">&gt;</li>
+                <li class="app-breadcrumb-item">
+                  <button type="button" class="link-button app-breadcrumb-link app-breadcrumb-dashboard">Dashboard</button>
+                </li>
+                <li class="app-breadcrumb-sep" aria-hidden="true">&gt;</li>
+                <li class="app-breadcrumb-item">
+                  <span class="app-breadcrumb-current" id="editor-breadcrumb-current" aria-current="page">Story</span>
+                </li>
+              </ol>
+            </nav>
             <button id="go-dashboard-from-board" class="ghost-button back-arrow-button" type="button" aria-label="Back to dashboard">←</button>
           </div>
           <div class="editor-topbar-center">
@@ -715,6 +849,22 @@
       <section id="phase-view" class="view hidden">
         <header class="topbar editor-topbar">
           <div class="editor-topbar-left">
+            <button type="button" class="ghost-button app-history-back-btn" aria-label="Back in browsing history">Back</button>
+            <nav class="app-breadcrumb" aria-label="Breadcrumb">
+              <ol class="app-breadcrumb-list">
+                <li class="app-breadcrumb-item">
+                  <button type="button" class="link-button app-breadcrumb-link app-breadcrumb-home">Home</button>
+                </li>
+                <li class="app-breadcrumb-sep" aria-hidden="true">&gt;</li>
+                <li class="app-breadcrumb-item">
+                  <button type="button" class="link-button app-breadcrumb-link app-breadcrumb-dashboard">Dashboard</button>
+                </li>
+                <li class="app-breadcrumb-sep" aria-hidden="true">&gt;</li>
+                <li class="app-breadcrumb-item">
+                  <span class="app-breadcrumb-current" id="phase-breadcrumb-current" aria-current="page">Phase</span>
+                </li>
+              </ol>
+            </nav>
             <button id="go-board-from-phase" class="ghost-button back-arrow-button" type="button" aria-label="Back to story">←</button>
           </div>
           <div class="editor-topbar-center">
@@ -789,7 +939,7 @@
                 <button id="open-create-story-action" class="ghost-button" type="button">Create a new story</button>
                 <button id="open-import-story-action" class="ghost-button" type="button">Import/merge a saved story</button>
                 <button id="dashboard-import-story-paste-action" class="ghost-button" type="button">
-                  Import story (paste JSON)
+                  Import/merge pasting JSON
                 </button>
               </div>
             </details>
@@ -804,9 +954,11 @@
               <div class="dashboard-actions-section-body">
                 <button id="open-create-structure-action" class="ghost-button" type="button">Add a structure not listed</button>
                 <button id="dashboard-export-structures-action" class="ghost-button" type="button">Export custom structures</button>
-                <button id="dashboard-import-structures-action" class="ghost-button" type="button">Import custom structure</button>
+                <button id="dashboard-import-structures-action" class="ghost-button" type="button">
+                  Import/merge a custom structure
+                </button>
                 <button id="dashboard-import-structures-paste-action" class="ghost-button" type="button">
-                  Import custom structure (paste JSON)
+                  Import/merge pasting JSON
                 </button>
                 <button id="dashboard-remove-structures-action" class="ghost-button" type="button" disabled>
                   Remove a structure
@@ -930,8 +1082,8 @@
       </div>
 
       <div id="dashboard-import-structures-paste-modal-overlay" class="modal-overlay hidden">
-        <div class="modal" role="dialog" aria-modal="true" aria-label="Import custom structure from JSON text">
-          <h2>Import custom structure (paste JSON)</h2>
+        <div class="modal" role="dialog" aria-modal="true" aria-label="Import/merge pasting JSON (custom structure)">
+          <h2>Import/merge pasting JSON</h2>
           <p class="subtitle">Paste a valid `structurer.custom-structures` JSON payload.</p>
           <form id="import-structures-paste-form">
             <textarea
@@ -964,8 +1116,8 @@
       </div>
 
       <div id="dashboard-import-story-paste-modal-overlay" class="modal-overlay hidden">
-        <div class="modal" role="dialog" aria-modal="true" aria-label="Import story from pasted JSON">
-          <h2>Import story (paste JSON)</h2>
+        <div class="modal" role="dialog" aria-modal="true" aria-label="Import/merge pasting JSON (story)">
+          <h2>Import/merge pasting JSON</h2>
           <p class="subtitle">Paste a story JSON payload (the same shape as <strong>Export story</strong> or the built-in demos).</p>
           <form id="import-story-paste-form">
             <textarea

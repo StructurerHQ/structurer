@@ -117,7 +117,14 @@ export function structureAlteredEditPhaseRowTemplate(
 }
 
 /** @param structureLineHtml — escaped name plus optional UI markers (e.g. altered suffix span); not double-escaped */
-export function boardCardTemplate(board, structureLineHtml, updatedAtText, isDemo = false, editingStoryTitleBoardId = null) {
+export function boardCardTemplate(
+  board,
+  structureLineHtml,
+  updatedAtText,
+  isDemo = false,
+  editingStoryTitleBoardId = null,
+  isAiAnalysisImport = false,
+) {
   const noteCount = board.notes.length;
   const safeTitle = escapeHtml(board.title);
   const titleMarkup =
@@ -127,7 +134,7 @@ export function boardCardTemplate(board, structureLineHtml, updatedAtText, isDem
   return `
     <article class="board-card" data-board-id="${board.id}" role="button" tabindex="0" aria-label="Open ${safeTitle}">
       <div>
-        <strong><div class="inline-story-title-root" data-role="inline-story-title-root" data-board-id="${board.id}"><span class="inline-story-title-host" data-role="inline-story-title-host">${isDemo ? '<span class="demo-label">Demo</span> ' : ""}${titleMarkup}</span></div></strong>
+        <strong><div class="inline-story-title-root" data-role="inline-story-title-root" data-board-id="${board.id}"><span class="inline-story-title-host" data-role="inline-story-title-host">${isDemo ? '<span class="demo-label">Demo</span> ' : ""}${isAiAnalysisImport ? '<span class="analysis-label">AI analysis</span> ' : ""}${titleMarkup}</span></div></strong>
         <div class="board-meta">
           <div class="board-meta-line">${structureLineHtml} • ${noteCount} notes</div>
           <div class="board-meta-line">Updated ${updatedAtText}</div>
@@ -137,6 +144,22 @@ export function boardCardTemplate(board, structureLineHtml, updatedAtText, isDem
         <button type="button" class="action-button" data-role="board-actions" aria-label="Story actions">
           <span class="action-icon" aria-hidden="true">⋯</span>
         </button>
+      </div>
+    </article>
+  `;
+}
+
+/** Dashboard-only card after the story list: opens Build AI import prompt. */
+export function dashboardAiPromptCtaCardTemplate() {
+  return `
+    <article class="board-card board-card-ai-prompt-cta" data-role="dashboard-ai-prompt-cta" role="button" tabindex="0" aria-label="Open Build AI import prompt">
+      <div>
+        <strong><span class="board-card-ai-prompt-cta-title">Want analyses that aren’t in the demos?</span></strong>
+        <div class="board-meta">
+          <div class="board-meta-line">
+            Click here to build a prompt for an AI assistant, then import the JSON into Structurer.
+          </div>
+        </div>
       </div>
     </article>
   `;

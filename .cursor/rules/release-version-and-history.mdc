@@ -1,0 +1,14 @@
+---
+description: When to bump package version vs append to HISTORY for the current release
+alwaysApply: true
+---
+
+# Version and HISTORY workflow
+
+Before changing `package.json` / `package-lock.json` version or adding a **new** top section in `HISTORY.md`:
+
+1. **Check the current git branch** (e.g. `git branch --show-current`).
+2. If the branch is still the **in-flight release** (e.g. `version-1-15-4` while `package.json` is `1.15.4`), **do not** increment the version. **Append** new bullets under the existing **`1.15.4`** block in `HISTORY.md` only.
+3. **Increment** the version and add a **new** dated section at the top of `HISTORY.md` **only** when working on the **next** release branch or after merge (e.g. branch `version-1-15-5` or default branch already targeting the next version).
+
+Never retroactively edit old `HISTORY.md` sections for past versions; only append new sections for new releases or append bullets to the **current** release block as above.

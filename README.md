@@ -71,7 +71,7 @@ You can also create and save your own custom structures directly in the dashboar
 - Hero with a Thousand Faces -> The Odyssey (and Harry Potter and the Sorcerer's Stone as an alternative mapping)
 - Three-Act Structure -> The Matrix Reloaded
 - Three-Act Structure -> Jurassic Park
-- Save the Cat -> Back to the Future
+- Save the Cat -> Blade Runner
 - Save the Cat -> The Matrix Revolution
 - Story Circle -> Finding Nemo
 - 7-Point Story Structure -> The Hunger Games
@@ -141,7 +141,7 @@ Version history is maintained in [HISTORY.md](HISTORY.md).
 
 - Curated extensions catalog: [Structurer Extensions Catalog](https://github.com/sullof/structurer-extensions/blob/main/EXTENSIONS.md)
 - How to contribute extension files: [Structurer Extensions Contribution Guide](https://github.com/sullof/structurer-extensions/blob/main/CONTRIBUTING_EXTENSIONS.md)
-- Import workflow in app: Dashboard `... Actions` -> `Import custom structure` (file) or `Import custom structure (paste JSON)`
+- Import workflow in app: Dashboard `... Actions → Structure` → `Import/merge a custom structure` (file) or `Import/merge pasting JSON`
 - Custom structure imports are strict-validated (invalid files fail entirely, no partial import)
 - Structure merge policy: UID-first, fingerprint fallback (`name + phases`), then Last-Write-Wins by `updatedAt`
 

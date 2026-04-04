@@ -2,207 +2,63 @@
   "title": "The Godfather",
   "structure": "Hero's Journey",
   "notes": [
-    {
-      "kind": "plot",
-      "column": 0,
-      "order": 0,
-      "text": "The Corleone family leads a powerful crime syndicate in 1940s New York. Michael Corleone, the youngest son, is a decorated war hero who wants nothing to do with the family business."
-    },
-    {
-      "kind": "character",
-      "column": 0,
-      "order": 1,
-      "text": "Michael Corleone, the reluctant heir, is intelligent, reserved, and moralistic. He sees himself outside the criminal world.",
-      "characterName": "Michael Corleone",
-      "archetype": "hero"
-    },
-    {
-      "kind": "theme",
-      "column": 0,
-      "order": 2,
-      "text": "Theme of family vs. criminal enterprise: the Corleone family is bound by blood and violence."
-    },
-    {
-      "kind": "plot",
-      "column": 1,
-      "order": 0,
-      "text": "Virgil 'The Turk' Sollozzo asks Don Vito Corleone to enter the narcotics trade. Don Corleone refuses, leading to an assassination attempt on his life."
-    },
-    {
-      "kind": "character",
-      "column": 1,
-      "order": 1,
-      "text": "The family needs Michael's help. He is called back from his 'ordinary world' of civilian life.",
-      "characterName": "Michael Corleone",
-      "archetype": "hero"
-    },
-    {
-      "kind": "plot",
-      "column": 2,
-      "order": 0,
-      "text": "Michael initially resists involvement. He tells Kay, 'That's my family, Kay, not me.' He insists he is different."
-    },
-    {
-      "kind": "theme",
-      "column": 2,
-      "order": 1,
-      "text": "Michael's internal conflict: loyalty to family vs. personal morality. The refusal highlights his tragic innocence."
-    },
-    {
-      "kind": "character",
-      "column": 3,
-      "order": 0,
-      "text": "Don Vito Corleone, recovering from the assassination attempt, becomes Michael's mentor in power and pragmatism. He teaches Michael how 'the man behind the table' operates.",
-      "characterName": "Don Vito Corleone",
-      "archetype": "mentor"
-    },
-    {
-      "kind": "plot",
-      "column": 3,
-      "order": 1,
-      "text": "Tom Hagen and Sonny also act as mentors in the family's violent code. Michael learns the rules of the criminal world."
-    },
-    {
-      "kind": "plot",
-      "column": 4,
-      "order": 0,
-      "text": "Michael volunteers to kill Sollozzo and corrupt police captain McCluskey at a restaurant meeting. He crosses from civilian into murderer."
-    },
-    {
-      "kind": "character",
-      "column": 4,
-      "order": 1,
-      "text": "Michael's transformation begins: he retrieves a hidden gun, and his face becomes cold and determined.",
-      "characterName": "Michael Corleone",
-      "archetype": "hero"
-    },
-    {
-      "kind": "detail",
-      "column": 4,
-      "order": 2,
-      "text": "Iconic line: 'It's not personal, Sonny. It's strictly business.'"
-    },
-    {
-      "kind": "plot",
-      "column": 5,
-      "order": 0,
-      "text": "Michael hides in Sicily. He meets and marries Apollonia. Meanwhile, Sonny is murdered at a causeway tollbooth."
-    },
-    {
-      "kind": "character",
-      "column": 5,
-      "order": 1,
-      "text": "Tom Hagen, loyal consigliere, remains an ally. The five families, especially Barzini and Tattaglia, are enemies.",
-      "characterName": "Tom Hagen",
-      "archetype": "ally"
-    },
-    {
-      "kind": "character",
-      "column": 5,
-      "order": 2,
-      "text": "Virgil Sollozzo and McCluskey are early enemies (shadows). Barzini is the ultimate puppet-master shadow.",
-      "characterName": "Emilio Barzini",
-      "archetype": "shadow"
-    },
-    {
-      "kind": "theme",
-      "column": 5,
-      "order": 3,
-      "text": "Theme of loyalty and betrayal: the family is torn apart by internal and external enemies."
-    },
-    {
-      "kind": "plot",
-      "column": 6,
-      "order": 0,
-      "text": "Michael returns to New York after Apollonia is killed by a car bomb meant for him. He prepares to take over as Don and plans a series of revenge assassinations."
-    },
-    {
-      "kind": "character",
-      "column": 6,
-      "order": 1,
-      "text": "Michael hardens completely. He lies to Kay about becoming 'legitimate' while secretly planning the purge.",
-      "characterName": "Michael Corleone",
-      "archetype": "hero"
-    },
-    {
-      "kind": "plot",
-      "column": 7,
-      "order": 0,
-      "text": "During his nephew's baptism, Michael renounces Satan while his men murder the five family heads, Moe Greene, and others. This is his moral death."
-    },
-    {
-      "kind": "character",
-      "column": 7,
-      "order": 1,
-      "text": "The baptism scene cross-cut with murders: Michael becomes the new Godfather, losing his soul.",
-      "characterName": "Michael Corleone",
-      "archetype": "hero"
-    },
-    {
-      "kind": "theme",
-      "column": 7,
-      "order": 2,
-      "text": "Theme of corruption: religious sanctity juxtaposed with brutal murder. Michael's 'ordeal' is spiritual damnation."
-    },
-    {
-      "kind": "plot",
-      "column": 8,
-      "order": 0,
-      "text": "Michael eliminates all enemies. He becomes the undisputed Don of the most powerful crime family in New York. The 'reward' is power, but at the cost of his humanity."
-    },
-    {
-      "kind": "character",
-      "column": 8,
-      "order": 1,
-      "text": "Michael's reward: control. But he loses his innocence, his wife Kay, and his own conscience.",
-      "characterName": "Michael Corleone",
-      "archetype": "hero"
-    },
-    {
-      "kind": "plot",
-      "column": 9,
-      "order": 0,
-      "text": "Kay confronts Michael about the murders. He denies ordering the killing of Carlo, who betrayed Sonny. But we see Michael's men close the door on Kay, excluding her."
-    },
-    {
-      "kind": "character",
-      "column": 9,
-      "order": 1,
-      "text": "Michael lies to Kay's face, then accepts the title of Don from his men. The road back is a lie.",
-      "characterName": "Michael Corleone",
-      "archetype": "hero"
-    },
-    {
-      "kind": "plot",
-      "column": 10,
-      "order": 0,
-      "text": "Michael orders Carlo's murder. He has become what he once despised. The final resurrection is not of Michael the man, but of the new Godfather."
-    },
-    {
-      "kind": "character",
-      "column": 10,
-      "order": 1,
-      "text": "The old Michael is dead. The resurrected Michael is a cold, ruthless mafia boss.",
-      "characterName": "Michael Corleone",
-      "archetype": "hero"
-    },
-    {
-      "kind": "detail",
-      "column": 10,
-      "order": 2,
-      "text": "Final shot: a door closes on Kay, symbolizing Michael's total isolation."
-    },
-    {
-      "kind": "plot",
-      "column": 11,
-      "order": 0,
-      "text": "Michael returns with the 'elixir' of absolute power. He is now the new Don, having secured the family's future through violence and betrayal."
-    },
-    {
-      "kind": "theme",
-      "column": 11,
-      "order": 1,
-      "text": "The tragic elixir: power corrupts absolutely. Michael has everything and nothing."
-    }
+    { "kind": "plot", "column": 0, "order": 0, "text": "The Corleone compound in 1945: a wedding in sunlight, a dark study where Don Vito hears petitioners with godlike patience. Michael Corleone arrives in Army uniform with Kay on his arm — the one son who stayed out of the business, the one the Don perhaps hoped for most." },
+    { "kind": "character", "column": 0, "order": 1, "text": "Michael is introduced as the family's exception: a war hero, educated, moral, and in love with a woman from the civilian world. 'That's my family, Kay, not me.' He means it. The tragedy is that he is also the most capable of them all — and the family will eventually know it.", "characterName": "Michael Corleone", "archetype": "hero" },
+    { "kind": "character", "column": 0, "order": 2, "text": "Don Vito Corleone in his study: unhurried, certain, quietly terrifying. He dispenses justice and favours in the dark while a wedding plays outside. The contrast is the film's first and most fundamental image — power that wears the face of paternal love.", "characterName": "Don Vito Corleone", "archetype": "mentor" },
+    { "kind": "theme", "column": 0, "order": 3, "text": "The ordinary world establishes the film's central question in the gap between sunlight and shadow: can a person stand at the border between two worlds indefinitely? The answer is no — and Michael's entire arc is the proof." },
+    { "kind": "location", "column": 0, "order": 4, "text": "The Corleone compound in Long Island: a world unto itself, governed by its own laws, its own loyalties, its own language. It is beautiful and insular — which is what makes it a trap." },
+
+    { "kind": "plot", "column": 1, "order": 0, "text": "Virgil Sollozzo approaches Don Corleone to back the narcotics trade and provide political protection. The Don refuses — narcotics are too dirty, the risk too high. His refusal sets every event in the film in motion." },
+    { "kind": "character", "column": 1, "order": 1, "text": "The assassination attempt on Don Vito leaves him gravely wounded and the family without its head. Michael's call to adventure is not an invitation but a crisis: his father is dying in a hospital with no protection, and the family is paralysed by grief and indecision.", "characterName": "Michael Corleone", "archetype": "hero" },
+    { "kind": "character", "column": 1, "order": 2, "text": "Sollozzo is the call's engine — impatient, pragmatic, and underestimating the Corleones at every turn. He is not the film's true villain; he is the first domino.", "characterName": "Virgil Sollozzo", "archetype": "shadow" },
+    { "kind": "theme", "column": 1, "order": 3, "text": "The call arrives not as opportunity but as emergency. Michael is not invited into the family business — he is dragged toward it by love and crisis. This is the film's argument: the worst corruptions begin as acts of loyalty." },
+
+    { "kind": "plot", "column": 2, "order": 0, "text": "Michael insists he is not part of this world. He tells Sonny to calm down; he tells Kay the family is separate from him. But he also goes alone to the hospital to check on his father, and when he finds it unguarded, he acts to protect him — his first step across the line." },
+    { "kind": "character", "column": 2, "order": 1, "text": "Michael's refusal is genuine and temporary. He genuinely believes he is different. The film does not mock this belief — it treats it as a real quality that the world will systematically destroy. His innocence is not weakness; it is the thing that will be taken from him.", "characterName": "Michael Corleone", "archetype": "hero" },
+    { "kind": "theme", "column": 2, "order": 2, "text": "The refusal beat is the film's most melancholy moment in retrospect: we watch Michael insist on a version of himself that will not survive the next two hours. Coppola never lets us feel superior to him — his reasoning is sound, and it is still not enough." },
+
+    { "kind": "plot", "column": 3, "order": 0, "text": "Don Vito, recovering from his wounds, becomes Michael's mentor — not by teaching him violence but by teaching him how power actually works: patience, relationships, leverage, the long game. He is the Don even from his hospital bed." },
+    { "kind": "character", "column": 3, "order": 1, "text": "Tom Hagen advises Michael on the family's legal exposure; Sonny models the hot-tempered, reactive alternative to the Don's coolness. Michael studies both and absorbs neither fully — he will synthesise them into something colder and more complete.", "characterName": "Tom Hagen", "archetype": "ally" },
+    { "kind": "character", "column": 3, "order": 2, "text": "The Don's wisdom is not simply criminal — it is civilisational. He understands that all power is a form of transaction, that loyalty is currency, and that violence is a tool of last resort precisely because it cannot be undone. He is trying to protect Michael from needing this knowledge.", "characterName": "Don Vito Corleone", "archetype": "mentor" },
+    { "kind": "theme", "column": 3, "order": 3, "text": "The mentor stage is where the film is most explicit about what Michael is being taught and what it will cost. The Don does not want Michael to succeed him — and yet he is the one who teaches Michael how." },
+
+    { "kind": "plot", "column": 4, "order": 0, "text": "Michael volunteers to meet Sollozzo and McCluskey at a restaurant and kill them both. He retrieves a planted gun from the bathroom. He sits with them, hears the sound of a passing train screaming in his head, and fires." },
+    { "kind": "character", "column": 4, "order": 1, "text": "The threshold crossing is a murder — which is the film's darkest structural choice. Most hero's journeys cross into adventure; Michael crosses into crime. The transformation begins not with power but with a killing in a cheap Italian restaurant.", "characterName": "Michael Corleone", "archetype": "hero" },
+    { "kind": "location", "column": 4, "order": 2, "text": "Louis's restaurant: modest, ordinary, the kind of place where nothing should happen. The banality of the setting is deliberate — the threshold is not grand. It is a bathroom and a table and a gun, and the sound of a train that only Michael can hear." },
+    { "kind": "detail", "column": 4, "order": 3, "text": "'Leave the gun. Take the cannoli.' — Clemenza's instruction after a murder, delivered with complete domestic practicality. The line defines the film's moral world: life and death and dinner, all in the same breath." },
+
+    { "kind": "plot", "column": 5, "order": 0, "text": "Michael hides in Sicily, pursued by McCluskey's allies. He falls in love with and marries Apollonia — a brief, sun-drenched pause in the film's darkening. Back in New York, Sonny is ambushed and killed at a causeway tollbooth." },
+    { "kind": "character", "column": 5, "order": 1, "text": "Apollonia represents the life Michael might have had — simple, beautiful, outside the family's world. Her death by car bomb (meant for Michael) is the film's cruelest irony: he brought destruction to the one place he tried to be separate from it.", "characterName": "Apollonia", "archetype": "ally" },
+    { "kind": "character", "column": 5, "order": 2, "text": "Emilio Barzini is revealed, slowly, as the true architect of the war against the Corleones — the shadow behind Sollozzo, the intelligence behind Tattaglia. He is the real antagonist, and Michael will not understand this until his father names him.", "characterName": "Emilio Barzini", "archetype": "shadow" },
+    { "kind": "subplot", "column": 5, "order": 3, "text": "Kay Adams waits. She does not know where Michael is or what he has done. Her waiting is the subplot's through-line: the civilian world, patient and unknowing, being slowly excluded from Michael's life before she has consented to leave it." },
+    { "kind": "location", "column": 5, "order": 4, "text": "Sicily: golden, timeless, and violent in the old way — vendetta and honour in a landscape that has not changed in centuries. Michael is temporarily absorbed into a world even older than the Corleones'. He is not safe here either." },
+
+    { "kind": "plot", "column": 6, "order": 0, "text": "Michael returns to New York. He reconnects with Kay, lies about what he has become, and marries her. He prepares — methodically, invisibly — to take over the family and destroy its enemies. The approach begins the moment he lands." },
+    { "kind": "character", "column": 6, "order": 1, "text": "Don Vito, recovered and ageing, names Barzini as the real enemy before Michael has asked. He knows his son has surpassed him — and he mourns it. 'I never wanted this for you, Michael. I worked my whole life, I don't apologise, to take care of my family. And I refused to be a fool, dancing on the string held by all those big shots.' The blessing is also a confession.", "characterName": "Don Vito Corleone", "archetype": "mentor" },
+    { "kind": "character", "column": 6, "order": 2, "text": "Michael lies to Kay with absolute fluency. This is the approach's most chilling detail: he is not struggling to deceive her. The man who could not lie has been replaced by a man for whom deception is simply a tool.", "characterName": "Michael Corleone", "archetype": "hero" },
+    { "kind": "theme", "column": 6, "order": 3, "text": "The approach to the inmost cave is Michael's consolidation of power dressed as normalcy. He reassumes civilian life, remarries, and plans murder simultaneously. The gap between his face and his actions is the film's measure of how far he has come." },
+
+    { "kind": "plot", "column": 7, "order": 0, "text": "Michael stands as godfather at his nephew's baptism. In intercutting sequence, his men murder all five family heads, Moe Greene, and every enemy the Corleones have. Michael renounces Satan while the killing proceeds." },
+    { "kind": "character", "column": 7, "order": 1, "text": "The baptism sequence is the film's masterwork: Michael's face remains serene, liturgical, entirely separate from what his hands are doing. He has achieved a total dissociation between his outward self and his actual nature. This is not strength — it is the completion of his corruption.", "characterName": "Michael Corleone", "archetype": "hero" },
+    { "kind": "theme", "column": 7, "order": 2, "text": "The ordeal is not physical but spiritual: Michael destroys his soul in a church. The film uses the baptism's structure — question and answer, renunciation and affirmation — to show us the exact mechanism of moral death. 'Do you renounce Satan?' 'I do renounce him.'" },
+
+    { "kind": "plot", "column": 8, "order": 0, "text": "Michael is undisputed Don. The Corleone family is safe; its enemies are dead; its future is secured. The reward is everything the family wanted and everything Michael once refused. He has succeeded in his father's terms and destroyed himself in his own." },
+    { "kind": "character", "column": 8, "order": 1, "text": "The reward scene — men kissing Michael's hand, calling him 'Don Corleone' — mirrors the film's opening. But where the Don received petitioners with warmth and calculation, Michael receives homage with perfect blankness. The face has closed.", "characterName": "Michael Corleone", "archetype": "hero" },
+    { "kind": "theme", "column": 8, "order": 2, "text": "The reward is the film's most corrosive irony: Michael has everything and has become nothing. Power achieved through the total sacrifice of self is not reward but substitution — the man wanted it; the Don received it." },
+
+    { "kind": "plot", "column": 9, "order": 0, "text": "Don Vito dies peacefully in his garden, playing with his grandson. Michael orders Carlo's death — his sister's husband, who betrayed Sonny. He sits with Connie's rage and denies nothing. The road back is walked over the bodies of everyone who trusted the family." },
+    { "kind": "character", "column": 9, "order": 1, "text": "The Don's death is the film's gentlest scene — a man who lived by violence dying in sunlight, chasing a child. It is deliberately dissonant: his life was terrible, and his death is peaceful. The film does not resolve this contradiction; it holds it.", "characterName": "Don Vito Corleone", "archetype": "mentor" },
+    { "kind": "subplot", "column": 9, "order": 2, "text": "Kay begins to understand something has changed in Michael — not fully, not yet. She is still inside the relationship, still capable of asking the wrong questions and receiving smooth denials. Her road back is not yet visible to her." },
+    { "kind": "theme", "column": 9, "order": 3, "text": "The road back is Michael's elimination of the last domestic threat — Carlo. He is tidying the world, removing loose ends, completing the logic of his own transformation. The road back is, for him, forward." },
+
+    { "kind": "plot", "column": 10, "order": 0, "text": "Kay asks Michael directly: did he order Carlo's killing? He tells her no — this one time, you can ask. She believes him, relieved. And then the door closes between them as his men kiss his hand in the next room." },
+    { "kind": "character", "column": 10, "order": 1, "text": "The lie to Kay is Michael's resurrection — but it is the resurrection of the Don, not Michael Corleone. The old Michael is dead. What rises in his place is a man who can lie to his wife about murder and feel nothing of consequence.", "characterName": "Michael Corleone", "archetype": "hero" },
+    { "kind": "character", "column": 10, "order": 2, "text": "Kay sees the door close and understands — in some wordless way she cannot yet name — that she has been excluded from her husband's real life. Her face in the last shot is the audience's face: we are all outside the door.", "characterName": "Kay Adams", "archetype": "shapeshifter" },
+    { "kind": "theme", "column": 10, "order": 3, "text": "The resurrection inverts the monomyth: the hero does not return transformed toward wholeness but toward emptiness. The film's argument is that the Hero's Journey can run in reverse — that the ordinary world a person abandons can be a kind of grace they only recognise once it's gone." },
+
+    { "kind": "plot", "column": 11, "order": 0, "text": "Michael sits in his study. Men come to pay respect. The door closes. Kay watches from outside." },
+    { "kind": "character", "column": 11, "order": 1, "text": "Michael has returned with the elixir — but the elixir is power, and power cannot heal what its acquisition destroyed. He has what his father had: a compound, a family, a title. He has lost what his father also had: the warmth that made those things worth having.", "characterName": "Michael Corleone", "archetype": "hero" },
+    { "kind": "theme", "column": 11, "order": 2, "text": "The elixir the film delivers is tragic knowledge: the family was always a trap, the Don's love was always conditional on succession, and Michael — the most capable son — was always going to be the one who sprung it. The ordinary world he left was the only world that could have saved him." },
+    { "kind": "detail", "column": 11, "order": 3, "text": "The closing image — a door swinging shut on Kay, cutting off our view of Michael — is cinema's most precise image of corruption complete. He is not hidden from us; he has simply become someone we are no longer permitted to see." }
   ]
 }
