@@ -46,8 +46,11 @@ Root JSON shape:
 {
   "title": string (e.g. the work title or "Analysis: …"),
   "structure": string — MUST be exactly: ${JSON.stringify(structureName)},
+  "aiAnalysisImport": true,
   "notes": [ ... ]
 }
+
+You MUST include "aiAnalysisImport": true (boolean) at the root. Structurer uses it to treat this board as an LLM-generated analysis (same visibility bucket as demos: "Hide demos" can hide analyses too). Omitting it or setting it to false makes the import a normal user story.
 
 Each note object:
 - "kind": one of these string ids (use the id exactly):
@@ -62,6 +65,7 @@ For kind "character" ONLY, also include:
 ${archetypeLines}
 
 Rules:
+- Always include "aiAnalysisImport": true at the root (see above).
 - Do not include "uid" fields; the app will assign them.
 - Spread notes across columns according to where each beat belongs in ${JSON.stringify(structureName)}.
 - Use several notes per phase where useful (plot + theme + character, etc.), similar in spirit to Structurer demo stories.

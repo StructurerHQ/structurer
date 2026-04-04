@@ -30,6 +30,7 @@ import {
 import {
   addNoteModalBodyTemplate,
   boardCardTemplate,
+  dashboardAiPromptCtaCardTemplate,
   noteTemplate,
   renderStructureOptionsHtml,
   structureAlteredEditPhaseRowTemplate,
@@ -249,6 +250,9 @@ const cancelEditNoteTypesBtn = document.querySelector("#cancel-edit-note-types")
 const saveEditNoteTypesBtn = document.querySelector("#save-edit-note-types");
 const goDashboardBtn = document.querySelector("#go-dashboard");
 const goBoardFromPhaseBtn = document.querySelector("#go-board-from-phase");
+const editorBreadcrumbCurrentEl = document.querySelector("#editor-breadcrumb-current");
+const groupBreadcrumbCurrentEl = document.querySelector("#group-breadcrumb-current");
+const phaseBreadcrumbCurrentEl = document.querySelector("#phase-breadcrumb-current");
 const phaseCommentsTitleEl = document.querySelector("#phase-comments-title");
 const phaseCommentsSubtitleEl = document.querySelector("#phase-comments-subtitle");
 const phaseNotesListEl = document.querySelector("#phase-notes-list");
@@ -274,6 +278,22 @@ const toggleDemoVisibilityBtn = document.querySelector("#toggle-demo-visibility"
 const openCreateStructureInlineBtn = document.querySelector("#open-create-structure-inline");
 const openCreateStoryEmptyStateBtn = document.querySelector("#open-create-story-empty-state");
 const homeCollapsiblePanels = [...document.querySelectorAll("#home-view .collapsible-panel")];
+document.querySelectorAll(".app-history-back-btn").forEach((btn) => {
+  btn.addEventListener("click", () => {
+    window.history.back();
+  });
+});
+document.addEventListener("click", (event) => {
+  if (event.target.closest(".app-breadcrumb-home")) {
+    event.preventDefault();
+    openLanding();
+    return;
+  }
+  if (event.target.closest(".app-breadcrumb-dashboard")) {
+    event.preventDefault();
+    openHome();
+  }
+});
 let addBoardToGroupTargetBoardId = null;
 let pendingRestoreBackupText = null;
 
@@ -1604,32 +1624,35 @@ function renderHome() {
   });
   saveGroups();
 
-  const demoBoardIdSet = new Set(demoBoardIds);
   const sortedGroups = [...groups]
     .filter((group) => {
-      // When demos are hidden, also hide demo-only series (series made exclusively of demo stories).
+      // When demos are hidden, hide series made only of demo stories and/or AI analysis imports.
       if (showDemoBoards) return true;
-      return !group.boardIds.every((id) => demoBoardIdSet.has(id));
+      return !group.boardIds.every((id) => {
+        const b = boards.find((item) => item.id === id);
+        return b && isDemoOrAiAnalysisBoard(b);
+      });
     })
     .sort((a, b) => b.updatedAt - a.updatedAt);
   groupsList.innerHTML = sortedGroups.map(groupCardTemplate).join("");
   groupsList.style.display = sortedGroups.length > 0 ? "grid" : "none";
 
   const sortedBoards = [...boards]
-    .filter((board) => showDemoBoards || !isDemoBoard(board))
+    .filter((board) => showDemoBoards || !isDemoOrAiAnalysisBoard(board))
     .sort((a, b) => b.updatedAt - a.updatedAt);
-  boardsList.innerHTML = sortedBoards
-    .map((board) => {
-      const structure = getStructureConfig(board.structureId);
-      return boardCardTemplate(
-        board,
-        boardStructureDisplayLineHtml(board),
-        formatDate(board.updatedAt),
-        isDemoBoard(board),
-        inlineTitleEdit.getEditingStoryBoardId(),
-      );
-    })
-    .join("");
+  boardsList.innerHTML =
+    sortedBoards
+      .map((board) => {
+        return boardCardTemplate(
+          board,
+          boardStructureDisplayLineHtml(board),
+          formatDate(board.updatedAt),
+          isDemoBoard(board),
+          inlineTitleEdit.getEditingStoryBoardId(),
+          isAiAnalysisImportBoard(board),
+        );
+      })
+      .join("") + dashboardAiPromptCtaCardTemplate();
   if (homeListControlsEl) {
     groupsList.insertAdjacentElement("afterend", homeListControlsEl);
   }
@@ -1661,9 +1684,9 @@ function renderHome() {
     dashboardGroupsHeading.classList.toggle("hidden", sortedGroups.length === 0);
   }
   if (dashboardBoardsHeading) {
-    dashboardBoardsHeading.classList.toggle("hidden", sortedBoards.length === 0);
+    dashboardBoardsHeading.classList.remove("hidden");
   }
-  const hasAtLeastOneNonDemoStory = boards.some((board) => !isDemoBoard(board));
+  const hasAtLeastOneNonDemoStory = boards.some((board) => !isDemoOrAiAnalysisBoard(board));
   emptyState.style.display = hasAtLeastOneNonDemoStory ? "none" : "block";
   applyDemoVisibilityControl();
   renderCreateGroupBoardCheckboxes();
@@ -1698,7 +1721,7 @@ function renderEditor() {
     board.id === inlineTitleEdit.getEditingStoryBoardId()
       ? `<input class="inline-story-title-input editor-title-input" type="text" maxlength="80" value="${escapeHtml(board.title)}" data-role="inline-story-title-input" data-board-id="${board.id}" aria-label="Story name" />`
       : `<span class="editor-title-text" data-role="board-title-dblclick">${escapeHtml(board.title)}</span>`;
-  editorTitle.innerHTML = `<div class="inline-story-title-root" data-role="inline-story-title-root" data-board-id="${board.id}"><span class="inline-story-title-host" data-role="inline-story-title-host">${isDemoBoard(board) ? '<span class="demo-label">Demo</span> ' : ""}${editorTitleMarkup}</span></div>`;
+  editorTitle.innerHTML = `<div class="inline-story-title-root" data-role="inline-story-title-root" data-board-id="${board.id}"><span class="inline-story-title-host" data-role="inline-story-title-host">${isDemoBoard(board) ? '<span class="demo-label">Demo</span> ' : ""}${isAiAnalysisImportBoard(board) ? '<span class="analysis-label">AI analysis</span> ' : ""}${editorTitleMarkup}</span></div>`;
   const structDisplayBase = structure.name;
   const structDisplay = isModifiedOrder ? `${structDisplayBase} (modified)` : structDisplayBase;
   const canEditStructureName = boardUsesOwnAlteredStructure(board);
@@ -1768,6 +1791,9 @@ function renderEditor() {
     .join("");
   autoResizeTextareas();
   syncEditorQuickHelpVisibility();
+  if (editorBreadcrumbCurrentEl) {
+    editorBreadcrumbCurrentEl.textContent = (board.title || "").trim() || "Story";
+  }
 }
 
 function autoResizeTextareas() {
@@ -1870,6 +1896,9 @@ function renderGroup() {
       : `<span class="group-title-text" data-role="group-title-dblclick">${escapeHtml(group.title)}</span>`;
   groupTitleEl.innerHTML = `<span class="inline-story-title-host" data-role="inline-story-title-host">${isDemoSeries ? '<span class="demo-label">Demo</span> ' : ""}${groupTitleMarkup}</span>`;
   groupSubtitleEl.textContent = `${groupBoards.length} stories`;
+  if (groupBreadcrumbCurrentEl) {
+    groupBreadcrumbCurrentEl.textContent = (group.title || "").trim() || "Series";
+  }
   groupBoardStackEl.innerHTML = groupBoards
     .map((board) => {
       const structure = getStructureConfig(board.structureId);
@@ -1878,7 +1907,7 @@ function renderGroup() {
       <section class="group-board-card">
         <header class="group-board-head">
           <div>
-            <h2><div class="inline-story-title-root" data-board-id="${board.id}"><span class="inline-story-title-host">${isDemoBoard(board) ? '<span class="demo-label">Demo</span> ' : ""}<span class="group-board-title-text">${escapeHtml(board.title)}</span></span></div></h2>
+            <h2><div class="inline-story-title-root" data-board-id="${board.id}"><span class="inline-story-title-host">${isDemoBoard(board) ? '<span class="demo-label">Demo</span> ' : ""}${isAiAnalysisImportBoard(board) ? '<span class="analysis-label">AI analysis</span> ' : ""}<span class="group-board-title-text">${escapeHtml(board.title)}</span></span></div></h2>
             <p class="subtitle">${boardStructureDisplayLineHtml(board)}</p>
           </div>
           <div class="group-board-head-actions">
@@ -2139,6 +2168,16 @@ function isDemoBoard(board) {
   return isLikelyDemoBoard(board);
 }
 
+/** Story imported from LLM JSON that included root `aiAnalysisImport: true` (Build AI import prompt). */
+function isAiAnalysisImportBoard(board) {
+  return Boolean(board && board.aiAnalysisImport === true);
+}
+
+/** Hidden when "Hide demos" is off: built-in demos and optional AI analysis imports. */
+function isDemoOrAiAnalysisBoard(board) {
+  return isDemoBoard(board) || isAiAnalysisImportBoard(board);
+}
+
 function resetSingleDemoBoard(board) {
   if (!board) return;
   const boardSlug = board.slug || slugifyTitle(board.title || "");
@@ -2166,13 +2205,19 @@ function resetSingleDemoBoard(board) {
   board.phaseComments = fresh.phaseComments;
   board.phaseCommentsVersion = fresh.phaseCommentsVersion;
   board.isDemo = true;
+  delete board.aiAnalysisImport;
   board.updatedAt = Date.now();
   saveBoards();
 }
 
 function applyDemoVisibilityControl() {
   if (!toggleDemoVisibilityBtn) return;
-  toggleDemoVisibilityBtn.textContent = showDemoBoards ? "Hide demos" : "Show demos";
+  const hasAiAnalysis = boards.some(isAiAnalysisImportBoard);
+  if (showDemoBoards) {
+    toggleDemoVisibilityBtn.textContent = hasAiAnalysis ? "Hide demos and AI analyses" : "Hide demos";
+  } else {
+    toggleDemoVisibilityBtn.textContent = hasAiAnalysis ? "Show demos and AI analyses" : "Show demos";
+  }
 }
 
 function replaceDemoBoardsOnly() {
@@ -2334,6 +2379,9 @@ function boardToExportPayload(board) {
         collapsed: Boolean(note.collapsed),
       })),
   };
+  if (board.aiAnalysisImport === true) {
+    payload.aiAnalysisImport = true;
+  }
   if (boardUsesOwnAlteredStructure(board)) {
     const st = getStructureConfig(board.structureId);
     payload.alteredStructure = {
@@ -3260,6 +3308,13 @@ function importBoardFromJson(rawText) {
     } else {
       existingByUid.updatedAt = Math.max(existingByUid.updatedAt || 0, importedBoardUpdatedAt);
     }
+    if (Object.prototype.hasOwnProperty.call(parsed, "aiAnalysisImport")) {
+      if (parsed.aiAnalysisImport === true) {
+        existingByUid.aiAnalysisImport = true;
+      } else {
+        delete existingByUid.aiAnalysisImport;
+      }
+    }
     normalizeOrders(existingByUid.notes, existingByUid.structureId);
     existingByUid.nextNoteId =
       existingByUid.notes.reduce((max, note) => Math.max(max, Number(note.id) || 0), 0) + 1;
@@ -3298,6 +3353,9 @@ function importBoardFromJson(rawText) {
     phaseComments: newPhaseComments,
     phaseCommentsVersion: 2,
   };
+  if (parsed.aiAnalysisImport === true) {
+    newBoard.aiAnalysisImport = true;
+  }
   normalizeOrders(newBoard.notes, newBoard.structureId);
   boards.push(newBoard);
   saveBoards();
@@ -3387,6 +3445,9 @@ function renderPhaseDetailView() {
   const comments = getPhaseComments(board, activePhaseCommentsColumn);
   const notes = getColumnNotes(board.notes, activePhaseCommentsColumn);
   const phaseName = getCurrentPhaseName(board, activePhaseCommentsColumn);
+  if (phaseBreadcrumbCurrentEl) {
+    phaseBreadcrumbCurrentEl.textContent = phaseName;
+  }
   if (phaseCommentsTitleEl) phaseCommentsTitleEl.textContent = `Phase details - ${phaseName}`;
   if (phaseCommentsSubtitleEl) {
     phaseCommentsSubtitleEl.textContent = `${board.title} - ${
@@ -3574,6 +3635,10 @@ boardsList.addEventListener("click", (event) => {
   }
   const boardCard = event.target.closest(".board-card");
   if (!boardCard) return;
+  if (boardCard.dataset.role === "dashboard-ai-prompt-cta") {
+    openAiAnalysisPrompt();
+    return;
+  }
   const boardId = boardCard.dataset.boardId;
   const actionButton = event.target.closest("button[data-role]");
   if (actionButton && actionButton.dataset.role === "board-actions") {
@@ -3605,6 +3670,10 @@ boardsList.addEventListener("keydown", (event) => {
   if (!boardCard) return;
   if (event.key === "Enter" || event.key === " ") {
     event.preventDefault();
+    if (boardCard.dataset.role === "dashboard-ai-prompt-cta") {
+      openAiAnalysisPrompt();
+      return;
+    }
     openBoard(boardCard.dataset.boardId);
   }
 });

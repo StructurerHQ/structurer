@@ -5,7 +5,7 @@ import matrixRevolutionSaveTheCatDemo from "./data/matrix-revolution-save-the-ca
 import odysseyHeroThousandFacesDemo from "./data/odyssey-hero-thousand-faces-demo.json";
 import harryPotterHeroThousandFacesDemo from "./data/harry-potter-hero-thousand-faces-demo.json";
 import jurassicParkThreeActDemo from "./data/jurassic-park-three-act-demo.json";
-import backToTheFutureSaveTheCatDemo from "./data/back-to-the-future-save-the-cat-demo.json";
+import bladeRunnerSaveTheCatDemo from "./data/blade-runner-save-the-cat-demo.json";
 import findingNemoStoryCircleDemo from "./data/finding-nemo-story-circle-demo.json";
 import theHungerGamesSevenPointDemo from "./data/the-hunger-games-seven-point-demo.json";
 import prideAndPrejudiceRomancingDemo from "./data/pride-and-prejudice-romancing-the-beat-demo.json";
@@ -19,7 +19,7 @@ export const DEMO_BOARD_DATA = [
   odysseyHeroThousandFacesDemo,
   harryPotterHeroThousandFacesDemo,
   jurassicParkThreeActDemo,
-  backToTheFutureSaveTheCatDemo,
+  bladeRunnerSaveTheCatDemo,
   findingNemoStoryCircleDemo,
   theHungerGamesSevenPointDemo,
   prideAndPrejudiceRomancingDemo,

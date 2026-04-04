@@ -1,5 +1,21 @@
 # History
 
+**1.15.4** - 2026-04-04
+- **Demos:** replaced **Back to the Future (Save the Cat)** with **Blade Runner (Save the Cat)** (`blade-runner-save-the-cat-demo.json`). Detailed beat-by-beat analysis covering all 15 columns with plot, character, theme, location, subplot, and detail notes. Landing **Demo map** and **README** updated. On load, the new demo is **appended** automatically; existing installs can **Reset demos** to remove Back to the Future.
+- **Note types:** removed the built-in **Other** type (phase descriptions cover general commentary; **Todo** remains for actionable items). Notes with legacy `kind: "other"` still display via the existing unknown-type fallback.
+
+**1.15.3** - 2026-04-04
+- **AI analysis imports:** story JSON from the **Build AI import prompt** flow should include root **`"aiAnalysisImport": true`**. Import stores it on the board; **export** preserves it. **Merge** updates or clears the flag when the import payload includes `aiAnalysisImport`.
+- **Visibility:** boards with that flag are hidden together with demos when the dashboard control reads **Hide demos and AI analyses** / **Show demos and AI analyses** (label falls back to **Hide demos** / **Show demos** when you have no AI-tagged boards). **Series** that contain only demo and/or AI-analysis stories are hidden when that toggle hides curated content.
+- **UI:** **AI analysis** badge (indigo pill) on dashboard cards, editor header, and series previews (alongside **Demo** when applicable). **Reset demo story** clears `aiAnalysisImport` on that board.
+- **Docs:** Help and **After the AI returns JSON** explain the flag and the toggle.
+
+**1.15.2** - 2026-04-04
+- **Navigation:** **Back** uses browser **history** (`history.back()`). **Breadcrumb** to the right of Back on dashboard, help, legal pages, **Build AI import prompt**, series, story editor, and phase detail: **Home** / **Dashboard** (clickable) plus current page; dashboard shows **Home > Dashboard** only. Breadcrumb **hidden below 641px**; **←** stays for mobile, **hidden on desktop** where the breadcrumb appears.
+- **Dashboard — Stories:** trailing **CTA card** (same `board-card` layout as stories) invites users who want analyses beyond the demos to open **Build AI import prompt**; **Stories** heading stays visible so the card always has a place.
+- **Build AI import prompt:** shorter intro; **After the AI returns JSON** block with import steps; path **⋯ Actions → Story → Import/merge pasting JSON**. Help FAQ and extension copy updated for **⋯ Actions → Structure** where relevant.
+- **Actions labels (Story / Structure):** **Import/merge pasting JSON** (story paste modal and direct dashboard action; `aria-label` distinguishes story vs structure). **Import/merge a custom structure** (file). Structure paste modal title matches; **README** / **HISTORY** cross-references refreshed.
+
 **1.15.1** - 2026-04-04
 - **Demos:** added **The Godfather** on **Hero's Journey** (`the-godfather-hero-journey-demo.json`). Landing **Demo map** updated. On load, any **new** demo definition in `DEMO_BOARD_DATA` that is not already present (same title + structure name) is **appended** automatically so existing installs pick it up without a full **Reset demos**.
 
@@ -97,7 +113,7 @@
 - Added dashboard actions to export and import custom structures as a dedicated JSON package (`structurer.custom-structures`).
 - Added strict import validation for custom structures (required fields, id/uid format, non-empty phase arrays, duplicate checks, and built-in id conflict checks): if any entry is invalid, the full import fails.
 - Added custom-structure merge behavior with deterministic outcomes: merge by structure UID first, fallback by normalized fingerprint (name + phases), and last-write-wins by `updatedAt`.
-- Added a second import path for custom structures: paste JSON directly in dashboard actions (`Import custom structure (paste JSON)`), reusing the same strict validation and merge logic.
+- Added a second import path for custom structures: paste JSON directly in dashboard actions (`Import/merge pasting JSON` under Structure), reusing the same strict validation and merge logic.
 - Moved the extensions catalog and JSON packs to a dedicated repository ([structurer-extensions](https://github.com/sullof/structurer-extensions) under **sullof**); the main app repo no longer ships extension JSON files. Help/FAQ/README link to the external catalog and the main app under `sullof/structurer`.
 - Added dashboard **Active structures**: a compact multi-column list of all available structure names (built-in + custom), with a **NEW** badge for recently added or imported custom structures (based on local activity timestamps within the last hour, without overwriting merge `updatedAt` semantics). Stored activity in `localStorage` under `structurer.customStructureActivity.v1`, included in full app backup/restore.
 - Refreshed the dashboard after custom-structure import so **Active structures** updates immediately; user-facing import alerts use plain-language success/skip/error messages instead of raw Created/Updated/Skipped counts.
