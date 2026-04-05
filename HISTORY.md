@@ -1,5 +1,9 @@
 # History
 
+**1.15.8** - 2026-04-05
+- **Build AI import prompt:** new **Language of the analysis text** control (preset languages plus **Other…** with a custom name). The generated instructions stay in English; the prompt tells the model to write each note’s `text` (and similar prose) in the chosen language while keeping JSON keys, `kind` / `archetype` ids, and the exact `structure` string unchanged (`index.html`, `main.js`, `ai-story-analysis-prompt.js`). Help FAQ on mapping a work to a structure mentions this option.
+- **Build AI import prompt:** the list of note **kind** ids and character **archetype** ids in the generated prompt uses only **built-in** app defaults (`BUILTIN_NOTE_TYPES`, `BUILTIN_ARCHETYPES` from `app-config.js`), not custom note types, custom archetypes, or per-user label overrides—so local customization does not leak into the LLM instructions (`main.js`).
+
 **1.15.7** - 2026-04-05
 - **Dashboard — import story:** a single entry under **⋯ Actions → Story**: **Import/merge a story** (removed the separate **Import/merge pasting JSON** action). The follow-up dialog title is **Import/merge a story**; buttons are **Import from a file** and **Paste story JSON**. Help FAQ and **Build AI import prompt** steps updated to match.
 - **Dashboard — import custom structures:** same pattern as stories — one **⋯ Actions → Structure** command **Import/merge custom structures**, then a chooser (**Import from a file** / **Paste custom structures JSON**). Removed the direct **Import/merge pasting JSON** action; paste modal title is **Paste custom structures JSON**. **`#import-custom-structures-input`** lives in the chooser modal (`main.js`, `index.html`).

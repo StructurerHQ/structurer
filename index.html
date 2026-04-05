@@ -446,8 +446,8 @@
               <p>
                 Demos are only examples. On the dashboard, open the last card under <strong>Stories</strong> (“Want analyses
                 that aren’t in the demos?”) or use <strong>Build AI import prompt</strong> below: you get a ready-made
-                prompt for an AI assistant; full steps for importing the JSON are on that page after you generate the
-                prompt.
+                prompt for an AI assistant (instructions stay in English; you can choose the language for the analysis text
+                in the notes). Full steps for importing the JSON are on that page after you generate the prompt.
               </p>
               <p>
                 <button id="go-ai-analysis-prompt-from-help" type="button" class="ghost-button help-inline-action">
@@ -586,8 +586,10 @@
 
         <section class="help-card ai-analysis-prompt-card">
           <p class="subtitle">
-            Pick a structure template and the work’s title. Structurer builds one block of text to paste into ChatGPT,
-            Claude, or another LLM—ask it to reply with <strong>only</strong> valid JSON in Structurer’s import shape.
+            Pick a structure template and the work’s title. Structurer builds one block of text (in English) to paste into
+            ChatGPT, Claude, or another LLM—ask it to reply with <strong>only</strong> valid JSON in Structurer’s import
+            shape. Choose the language for the <strong>analysis text inside the notes</strong> separately so non-English
+            writers get readable output without translating the instructions themselves.
           </p>
 
           <form id="ai-analysis-prompt-form" class="ai-analysis-prompt-form">
@@ -615,6 +617,49 @@
               <option value="play">Play / stage</option>
               <option value="other">Other</option>
             </select>
+
+            <label class="ai-prompt-label" for="ai-prompt-analysis-language-select">Language of the analysis text</label>
+            <select id="ai-prompt-analysis-language-select" class="ai-prompt-select" aria-label="Language of the analysis text">
+              <option value="English" selected>English</option>
+              <option value="Italian">Italian</option>
+              <option value="Spanish">Spanish</option>
+              <option value="French">French</option>
+              <option value="German">German</option>
+              <option value="Portuguese">Portuguese</option>
+              <option value="Dutch">Dutch</option>
+              <option value="Russian">Russian</option>
+              <option value="Polish">Polish</option>
+              <option value="Japanese">Japanese</option>
+              <option value="Chinese (Simplified)">Chinese (Simplified)</option>
+              <option value="Korean">Korean</option>
+              <option value="Arabic">Arabic</option>
+              <option value="Hindi">Hindi</option>
+              <option value="Turkish">Turkish</option>
+              <option value="Swedish">Swedish</option>
+              <option value="Norwegian">Norwegian</option>
+              <option value="Danish">Danish</option>
+              <option value="Finnish">Finnish</option>
+              <option value="Greek">Greek</option>
+              <option value="Czech">Czech</option>
+              <option value="Ukrainian">Ukrainian</option>
+              <option value="Vietnamese">Vietnamese</option>
+              <option value="Indonesian">Indonesian</option>
+              <option value="Hebrew">Hebrew</option>
+              <option value="Romanian">Romanian</option>
+              <option value="Hungarian">Hungarian</option>
+              <option value="other">Other…</option>
+            </select>
+            <div id="ai-prompt-analysis-language-custom-wrap" class="hidden">
+              <label class="ai-prompt-label" for="ai-prompt-analysis-language-custom">Specify language (English name)</label>
+              <input
+                id="ai-prompt-analysis-language-custom"
+                class="ai-prompt-input"
+                type="text"
+                maxlength="80"
+                placeholder="e.g. Welsh, Catalan"
+                aria-label="Custom analysis language name"
+              />
+            </div>
 
             <div class="ai-prompt-output-wrap">
               <label class="ai-prompt-label" for="ai-prompt-output">Prompt to copy</label>

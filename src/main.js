@@ -199,6 +199,9 @@ const importStoryPasteText = document.querySelector("#import-story-paste-text");
 const aiPromptStructureSelect = document.querySelector("#ai-prompt-structure-select");
 const aiPromptWorkTitleInput = document.querySelector("#ai-prompt-work-title");
 const aiPromptMediumSelect = document.querySelector("#ai-prompt-medium-select");
+const aiPromptAnalysisLangSelect = document.querySelector("#ai-prompt-analysis-language-select");
+const aiPromptAnalysisLangCustomWrap = document.querySelector("#ai-prompt-analysis-language-custom-wrap");
+const aiPromptAnalysisLangCustomInput = document.querySelector("#ai-prompt-analysis-language-custom");
 const aiPromptOutputTextarea = document.querySelector("#ai-prompt-output");
 const copyAiPromptBtn = document.querySelector("#copy-ai-prompt-btn");
 const aiAnalysisPromptForm = document.querySelector("#ai-analysis-prompt-form");
@@ -4582,6 +4585,20 @@ function openDashboardImportStoryPasteModal() {
   if (importStoryPasteText) importStoryPasteText.focus();
 }
 
+function syncAiPromptAnalysisLanguageCustomVisibility() {
+  if (!aiPromptAnalysisLangCustomWrap || !aiPromptAnalysisLangSelect) return;
+  aiPromptAnalysisLangCustomWrap.classList.toggle("hidden", aiPromptAnalysisLangSelect.value !== "other");
+}
+
+function getAiPromptAnalysisLanguage() {
+  if (!aiPromptAnalysisLangSelect) return "English";
+  if (aiPromptAnalysisLangSelect.value === "other") {
+    const custom = aiPromptAnalysisLangCustomInput ? aiPromptAnalysisLangCustomInput.value.trim() : "";
+    return custom || "English";
+  }
+  return aiPromptAnalysisLangSelect.value;
+}
+
 function refreshAiAnalysisPromptPage() {
   if (!aiPromptStructureSelect || !aiPromptOutputTextarea) return;
   const catalog = getCatalogStructureList();
@@ -4597,6 +4614,7 @@ function refreshAiAnalysisPromptPage() {
 
 function syncAiPromptOutputFromForm() {
   if (!aiPromptStructureSelect || !aiPromptOutputTextarea) return;
+  syncAiPromptAnalysisLanguageCustomVisibility();
   const id = aiPromptStructureSelect.value;
   const entry = getCatalogStructureList().find((s) => s.id === id) || getCatalogStructureList()[0];
   if (!entry) {
@@ -4610,12 +4628,14 @@ function syncAiPromptOutputFromForm() {
   }
   const workTitle = aiPromptWorkTitleInput ? aiPromptWorkTitleInput.value.trim() : "";
   const medium = aiPromptMediumSelect ? aiPromptMediumSelect.value : "unspecified";
-  const noteKinds = getAllNoteTypes().map((t) => ({ id: t.id, label: t.label }));
-  const archetypes = getAllArchetypes().map((a) => ({ id: a.id, label: a.label, icon: a.icon }));
+  const analysisLanguage = getAiPromptAnalysisLanguage();
+  const noteKinds = BUILTIN_NOTE_TYPES.map((t) => ({ id: t.id, label: t.label }));
+  const archetypes = BUILTIN_ARCHETYPES.map((a) => ({ id: a.id, label: a.label, icon: a.icon }));
   aiPromptOutputTextarea.value = buildLlmStoryAnalysisPrompt({
     structureName: entry.name,
     workTitle: workTitle || "(work title — fill in above)",
     medium,
+    analysisLanguage,
     phaseTitles,
     noteKinds,
     archetypes,

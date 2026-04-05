@@ -8,6 +8,7 @@
  * @param {string} opts.structureName - Exact `structure` string for JSON (catalog display name).
  * @param {string} opts.workTitle - Film / book / show title.
  * @param {string} opts.medium - e.g. "film", "novel", "TV series".
+ * @param {string} opts.analysisLanguage - Language for narrative text in notes (e.g. "English", "Italian").
  * @param {string[]} opts.phaseTitles - One label per column, index = column number.
  * @param {{ id: string, label: string }[]} opts.noteKinds
  * @param {{ id: string, label: string, icon?: string }[]} opts.archetypes
@@ -16,6 +17,7 @@ export function buildLlmStoryAnalysisPrompt({
   structureName,
   workTitle,
   medium,
+  analysisLanguage = "English",
   phaseTitles,
   noteKinds,
   archetypes,
@@ -63,6 +65,11 @@ For kind "character" ONLY, also include:
 - "characterName": string
 - "archetype": one of these ids (pick the best fit):
 ${archetypeLines}
+
+Language for readable content:
+- Write every note's "text" field in ${JSON.stringify(analysisLanguage)}. Apply the same language to any other prose in the JSON that is meant for a human reader, except where this prompt requires a fixed value (see below).
+- Keep JSON key names in English. Keep "kind" and "archetype" string values exactly as the ids listed above. The root "structure" string MUST remain exactly: ${JSON.stringify(structureName)} (do not translate it).
+- Proper names (work title, character names, places) may follow the work's usual spelling even when it differs from ${JSON.stringify(analysisLanguage)}.
 
 Rules:
 - Always include "aiAnalysisImport": true at the root (see above).
