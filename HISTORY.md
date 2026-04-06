@@ -1,5 +1,11 @@
 # History
 
+**1.18.2** - 2026-04-06
+- **Optional comments in story export:** exporting a story now opens a small options dialog with **Export phase comments too** enabled by default. If unchecked, Structurer exports the story JSON without `phaseComments`/`phaseCommentsVersion`, making it easier to share cleaner files when comments are private (`main.js`).
+- **Shared preview UX refinement:** when `/#/shared?src=...` loads successfully, the temporary status line is hidden (the page title already communicates read-only mode). If the same story was already imported, Structurer now shows an inline **Open it** link in the note so you can jump directly to the local story (`index.html`, `main.js`).
+- **Story export comments reliability:** fixed the export options fallback so, when **Export phase comments too** is selected (default), comments are reliably included in the generated story JSON (`main.js`).
+- **Shared-link privacy canonicalization:** on app load, legacy shared URLs that pass `src` via `location.search` are automatically rewritten to hash form (`/#/shared?src=...`) for compatibility, and non-hash tracking query params (e.g. `fbclid`) are removed when a hash route is present (`main.js`, `navigation.js`).
+
 **1.18.1** - 2026-04-06
 - **Shared import navigation:** after importing from `/#/shared?src=...` via **Import into my workspace**, Structurer now opens the imported/merged story directly (fallback: dashboard) instead of leaving users on the shared preview page (`main.js`).
 

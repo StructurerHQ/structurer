@@ -76,7 +76,7 @@ export function createNavigationController({
     if (target === current) return;
     const nextHash = target === "/" ? "#/" : `#${target}`;
     if (replace) {
-      const base = `${window.location.pathname}${window.location.search}`;
+      const base = window.location.pathname === "/shared" ? "/" : window.location.pathname;
       window.location.replace(`${base}${nextHash}`);
       return;
     }
