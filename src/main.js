@@ -238,6 +238,8 @@ const goHomeFromSharedBtn = document.querySelector("#go-home-from-shared");
 const sharedStoryStatusEl = document.querySelector("#shared-story-status");
 const sharedStorySourceLink = document.querySelector("#shared-story-source-link");
 const sharedStoryImportBtn = document.querySelector("#shared-story-import-btn");
+const sharedStoryImportedNoteEl = document.querySelector("#shared-story-imported-note");
+const sharedStoryOpenImportedBtn = document.querySelector("#shared-story-open-imported-btn");
 const sharedStoryPreviewHostEl = document.querySelector("#shared-story-preview-host");
 const goDashboardFromBoardBtn = document.querySelector("#go-dashboard-from-board");
 const goDashboardFromGroupBtn = document.querySelector("#go-dashboard-from-group");
@@ -330,6 +332,7 @@ document.addEventListener("click", (event) => {
 let addBoardToGroupTargetBoardId = null;
 let pendingRestoreBackupText = null;
 let latestSharedStoryRawText = "";
+let latestSharedImportedBoardId = null;
 let sharedStoryRenderRequestId = 0;
 
 function loadBoards() {
@@ -2165,12 +2168,51 @@ function openSharedStoryRouteFromSourceUrl(sourceUrl, replaceRoute = false) {
   const encoded = encodeURIComponent(safeUrl);
   const hash = `#/shared?src=${encoded}`;
   if (replaceRoute) {
-    const base = `${window.location.pathname}${window.location.search}`;
+    const base = window.location.pathname === "/shared" ? "/" : window.location.pathname;
     window.location.replace(`${base}${hash}`);
     return true;
   }
   window.location.hash = hash;
   return true;
+}
+
+function getHashQueryParam(name) {
+  const hash = String(window.location.hash || "");
+  const raw = hash.startsWith("#") ? hash.slice(1) : hash;
+  if (!raw) return "";
+  const queryIndex = raw.indexOf("?");
+  if (queryIndex < 0) return "";
+  const value = new URLSearchParams(raw.slice(queryIndex + 1)).get(name);
+  return typeof value === "string" ? value.trim() : "";
+}
+
+function canonicalizeUrlToHashRoutesForPrivacy() {
+  const search = new URLSearchParams(window.location.search || "");
+  const hasSearch = String(window.location.search || "").length > 1;
+  const pathname = window.location.pathname || "/";
+  const hash = String(window.location.hash || "");
+  const hashHasRoute = hash.startsWith("#/");
+  const hashSrc = getHashQueryParam("src");
+  const legacySrc = search.get("src");
+
+  // Compatibility: old shared links like /shared?src=... or /?src=... become /#/shared?src=...
+  if (legacySrc && (!hashHasRoute || !hashSrc)) {
+    const safe = ensureSafeSharedSourceUrl(legacySrc);
+    if (safe) {
+      const encoded = encodeURIComponent(safe);
+      window.location.replace(`/#/shared?src=${encoded}`);
+      return true;
+    }
+  }
+
+  // Privacy: drop non-hash query params (e.g. fbclid) once the app is loaded.
+  if (hasSearch && hashHasRoute) {
+    const cleanPath = pathname === "/shared" ? "/" : pathname;
+    window.location.replace(`${cleanPath}${hash}`);
+    return true;
+  }
+
+  return false;
 }
 
 function getSharedPreviewDataFromStoryJson(rawText) {
@@ -2232,6 +2274,7 @@ function getSharedPreviewDataFromStoryJson(rawText) {
     };
   });
   return {
+    uid: typeof parsed.uid === "string" && parsed.uid ? parsed.uid : "",
     title: typeof parsed.title === "string" && parsed.title.trim() ? parsed.title.trim() : "Shared story",
     structureName: structure.name,
     phases: structure.phases,
@@ -2332,15 +2375,24 @@ async function renderSharedStory(sourceUrl) {
     sharedStoryImportBtn.classList.add("hidden");
     sharedStoryImportBtn.disabled = true;
   }
+  if (sharedStoryImportedNoteEl) {
+    sharedStoryImportedNoteEl.classList.add("hidden");
+  }
+  latestSharedImportedBoardId = null;
+  if (sharedStoryOpenImportedBtn) {
+    sharedStoryOpenImportedBtn.disabled = true;
+  }
   const safeUrl = ensureSafeSharedSourceUrl(sourceUrl);
   if (!safeUrl) {
     if (sharedStoryStatusEl) {
+      sharedStoryStatusEl.classList.remove("hidden");
       sharedStoryStatusEl.textContent =
         "Missing or invalid source URL. Open a link like /#/shared?src=https://... with a public Structurer story JSON.";
     }
     return;
   }
   if (sharedStoryStatusEl) {
+    sharedStoryStatusEl.classList.remove("hidden");
     sharedStoryStatusEl.textContent = "Loading shared story...";
   }
   if (sharedStorySourceLink) {
@@ -2368,16 +2420,36 @@ async function renderSharedStory(sourceUrl) {
     const preview = getSharedPreviewDataFromStoryJson(rawText);
     latestSharedStoryRawText = rawText;
     renderSharedStoryPreview(preview);
-    if (sharedStoryImportBtn) {
+    const importedBoard = preview.uid ? boards.find((board) => board.uid === preview.uid) : null;
+    const alreadyImported = Boolean(importedBoard);
+    if (alreadyImported) {
+      latestSharedImportedBoardId = importedBoard.id;
+      if (sharedStoryImportedNoteEl) {
+        sharedStoryImportedNoteEl.classList.remove("hidden");
+      }
+      if (sharedStoryOpenImportedBtn) {
+        sharedStoryOpenImportedBtn.disabled = false;
+      }
+      if (sharedStoryImportBtn) {
+        sharedStoryImportBtn.classList.add("hidden");
+        sharedStoryImportBtn.disabled = true;
+      }
+    } else if (sharedStoryImportBtn) {
       sharedStoryImportBtn.classList.remove("hidden");
       sharedStoryImportBtn.disabled = false;
     }
     if (sharedStoryStatusEl) {
-      sharedStoryStatusEl.textContent = `Loaded read-only preview: ${preview.title}`;
+      sharedStoryStatusEl.textContent = "";
+      sharedStoryStatusEl.classList.add("hidden");
     }
   } catch (error) {
     latestSharedStoryRawText = "";
+    latestSharedImportedBoardId = null;
+    if (sharedStoryOpenImportedBtn) {
+      sharedStoryOpenImportedBtn.disabled = true;
+    }
     if (sharedStoryStatusEl) {
+      sharedStoryStatusEl.classList.remove("hidden");
       sharedStoryStatusEl.textContent =
         error instanceof Error
           ? error.message
@@ -2924,22 +2996,29 @@ function ensureMatrixTrilogySeriesDemo() {
 }
 
 function boardToExportPayload(board) {
+  return boardToExportPayloadWithOptions(board, { includePhaseComments: true });
+}
+
+function boardToExportPayloadWithOptions(board, options = {}) {
+  const includePhaseComments = options.includePhaseComments !== false;
   const structure = getStructureConfig(board.structureId);
   const phaseUids = ensureBoardPhaseUids(board);
   normalizeBoardPhaseComments(board);
   const exportedPhaseComments = {};
-  phaseUids.forEach((phaseUid) => {
-    const comments = Array.isArray(board.phaseComments[phaseUid]) ? board.phaseComments[phaseUid] : [];
-    exportedPhaseComments[phaseUid] = comments
-      .map((comment) => ({
-        id: Number.isInteger(comment.id) ? comment.id : undefined,
-        uid: typeof comment.uid === "string" && comment.uid ? comment.uid : generateUniqueUid(),
-        text: typeof comment.text === "string" ? comment.text : "",
-        createdAt: Number.isFinite(comment.createdAt) ? comment.createdAt : Date.now(),
-        updatedAt: Number.isFinite(comment.updatedAt) ? comment.updatedAt : Date.now(),
-      }))
-      .sort((a, b) => a.createdAt - b.createdAt || (a.id || 0) - (b.id || 0));
-  });
+  if (includePhaseComments) {
+    phaseUids.forEach((phaseUid) => {
+      const comments = Array.isArray(board.phaseComments[phaseUid]) ? board.phaseComments[phaseUid] : [];
+      exportedPhaseComments[phaseUid] = comments
+        .map((comment) => ({
+          id: Number.isInteger(comment.id) ? comment.id : undefined,
+          uid: typeof comment.uid === "string" && comment.uid ? comment.uid : generateUniqueUid(),
+          text: typeof comment.text === "string" ? comment.text : "",
+          createdAt: Number.isFinite(comment.createdAt) ? comment.createdAt : Date.now(),
+          updatedAt: Number.isFinite(comment.updatedAt) ? comment.updatedAt : Date.now(),
+        }))
+        .sort((a, b) => a.createdAt - b.createdAt || (a.id || 0) - (b.id || 0));
+    });
+  }
   const usedNoteTypeIds = new Set(board.notes.map((note) => note.kind || "plot"));
   const usedArchetypeIds = new Set(
     board.notes
@@ -2963,8 +3042,6 @@ function boardToExportPayload(board) {
     structure: structure.name,
     phaseOrder: getBoardPhaseOrder(board),
     phaseUids,
-    phaseCommentsVersion: 2,
-    phaseComments: exportedPhaseComments,
     noteTypes: exportedNoteTypes,
     archetypes: exportedArchetypes,
     notes: [...board.notes]
@@ -3002,11 +3079,60 @@ function boardToExportPayload(board) {
       payload.alteredStructure.author = st.author.trim();
     }
   }
+  if (includePhaseComments) {
+    payload.phaseCommentsVersion = 2;
+    payload.phaseComments = exportedPhaseComments;
+  }
   return payload;
 }
 
-function downloadBoard(board) {
-  const payload = boardToExportPayload(board);
+function boardHasAnyPhaseComments(board) {
+  if (!board) return false;
+  normalizeBoardPhaseComments(board);
+  const phaseUids = ensureBoardPhaseUids(board);
+  return phaseUids.some((phaseUid) => {
+    const list = board.phaseComments[phaseUid];
+    return Array.isArray(list) && list.length > 0;
+  });
+}
+
+async function promptStoryExportOptions(board) {
+  const hasPhaseComments = boardHasAnyPhaseComments(board);
+  const result = await appDialog({
+    title: "Export the story",
+    message: "",
+    confirmLabel: "Export",
+    render(root, api) {
+      root.innerHTML = hasPhaseComments
+        ? `
+        <p class="subtitle" style="margin-top:0;line-height:1.45;">
+          Choose what to include in the exported story JSON.
+        </p>
+        <label class="factory-reset-confirm-checkbox" style="margin-top:14px;">
+          <input type="checkbox" id="story-export-include-comments" checked />
+          <span>Export phase comments too</span>
+        </label>
+      `
+        : `
+        <p class="subtitle" style="margin-top:0;line-height:1.45;">
+          This story has no phase comments to export.
+        </p>
+      `;
+      const checkbox = hasPhaseComments ? root.querySelector("#story-export-include-comments") : null;
+      api.setConfirmEnabled(true);
+      return () => ({
+        includePhaseComments: hasPhaseComments ? (checkbox ? Boolean(checkbox.checked) : true) : true,
+      });
+    },
+  });
+  if (!result || typeof result !== "object") return null;
+  return {
+    includePhaseComments: result.includePhaseComments !== false,
+  };
+}
+
+function downloadBoard(board, options = {}) {
+  const payload = boardToExportPayloadWithOptions(board, options);
   const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
   const url = URL.createObjectURL(blob);
   const filename = `${slugifyTitle(board.title || "story")}.json`;
@@ -4537,6 +4663,13 @@ if (sharedStoryImportBtn) {
   });
 }
 
+if (sharedStoryOpenImportedBtn) {
+  sharedStoryOpenImportedBtn.addEventListener("click", () => {
+    if (!latestSharedImportedBoardId) return;
+    openBoard(latestSharedImportedBoardId);
+  });
+}
+
 if (goPrivacyFromFooterBtn) {
   goPrivacyFromFooterBtn.addEventListener("click", () => {
     openPrivacy();
@@ -4832,10 +4965,12 @@ if (phaseOrderConflictModalOverlay) {
 }
 
 if (modalExportBoardBtn) {
-  modalExportBoardBtn.addEventListener("click", () => {
+  modalExportBoardBtn.addEventListener("click", async () => {
     const board = boards.find((item) => item.id === boardActionsModalBoardId);
     if (!board) return;
-    downloadBoard(board);
+    const exportOptions = await promptStoryExportOptions(board);
+    if (!exportOptions) return;
+    downloadBoard(board, exportOptions);
     closeBoardActionsModal();
   });
 }
@@ -6529,6 +6664,7 @@ migrateUniqueUids();
 pruneOrphanAlteredStructures();
 saveBoards();
 saveGroups();
+canonicalizeUrlToHashRoutesForPrivacy();
 window.addEventListener("hashchange", () => {
   syncRouteToState(false);
 });
