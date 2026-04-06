@@ -68,14 +68,14 @@ Structurer also supports **series**: ordered collections of stories (for trilogi
 
 Structurer is local-first: the default robust workflow remains **Export story JSON** and **Import/merge a story**.
 
-For a simpler sharing flow (without attaching files), you can host a story JSON on a public URL (for example GitHub raw or S3) and open it in Structurer as a read-only preview:
+For a simpler sharing flow (without attaching files), you can host a story JSON on a public URL (for example GitHub raw or S3) and use the Dashboard command to generate the correct Structurer link to share:
 
 1. Export the story from Structurer as JSON.
 2. Publish that JSON file at a public HTTPS URL.
-3. Open Structurer with this route pattern:
-   - `https://structurer.sullo.co/#/shared?src=<url-encoded-json-url>`
-4. Structurer fetches the JSON client-side and shows a **read-only** board preview.
-5. From that screen, use **Import into my workspace** if you want to save a local copy.
+3. In Structurer open **Dashboard → ... Actions → Story → View shared story from URL**.
+4. Paste the JSON URL and click **View**.
+5. Structurer generates and opens the correctly encoded route (`/#/shared?src=...`): copy that URL from the address bar and share it with other people.
+6. Recipients see a **read-only** board preview and can use **Import into my workspace** to save a local copy.
 
 Notes:
 - The source URL must be publicly reachable and allow browser fetches (CORS must permit it).
