@@ -4,6 +4,9 @@
 - **Privacy-first routing:** switched app navigation from pathname routes to hash routes (`#/...`), so story/group slugs are kept in the URL fragment instead of request paths (`navigation.js`, `main.js`).
 - **Client navigation events:** route sync now follows `hashchange` (instead of `popstate`) and internal navigation writes `window.location.hash`, preserving existing view logic for landing/dashboard/help/editor/series/phase/404 screens (`main.js`, `navigation.js`).
 - **Nginx legacy path redirect:** direct requests like `/group/...`, `/<story-slug>`, and `/<story-slug>/phase/N` are redirected to `/#/...` via `nginx/default.conf`, while `/` still serves `index.html` normally (`nginx/default.conf`, `server.sh` mount unchanged).
+- **Shared remote story preview (read-only):** added `/#/shared?src=<https-url>` route that fetches a public Structurer story JSON (e.g. raw GitHub/S3), validates/parses it client-side, and renders a non-editable board preview with **Import into my workspace** and **Open source JSON** actions. Invalid URLs, fetch failures, and oversized payloads show clear status messages (`index.html`, `main.js`, `navigation.js`).
+- **Dashboard action for shared-story links:** under **⋯ Actions → Story**, new **View shared story from URL** command opens a small input dialog; after pasting a public JSON URL and confirming, Structurer navigates to the correctly encoded `/#/shared?src=...` route automatically (no manual URL formatting required) (`index.html`, `main.js`).
+- **Edit note types safety:** built-in note type labels are now fixed (read-only in the modal) and only their colors can be changed. Save logic now persists color-only overrides for built-ins, and legacy label overrides are ignored, preventing confusing cases like id `plot` shown with a different built-in label (`main.js`).
 
 **1.16.1** - 2026-04-04
 - Editor: scroll to new note and focus its textarea; viewport auto-scroll while dragging notes or phases.

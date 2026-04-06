@@ -89,6 +89,7 @@ const helpView = document.querySelector("#help-view");
 const privacyView = document.querySelector("#privacy-view");
 const termsView = document.querySelector("#terms-view");
 const aiAnalysisPromptView = document.querySelector("#ai-analysis-prompt-view");
+const sharedView = document.querySelector("#shared-view");
 const groupView = document.querySelector("#group-view");
 const editorView = document.querySelector("#editor-view");
 const phaseView = document.querySelector("#phase-view");
@@ -198,6 +199,7 @@ const closeDashboardImportStructuresPasteModalBtn = document.querySelector("#clo
 const importStructuresPasteForm = document.querySelector("#import-structures-paste-form");
 const importStructuresPasteText = document.querySelector("#import-structures-paste-text");
 const openImportStoryActionBtn = document.querySelector("#open-import-story-action");
+const openViewSharedStoryActionBtn = document.querySelector("#open-view-shared-story-action");
 const dashboardImportModalOverlay = document.querySelector("#dashboard-import-modal-overlay");
 const closeDashboardImportModalBtn = document.querySelector("#close-dashboard-import-modal");
 const openImportStoryPasteFromModalBtn = document.querySelector("#open-import-story-paste-from-modal");
@@ -231,6 +233,12 @@ const notFoundGenericLandingBtn = document.querySelector("#not-found-generic-lan
 const notFoundSharingDashboardBtn = document.querySelector("#not-found-sharing-dashboard");
 const notFoundSharingHelpBtn = document.querySelector("#not-found-sharing-help");
 const notFoundSharingLandingBtn = document.querySelector("#not-found-sharing-landing");
+const goHomeFromSharedBtn = document.querySelector("#go-home-from-shared");
+const sharedStoryStatusEl = document.querySelector("#shared-story-status");
+const sharedStorySourceLink = document.querySelector("#shared-story-source-link");
+const sharedStoryImportBtn = document.querySelector("#shared-story-import-btn");
+const sharedStoryHomeBtn = document.querySelector("#shared-story-home-btn");
+const sharedStoryPreviewHostEl = document.querySelector("#shared-story-preview-host");
 const goDashboardFromBoardBtn = document.querySelector("#go-dashboard-from-board");
 const goDashboardFromGroupBtn = document.querySelector("#go-dashboard-from-group");
 const goPrivacyFromFooterBtn = document.querySelector("#go-privacy-from-footer");
@@ -320,6 +328,8 @@ document.addEventListener("click", (event) => {
 });
 let addBoardToGroupTargetBoardId = null;
 let pendingRestoreBackupText = null;
+let latestSharedStoryRawText = "";
+let sharedStoryRenderRequestId = 0;
 
 function loadBoards() {
   return loadBoardsFromStorage(STORAGE_KEY);
@@ -883,7 +893,8 @@ function applyBuiltinOverrides(base) {
   if (!ov) return { ...base };
   return {
     ...base,
-    label: typeof ov.label === "string" && ov.label.trim() ? ov.label.trim() : base.label,
+    // Built-in note type ids keep their canonical labels to avoid id/label mismatch confusion.
+    label: base.label,
     color: typeof ov.color === "string" && isValidHexColor(ov.color) ? normalizeHexColor(ov.color) : base.color,
   };
 }
@@ -1183,7 +1194,9 @@ function fillEditNoteTypesModal() {
         <div class="edit-note-type-fields">
           <div class="edit-note-type-label-field">
             <label for="ntl-${safeId}">Label</label>
-            <input id="ntl-${safeId}" class="edit-note-type-label-input" type="text" maxlength="80" value="${escapeHtml(t.label)}" />
+            <input id="ntl-${safeId}" class="edit-note-type-label-input" type="text" maxlength="80" value="${escapeHtml(t.label)}" ${
+              isBuiltin ? "readonly aria-readonly=\"true\" title=\"Built-in labels are fixed; only color can be changed.\"" : ""
+            } />
           </div>
           <div class="edit-note-type-hex-field">
             <label for="ntc-${safeId}">Color (hex)</label>
@@ -1240,7 +1253,7 @@ async function saveEditNoteTypesFromModal() {
     }
     const isBuiltin = row.dataset.isBuiltin === "true";
     if (isBuiltin) {
-      noteTypeOverrides[id] = { label, color };
+      noteTypeOverrides[id] = { color };
     } else {
       const ct = customNoteTypes.find((item) => item.id === id);
       if (ct) {
@@ -1936,6 +1949,7 @@ const navigation = createNavigationController({
   views: {
     landingView,
     homeView,
+    sharedView,
     helpView,
     privacyView,
     termsView,
@@ -1965,6 +1979,7 @@ const navigation = createNavigationController({
   renderHome,
   renderEditor,
   renderGroup,
+  renderSharedStory,
   renderPhaseDetail: (boardId, phaseIndex) => {
     currentBoardId = boardId;
     activePhaseCommentsColumn = phaseIndex;
@@ -2101,6 +2116,248 @@ function renderGroup() {
     `;
     })
     .join("");
+}
+
+function ensureSafeSharedSourceUrl(rawValue) {
+  const candidate = String(rawValue || "").trim();
+  if (!candidate) return null;
+  let parsed;
+  try {
+    parsed = new URL(candidate);
+  } catch {
+    return null;
+  }
+  const protocol = parsed.protocol.toLowerCase();
+  const isLocalhost = parsed.hostname === "localhost" || parsed.hostname === "127.0.0.1";
+  if (protocol !== "https:" && !(protocol === "http:" && isLocalhost)) return null;
+  return parsed.toString();
+}
+
+function openSharedStoryRouteFromSourceUrl(sourceUrl, replaceRoute = false) {
+  const safeUrl = ensureSafeSharedSourceUrl(sourceUrl);
+  if (!safeUrl) return false;
+  const encoded = encodeURIComponent(safeUrl);
+  const hash = `#/shared?src=${encoded}`;
+  if (replaceRoute) {
+    const base = `${window.location.pathname}${window.location.search}`;
+    window.location.replace(`${base}${hash}`);
+    return true;
+  }
+  window.location.hash = hash;
+  return true;
+}
+
+function getSharedPreviewDataFromStoryJson(rawText) {
+  const parsed = JSON.parse(stripLeadingTrailingOutsideJsonObject(rawText));
+  if (!parsed || typeof parsed !== "object" || !Array.isArray(parsed.notes)) {
+    throw new Error("Invalid story JSON format.");
+  }
+  const storySchemaVersion = normalizeImportedStorySchemaVersion(parsed);
+  let structure;
+  if (parsed.alteredStructure && typeof parsed.alteredStructure === "object" && Array.isArray(parsed.alteredStructure.phases)) {
+    const phases = normalizePhasesFromAlteredStoryImport(parsed.alteredStructure.phases);
+    structure = {
+      id: "shared_altered_structure",
+      name:
+        (typeof parsed.alteredStructure.name === "string" && parsed.alteredStructure.name.trim()) ||
+        (typeof parsed.structure === "string" && parsed.structure.trim()) ||
+        "Altered structure",
+      phases,
+    };
+  } else {
+    structure = resolveStoryImportCatalogStructure(parsed, storySchemaVersion);
+  }
+  const noteTypes = [...BUILTIN_NOTE_TYPES];
+  if (Array.isArray(parsed.noteTypes)) {
+    parsed.noteTypes.forEach((noteType) => {
+      if (!noteType || typeof noteType.id !== "string" || typeof noteType.label !== "string") return;
+      if (noteTypes.some((item) => item.id === noteType.id)) return;
+      noteTypes.push({
+        id: noteType.id,
+        label: noteType.label.trim() || noteType.id,
+        color: typeof noteType.color === "string" && isValidHexColor(noteType.color) ? normalizeHexColor(noteType.color) : "#f3f4f6",
+      });
+    });
+  }
+  const archetypes = [...BUILTIN_ARCHETYPES];
+  if (Array.isArray(parsed.archetypes)) {
+    parsed.archetypes.forEach((archetype) => {
+      if (!archetype || typeof archetype.id !== "string" || typeof archetype.label !== "string") return;
+      if (archetypes.some((item) => item.id === archetype.id)) return;
+      archetypes.push({
+        id: archetype.id,
+        label: archetype.label.trim() || archetype.id,
+        icon: typeof archetype.icon === "string" ? archetype.icon : "✨",
+      });
+    });
+  }
+  const phaseCount = structure.phases.length;
+  const notes = parsed.notes.map((note, index) => {
+    const column = Number.isInteger(note.column) ? note.column : 0;
+    return {
+      id: index + 1,
+      kind: typeof note.kind === "string" && note.kind ? note.kind : "plot",
+      column: Math.max(0, Math.min(column, phaseCount - 1)),
+      order: Number.isInteger(note.order) ? note.order : index,
+      text: typeof note.text === "string" ? note.text : "",
+      characterName: typeof note.characterName === "string" ? note.characterName : "",
+      archetype: typeof note.archetype === "string" && note.archetype ? note.archetype : "none",
+      collapsed: Boolean(note.collapsed),
+    };
+  });
+  return {
+    title: typeof parsed.title === "string" && parsed.title.trim() ? parsed.title.trim() : "Shared story",
+    structureName: structure.name,
+    phases: structure.phases,
+    notes,
+    noteTypes,
+    archetypes,
+  };
+}
+
+function renderSharedStoryPreview(preview) {
+  if (!sharedStoryPreviewHostEl) return;
+  const noteTypeByIdForPreview = (id) =>
+    preview.noteTypes.find((item) => item.id === id) || {
+      id,
+      label: String(id || "note")
+        .replace(/_/g, " ")
+        .replace(/\b\w/g, (c) => c.toUpperCase()),
+      color: "#f3f4f6",
+    };
+  const archetypeByIdForPreview = (id) =>
+    preview.archetypes.find((item) => item.id === id) || {
+      id,
+      label: String(id || "none"),
+      icon: "",
+    };
+  sharedStoryPreviewHostEl.innerHTML = `
+    <section class="group-board-card">
+      <header class="group-board-head">
+        <div>
+          <h2>${escapeHtml(preview.title)}</h2>
+          <p class="subtitle">${escapeHtml(preview.structureName)}</p>
+        </div>
+      </header>
+      <section class="board wrap-columns group-board-preview">
+        ${preview.phases
+          .map((phase, columnIndex) => {
+            const noteItems = getColumnNotes(preview.notes, columnIndex);
+            const emptyClass = noteItems.length === 0 ? " column-empty" : "";
+            const phaseTitleText = escapeHtml(formatPhaseTitle(phase));
+            return `
+              <section class="column${emptyClass}">
+                <div class="phase-head">
+                  <h2 class="phase-title">${phaseTitleText}</h2>
+                </div>
+                <div class="notes">
+                  ${noteItems
+                    .map((note) => {
+                      const type = noteTypeByIdForPreview(note.kind);
+                      const archetype = archetypeByIdForPreview(note.archetype || "none");
+                      const textPreview = (note.text || "").trim();
+                      const characterLabel =
+                        note.kind === "character"
+                          ? [archetype?.label || "", note.characterName || ""]
+                              .map((part) => part.trim())
+                              .filter(Boolean)
+                              .join(" - ") || "Character"
+                          : "";
+                      const collapsedPreview =
+                        note.kind === "character" ? characterLabel || textPreview || "Character note" : textPreview || "Empty note";
+                      const header =
+                        note.kind === "character" ? `${archetype.label}${note.characterName ? ` - ${note.characterName}` : ""}` : type.label;
+                      const collapsed = Boolean(note.collapsed);
+                      return `<article class="note group-note-readonly${collapsed ? " is-collapsed" : ""}" style="--note-bg:${type.color};">
+                        <div class="note-head">
+                          ${
+                            collapsed
+                              ? `<div class="collapsed-preview" title="${escapeHtml(collapsedPreview)}">${escapeHtml(
+                                  collapsedPreview,
+                                )}</div>`
+                              : `<span class="badge">${escapeHtml(header)}</span>`
+                          }
+                        </div>
+                        ${collapsed ? "" : `<div class="group-note-text">${escapeHtml((note.text || "").trim() || "Empty note")}</div>`}
+                      </article>`;
+                    })
+                    .join("")}
+                </div>
+              </section>
+            `;
+          })
+          .join("")}
+      </section>
+    </section>
+  `;
+}
+
+async function renderSharedStory(sourceUrl) {
+  const requestId = ++sharedStoryRenderRequestId;
+  latestSharedStoryRawText = "";
+  if (sharedStoryPreviewHostEl) {
+    sharedStoryPreviewHostEl.innerHTML = "";
+  }
+  if (sharedStorySourceLink) {
+    sharedStorySourceLink.classList.add("hidden");
+    sharedStorySourceLink.href = "#";
+  }
+  if (sharedStoryImportBtn) {
+    sharedStoryImportBtn.classList.add("hidden");
+    sharedStoryImportBtn.disabled = true;
+  }
+  const safeUrl = ensureSafeSharedSourceUrl(sourceUrl);
+  if (!safeUrl) {
+    if (sharedStoryStatusEl) {
+      sharedStoryStatusEl.textContent =
+        "Missing or invalid source URL. Open a link like /#/shared?src=https://... with a public Structurer story JSON.";
+    }
+    return;
+  }
+  if (sharedStoryStatusEl) {
+    sharedStoryStatusEl.textContent = "Loading shared story...";
+  }
+  if (sharedStorySourceLink) {
+    sharedStorySourceLink.classList.remove("hidden");
+    sharedStorySourceLink.href = safeUrl;
+  }
+  try {
+    const response = await fetch(safeUrl, {
+      method: "GET",
+      mode: "cors",
+      credentials: "omit",
+      redirect: "follow",
+      cache: "no-store",
+    });
+    if (requestId !== sharedStoryRenderRequestId) return;
+    if (!response.ok) {
+      throw new Error(`Could not fetch shared JSON (${response.status}).`);
+    }
+    const rawText = await response.text();
+    if (requestId !== sharedStoryRenderRequestId) return;
+    const maxChars = 4 * 1024 * 1024;
+    if (rawText.length > maxChars) {
+      throw new Error("Shared JSON is too large. Ask the sender to use file export/import.");
+    }
+    const preview = getSharedPreviewDataFromStoryJson(rawText);
+    latestSharedStoryRawText = rawText;
+    renderSharedStoryPreview(preview);
+    if (sharedStoryImportBtn) {
+      sharedStoryImportBtn.classList.remove("hidden");
+      sharedStoryImportBtn.disabled = false;
+    }
+    if (sharedStoryStatusEl) {
+      sharedStoryStatusEl.textContent = `Loaded read-only preview: ${preview.title}`;
+    }
+  } catch (error) {
+    latestSharedStoryRawText = "";
+    if (sharedStoryStatusEl) {
+      sharedStoryStatusEl.textContent =
+        error instanceof Error
+          ? error.message
+          : "Could not load shared story. Check that the URL is public and CORS allows access.";
+    }
+  }
 }
 
 function showGroup(groupId) {
@@ -4047,6 +4304,25 @@ if (notFoundSharingLandingBtn) {
   });
 }
 
+if (goHomeFromSharedBtn) {
+  goHomeFromSharedBtn.addEventListener("click", () => {
+    openLanding();
+  });
+}
+
+if (sharedStoryHomeBtn) {
+  sharedStoryHomeBtn.addEventListener("click", () => {
+    openLanding();
+  });
+}
+
+if (sharedStoryImportBtn) {
+  sharedStoryImportBtn.addEventListener("click", async () => {
+    if (!latestSharedStoryRawText) return;
+    await tryImportBoardFromJsonWithFeedback(latestSharedStoryRawText);
+  });
+}
+
 if (goPrivacyFromFooterBtn) {
   goPrivacyFromFooterBtn.addEventListener("click", () => {
     openPrivacy();
@@ -5156,6 +5432,48 @@ if (closeDashboardCreateStructureModalBtn) {
 if (openImportStoryActionBtn) {
   openImportStoryActionBtn.addEventListener("click", () => {
     openDashboardImportModal();
+  });
+}
+
+if (openViewSharedStoryActionBtn) {
+  openViewSharedStoryActionBtn.addEventListener("click", async () => {
+    const result = await appDialog({
+      title: "View shared story from URL",
+      message: "Paste a public URL to a Structurer story JSON file.",
+      confirmLabel: "View",
+      render(root, api) {
+        root.innerHTML = `
+          <fieldset class="app-dialog-fieldset">
+            <legend class="app-dialog-legend">Story JSON URL</legend>
+            <input
+              type="url"
+              id="structurer-shared-story-url-input"
+              class="app-dialog-text-input"
+              maxlength="2048"
+              autocomplete="off"
+              placeholder="https://..."
+              aria-label="Story JSON URL"
+            />
+          </fieldset>
+          <p class="subtitle">The file must be publicly reachable and allow browser fetches (CORS).</p>
+        `;
+        const input = root.querySelector("#structurer-shared-story-url-input");
+        const sync = () => api.setConfirmEnabled(Boolean(ensureSafeSharedSourceUrl(input.value)));
+        input.addEventListener("input", sync);
+        input.addEventListener("keydown", (e) => {
+          if (e.key === "Enter") {
+            e.preventDefault();
+            if (ensureSafeSharedSourceUrl(input.value)) focusAppAlertConfirmIfEnabled();
+          }
+        });
+        sync();
+        window.setTimeout(() => input.focus(), 0);
+        return () => ensureSafeSharedSourceUrl(input.value) || null;
+      },
+    });
+    if (!result) return;
+    closeDashboardActionsModal();
+    openSharedStoryRouteFromSourceUrl(result);
   });
 }
 

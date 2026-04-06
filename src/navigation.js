@@ -25,6 +25,7 @@ export function createNavigationController({
   renderHome,
   renderEditor,
   renderGroup,
+  renderSharedStory,
   renderPhaseDetail,
   applyColumnWidth,
   applyWrapColumns,
@@ -32,6 +33,7 @@ export function createNavigationController({
   const {
     landingView,
     homeView,
+    sharedView,
     groupView,
     editorView,
     phaseView,
@@ -52,7 +54,20 @@ export function createNavigationController({
     if (!hash || hash === "#") return "/";
     const raw = hash.startsWith("#") ? hash.slice(1) : hash;
     if (!raw) return "/";
-    return normalizePathname(raw.startsWith("/") ? raw : `/${raw}`);
+    const queryIndex = raw.indexOf("?");
+    const pathOnly = queryIndex >= 0 ? raw.slice(0, queryIndex) : raw;
+    return normalizePathname(pathOnly.startsWith("/") ? pathOnly : `/${pathOnly}`);
+  }
+
+  function getCurrentRouteQueryParam(name) {
+    const hash = String(window.location.hash || "");
+    const raw = hash.startsWith("#") ? hash.slice(1) : hash;
+    if (!raw) return "";
+    const queryIndex = raw.indexOf("?");
+    if (queryIndex < 0) return "";
+    const query = raw.slice(queryIndex + 1);
+    const value = new URLSearchParams(query).get(name);
+    return typeof value === "string" ? value.trim() : "";
   }
 
   function navigateTo(path, replace = false) {
@@ -74,6 +89,7 @@ export function createNavigationController({
     landingView.classList.add("hidden");
     homeView.classList.remove("hidden");
     groupView.classList.add("hidden");
+    if (sharedView) sharedView.classList.add("hidden");
     editorView.classList.add("hidden");
     if (phaseView) phaseView.classList.add("hidden");
     helpView.classList.add("hidden");
@@ -90,6 +106,7 @@ export function createNavigationController({
     landingView.classList.remove("hidden");
     homeView.classList.add("hidden");
     groupView.classList.add("hidden");
+    if (sharedView) sharedView.classList.add("hidden");
     editorView.classList.add("hidden");
     if (phaseView) phaseView.classList.add("hidden");
     helpView.classList.add("hidden");
@@ -105,6 +122,7 @@ export function createNavigationController({
     landingView.classList.add("hidden");
     homeView.classList.add("hidden");
     groupView.classList.add("hidden");
+    if (sharedView) sharedView.classList.add("hidden");
     editorView.classList.add("hidden");
     if (phaseView) phaseView.classList.add("hidden");
     helpView.classList.remove("hidden");
@@ -120,6 +138,7 @@ export function createNavigationController({
     landingView.classList.add("hidden");
     homeView.classList.add("hidden");
     groupView.classList.add("hidden");
+    if (sharedView) sharedView.classList.add("hidden");
     editorView.classList.add("hidden");
     if (phaseView) phaseView.classList.add("hidden");
     helpView.classList.add("hidden");
@@ -135,6 +154,7 @@ export function createNavigationController({
     landingView.classList.add("hidden");
     homeView.classList.add("hidden");
     groupView.classList.add("hidden");
+    if (sharedView) sharedView.classList.add("hidden");
     editorView.classList.add("hidden");
     if (phaseView) phaseView.classList.add("hidden");
     helpView.classList.add("hidden");
@@ -150,6 +170,7 @@ export function createNavigationController({
     landingView.classList.add("hidden");
     homeView.classList.add("hidden");
     groupView.classList.add("hidden");
+    if (sharedView) sharedView.classList.add("hidden");
     editorView.classList.add("hidden");
     if (phaseView) phaseView.classList.add("hidden");
     helpView.classList.add("hidden");
@@ -174,6 +195,7 @@ export function createNavigationController({
     landingView.classList.add("hidden");
     homeView.classList.add("hidden");
     groupView.classList.add("hidden");
+    if (sharedView) sharedView.classList.add("hidden");
     editorView.classList.remove("hidden");
     if (phaseView) phaseView.classList.add("hidden");
     helpView.classList.add("hidden");
@@ -232,6 +254,7 @@ export function createNavigationController({
     landingView.classList.add("hidden");
     homeView.classList.add("hidden");
     groupView.classList.remove("hidden");
+    if (sharedView) sharedView.classList.add("hidden");
     editorView.classList.add("hidden");
     if (phaseView) phaseView.classList.add("hidden");
     helpView.classList.add("hidden");
@@ -252,6 +275,7 @@ export function createNavigationController({
     landingView.classList.add("hidden");
     homeView.classList.add("hidden");
     groupView.classList.add("hidden");
+    if (sharedView) sharedView.classList.add("hidden");
     editorView.classList.add("hidden");
     if (phaseView) phaseView.classList.add("hidden");
     helpView.classList.add("hidden");
@@ -270,6 +294,32 @@ export function createNavigationController({
       }
     }
     notFoundView.classList.remove("hidden");
+    requestAnimationFrame(() => {
+      window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+    });
+  }
+
+  function showSharedStory(sourceUrl) {
+    if (!sharedView) {
+      openLanding();
+      return;
+    }
+    setCurrentBoardId(null);
+    setCurrentGroupId(null);
+    landingView.classList.add("hidden");
+    homeView.classList.add("hidden");
+    groupView.classList.add("hidden");
+    editorView.classList.add("hidden");
+    if (phaseView) phaseView.classList.add("hidden");
+    helpView.classList.add("hidden");
+    if (privacyView) privacyView.classList.add("hidden");
+    if (termsView) termsView.classList.add("hidden");
+    if (aiAnalysisPromptView) aiAnalysisPromptView.classList.add("hidden");
+    if (notFoundView) notFoundView.classList.add("hidden");
+    sharedView.classList.remove("hidden");
+    if (typeof renderSharedStory === "function") {
+      renderSharedStory(sourceUrl);
+    }
     requestAnimationFrame(() => {
       window.scrollTo({ top: 0, left: 0, behavior: "auto" });
     });
@@ -369,6 +419,10 @@ export function createNavigationController({
       showAiAnalysisPrompt();
       return;
     }
+    if (path === "/shared") {
+      showSharedStory(getCurrentRouteQueryParam("src"));
+      return;
+    }
     if (path === "/group") {
       showNotFound("generic");
       return;
@@ -433,6 +487,7 @@ export function createNavigationController({
     openAiAnalysisPrompt,
     showAiAnalysisPrompt,
     showNotFound,
+    showSharedStory,
     syncRouteToState,
   };
 }
