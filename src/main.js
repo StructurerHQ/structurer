@@ -238,6 +238,7 @@ const goHomeFromSharedBtn = document.querySelector("#go-home-from-shared");
 const sharedStoryStatusEl = document.querySelector("#shared-story-status");
 const sharedStorySourceLink = document.querySelector("#shared-story-source-link");
 const sharedStoryImportBtn = document.querySelector("#shared-story-import-btn");
+const sharedStoryImportedNoteEl = document.querySelector("#shared-story-imported-note");
 const sharedStoryPreviewHostEl = document.querySelector("#shared-story-preview-host");
 const goDashboardFromBoardBtn = document.querySelector("#go-dashboard-from-board");
 const goDashboardFromGroupBtn = document.querySelector("#go-dashboard-from-group");
@@ -2232,6 +2233,7 @@ function getSharedPreviewDataFromStoryJson(rawText) {
     };
   });
   return {
+    uid: typeof parsed.uid === "string" && parsed.uid ? parsed.uid : "",
     title: typeof parsed.title === "string" && parsed.title.trim() ? parsed.title.trim() : "Shared story",
     structureName: structure.name,
     phases: structure.phases,
@@ -2332,6 +2334,10 @@ async function renderSharedStory(sourceUrl) {
     sharedStoryImportBtn.classList.add("hidden");
     sharedStoryImportBtn.disabled = true;
   }
+  if (sharedStoryImportedNoteEl) {
+    sharedStoryImportedNoteEl.classList.add("hidden");
+    sharedStoryImportedNoteEl.textContent = "Already imported in your workspace.";
+  }
   const safeUrl = ensureSafeSharedSourceUrl(sourceUrl);
   if (!safeUrl) {
     if (sharedStoryStatusEl) {
@@ -2368,7 +2374,16 @@ async function renderSharedStory(sourceUrl) {
     const preview = getSharedPreviewDataFromStoryJson(rawText);
     latestSharedStoryRawText = rawText;
     renderSharedStoryPreview(preview);
-    if (sharedStoryImportBtn) {
+    const alreadyImported = Boolean(preview.uid && boards.some((board) => board.uid === preview.uid));
+    if (alreadyImported) {
+      if (sharedStoryImportedNoteEl) {
+        sharedStoryImportedNoteEl.classList.remove("hidden");
+      }
+      if (sharedStoryImportBtn) {
+        sharedStoryImportBtn.classList.add("hidden");
+        sharedStoryImportBtn.disabled = true;
+      }
+    } else if (sharedStoryImportBtn) {
       sharedStoryImportBtn.classList.remove("hidden");
       sharedStoryImportBtn.disabled = false;
     }
