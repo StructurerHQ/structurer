@@ -1,9 +1,16 @@
 # History
 
+**1.18.0** - 2026-04-06
+- **Create story without a predefined structure:** in **Create a new story**, the structure select now includes **No structure (start from scratch)**. Choosing it opens a follow-up dialog to define a private altered structure for that story (`main.js`).
+- **Unstructured flow starts with 1+ phase:** the start-from-scratch dialog allows creating a story with a single initial phase (and optional phase descriptions), then extending phases later while editing the story (`main.js`).
+- **Built-in note types expanded for generic documents:** added **Time**, **Topic**, **Question**, and **Reference** to the default note kinds so Structurer works better beyond narrative-only use cases (`app-config.js`).
+- **Minor UX polish:** added spacing between the phase list and **Add row** actions in structure-style forms/modals (`styles.css`).
+
 **1.17.1** - 2026-04-06
 - **Shared story navigation polish:** breadcrumb now includes **Dashboard** (`Home > Dashboard > Shared story`) for consistency with other app views.
 - **Shared story actions cleanup:** removed the extra **Back to home** button from shared preview commands; the view now focuses on **Open source JSON** and **Import into my workspace**.
 - **Landing cards visual tweaks:** removed forced minimum height so cards size to content, and gave **AI-assisted analysis flow** a dedicated post-it color not reused by other landing cards.
+- **Built-in note types (generic docs + stories):** added four default kinds — **Time**, **Topic**, **Question**, and **Reference** — to better support non-narrative workflows (timelines, research notes, source tracking) while keeping the built-in set concise (`app-config.js`).
 
 **1.17.0** - 2026-04-06
 - **Privacy-first routing:** switched app navigation from pathname routes to hash routes (`#/...`), so story/group slugs are kept in the URL fragment instead of request paths (`navigation.js`, `main.js`).
