@@ -47,15 +47,25 @@ export function createNavigationController({
     return pathname.endsWith("/") ? pathname.slice(0, -1) : pathname;
   }
 
+  function getCurrentRoutePath() {
+    const hash = String(window.location.hash || "");
+    if (!hash || hash === "#") return "/";
+    const raw = hash.startsWith("#") ? hash.slice(1) : hash;
+    if (!raw) return "/";
+    return normalizePathname(raw.startsWith("/") ? raw : `/${raw}`);
+  }
+
   function navigateTo(path, replace = false) {
     const target = normalizePathname(path);
-    const current = normalizePathname(window.location.pathname);
+    const current = getCurrentRoutePath();
     if (target === current) return;
+    const nextHash = target === "/" ? "#/" : `#${target}`;
     if (replace) {
-      window.history.replaceState({}, "", target);
+      const base = `${window.location.pathname}${window.location.search}`;
+      window.location.replace(`${base}${nextHash}`);
       return;
     }
-    window.history.pushState({}, "", target);
+    window.location.hash = nextHash;
   }
 
   function showHome() {
@@ -334,7 +344,7 @@ export function createNavigationController({
   }
 
   function syncRouteToState(replaceRoute = true) {
-    const path = normalizePathname(window.location.pathname);
+    const path = getCurrentRoutePath();
     if (path === "/") {
       showLanding();
       return;

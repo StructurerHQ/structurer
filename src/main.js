@@ -3030,7 +3030,7 @@ function restoreFullAppBackupFromText(rawText) {
   saveJsonItem(GROUPS_KEY, nextGroups);
   saveJsonItem(DEMO_BOARD_IDS_KEY, nextDemoBoardIds);
 
-  window.location.assign(HOME_ROUTE);
+  window.location.assign(`#${HOME_ROUTE}`);
   return parsed;
 }
 
@@ -5507,7 +5507,7 @@ if (confirmFactoryResetBtn) {
       PHASE_HELP_STATE_KEY,
       EDITOR_QUICK_HELP_DISMISSED_KEY,
     ]);
-    window.location.assign(HOME_ROUTE);
+    window.location.assign(`#${HOME_ROUTE}`);
   });
 }
 
@@ -5994,7 +5994,7 @@ migrateUniqueUids();
 pruneOrphanAlteredStructures();
 saveBoards();
 saveGroups();
-window.addEventListener("popstate", () => {
+window.addEventListener("hashchange", () => {
   syncRouteToState(false);
 });
 applyColumnWidth();

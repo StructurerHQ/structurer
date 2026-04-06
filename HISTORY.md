@@ -1,5 +1,10 @@
 # History
 
+**1.17.0** - 2026-04-06
+- **Privacy-first routing:** switched app navigation from pathname routes to hash routes (`#/...`), so story/group slugs are kept in the URL fragment instead of request paths (`navigation.js`, `main.js`).
+- **Client navigation events:** route sync now follows `hashchange` (instead of `popstate`) and internal navigation writes `window.location.hash`, preserving existing view logic for landing/dashboard/help/editor/series/phase/404 screens (`main.js`, `navigation.js`).
+- **Nginx legacy path redirect:** direct requests like `/group/...`, `/<story-slug>`, and `/<story-slug>/phase/N` are redirected to `/#/...` via `nginx/default.conf`, while `/` still serves `index.html` normally (`nginx/default.conf`, `server.sh` mount unchanged).
+
 **1.16.1** - 2026-04-04
 - Editor: scroll to new note and focus its textarea; viewport auto-scroll while dragging notes or phases.
 - Editor: default **full height** (classic): note text grows with content, no capped scroll. **Capped** height (scroll inside, ~32vh / 260px cap) and the resize grip **also when the note is not in edit mode** are **per story** via **Options → Note height mode** (open story only). Built-in demos use capped mode. Story JSON may include optional `adaptiveNoteHeights: true`; full app backup no longer stores a global note-height flag (`legacyFullHeightNoteCards` is ignored if still present in old settings).
