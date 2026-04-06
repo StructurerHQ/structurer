@@ -51,6 +51,7 @@ import { validateStructureAuthor, validateStructureDescription } from "./structu
 const loadedBoards = loadBoards();
 let boards = loadedBoards || [];
 const GROUPS_KEY = "structurer.groups.v1";
+const NO_STRUCTURE_OPTION_VALUE = "__no_structure__";
 /** Latest `schemaVersion` for `exportType: structurer.story` exports and AI prompt output. */
 const STORY_JSON_SCHEMA_LATEST = 3;
 /** Structure template JSON from the dashboard preview (built-in or user catalog). */
@@ -1409,10 +1410,17 @@ function getStructureConfig(structureId) {
 function renderStructureOptions(selectedId = null) {
   const structures = getCatalogStructureList();
   let activeId = selectedId || boardStructureSelect.value || "hero_journey";
-  if (!structures.some((s) => s.id === activeId)) {
+  if (activeId !== NO_STRUCTURE_OPTION_VALUE && !structures.some((s) => s.id === activeId)) {
     activeId = structures[0]?.id || "hero_journey";
   }
   boardStructureSelect.innerHTML = renderStructureOptionsHtml(structures, activeId);
+  const noStructureOption = document.createElement("option");
+  noStructureOption.value = NO_STRUCTURE_OPTION_VALUE;
+  noStructureOption.textContent = "No structure (start from scratch)";
+  if (activeId === NO_STRUCTURE_OPTION_VALUE) {
+    noStructureOption.selected = true;
+  }
+  boardStructureSelect.append(noStructureOption);
 }
 
 const DEFAULT_STRUCTURE_PHASE_ROWS = [
@@ -2491,6 +2499,179 @@ function createBoard(title, structureId = "hero_journey") {
   saveBoards();
   renderHome();
   return newBoard;
+}
+
+function createBoardWithInitialAlteredStructure(title, phases, alteredStructureName = "Unstructured") {
+  const trimmedTitle = String(title || "").trim();
+  const normalizedPhases = (Array.isArray(phases) ? phases : [])
+    .map((phase) => {
+      const phaseTitle = String(phase?.title || "").trim();
+      if (!phaseTitle) return null;
+      const phaseDescription = String(phase?.description || "").trim();
+      return phaseDescription ? { title: phaseTitle, description: phaseDescription } : { title: phaseTitle };
+    })
+    .filter(Boolean);
+  if (!trimmedTitle) {
+    throw new Error("Story title is required.");
+  }
+  if (normalizedPhases.length < 1) {
+    throw new Error("Please add at least 1 phase.");
+  }
+  const structureName = String(alteredStructureName || "").trim() || "Unstructured";
+  const boardUid = generateUniqueUid();
+  const structureId = generateUniqueAlteredStructureId(structureName);
+  const now = Date.now();
+  const alteredStructure = {
+    id: structureId,
+    uid: generateUniqueUid(),
+    name: structureName,
+    phases: normalizedPhases,
+    updatedAt: now,
+    isAlteredStructure: true,
+    ownerBoardUid: boardUid,
+  };
+  customStructures.push(alteredStructure);
+  saveCustomStructures();
+
+  const baseSlug = slugifyTitle(trimmedTitle);
+  const slug = ensureUniqueSlug(baseSlug);
+  const newBoard = {
+    id: crypto.randomUUID(),
+    uid: boardUid,
+    title: trimmedTitle,
+    slug,
+    structureId: alteredStructure.id,
+    structure: alteredStructure.name,
+    phaseOrder: identityPhaseOrder(alteredStructure.phases.length),
+    phaseUids: identityPhaseOrder(alteredStructure.phases.length).map(() => generateUniqueUid()),
+    nextNoteId: 1,
+    nextCommentId: 1,
+    notes: [],
+    phaseComments: {},
+    phaseCommentsVersion: 2,
+    onboardingAddNotesHintSeen: false,
+    updatedAt: now,
+  };
+  boards.push(newBoard);
+  saveBoards();
+  renderHome();
+  return newBoard;
+}
+
+function collectStoryScratchPhaseRowsFromHost(hostEl) {
+  if (!hostEl) return [];
+  return [...hostEl.querySelectorAll(".structure-phase-row")].map((row) => ({
+    title: row.querySelector('[data-role="phase-input"]')?.value ?? "",
+    description: row.querySelector('[data-role="phase-description-input"]')?.value ?? "",
+  }));
+}
+
+function renderStoryScratchPhaseRows(hostEl, values) {
+  if (!hostEl) return;
+  const safeValues = Array.isArray(values) && values.length > 0 ? values : [{ title: "", description: "" }];
+  hostEl.innerHTML = safeValues
+    .map((value, index) => structurePhaseRowTemplate(index, normalizeStructureFormPhaseValue(value)))
+    .join("");
+  const rows = hostEl.querySelectorAll(".structure-phase-row");
+  rows.forEach((row) => {
+    const removeButton = row.querySelector('[data-role="remove-phase-row"]');
+    if (!removeButton) return;
+    const canRemove = rows.length > 1;
+    removeButton.disabled = !canRemove;
+    removeButton.title = canRemove ? "Remove row" : "At least 1 phase is required.";
+  });
+}
+
+async function promptCreateStoryFromScratch(initialTitle = "") {
+  return appDialog({
+    title: "Start story without a structure",
+    message:
+      "Create a private altered structure used only by this story. You can start with one phase and add more later.",
+    confirmLabel: "Create story",
+    render(root, api) {
+      root.innerHTML = `
+        <fieldset class="app-dialog-fieldset">
+          <legend class="app-dialog-legend">Story name</legend>
+          <input
+            type="text"
+            id="structurer-story-scratch-title"
+            class="app-dialog-text-input"
+            maxlength="80"
+            autocomplete="off"
+            aria-label="Story name"
+          />
+        </fieldset>
+        <fieldset class="app-dialog-fieldset">
+          <legend class="app-dialog-legend">Structure name (optional)</legend>
+          <input
+            type="text"
+            id="structurer-story-scratch-structure-name"
+            class="app-dialog-text-input"
+            maxlength="80"
+            autocomplete="off"
+            aria-label="Structure name"
+            placeholder="Unstructured"
+          />
+        </fieldset>
+        <p class="app-dialog-section-label">Phases</p>
+        <div id="structurer-story-scratch-phases" class="structure-phases-list"></div>
+        <div class="structure-form-actions">
+          <button id="structurer-story-scratch-add-row" class="ghost-button" type="button">Add row</button>
+        </div>
+      `;
+      const titleInput = root.querySelector("#structurer-story-scratch-title");
+      const structureNameInput = root.querySelector("#structurer-story-scratch-structure-name");
+      const phasesHost = root.querySelector("#structurer-story-scratch-phases");
+      const addRowBtn = root.querySelector("#structurer-story-scratch-add-row");
+      const sync = () => {
+        const storyTitle = titleInput.value.trim();
+        const phaseCount = collectStoryScratchPhaseRowsFromHost(phasesHost).filter((row) => row.title.trim()).length;
+        api.setConfirmEnabled(Boolean(storyTitle) && phaseCount >= 1);
+      };
+      renderStoryScratchPhaseRows(phasesHost, [{ title: "Phase 1", description: "" }]);
+      titleInput.value = String(initialTitle || "").trim();
+      if (titleInput.value) {
+        structureNameInput.value = `${titleInput.value} structure`;
+      }
+      titleInput.addEventListener("input", sync);
+      structureNameInput.addEventListener("input", sync);
+      phasesHost.addEventListener("input", sync);
+      phasesHost.addEventListener("click", (event) => {
+        const removeButton = event.target.closest('button[data-role="remove-phase-row"]');
+        if (!removeButton || removeButton.disabled) return;
+        const row = removeButton.closest(".structure-phase-row");
+        if (!row || !phasesHost.contains(row)) return;
+        row.remove();
+        renderStoryScratchPhaseRows(phasesHost, collectStoryScratchPhaseRowsFromHost(phasesHost));
+        sync();
+      });
+      addRowBtn.addEventListener("click", () => {
+        const values = collectStoryScratchPhaseRowsFromHost(phasesHost);
+        values.push({ title: "", description: "" });
+        renderStoryScratchPhaseRows(phasesHost, values);
+        const inputs = phasesHost.querySelectorAll('[data-role="phase-input"]');
+        const last = inputs[inputs.length - 1];
+        if (last) last.focus();
+        sync();
+      });
+      sync();
+      window.setTimeout(() => titleInput.focus(), 0);
+      return () => {
+        const storyTitle = titleInput.value.trim();
+        const structureName = structureNameInput.value.trim() || "Unstructured";
+        const phases = collectStoryScratchPhaseRowsFromHost(phasesHost)
+          .map((row) => {
+            const title = row.title.trim();
+            if (!title) return null;
+            const description = row.description.trim();
+            return description ? { title, description } : { title };
+          })
+          .filter(Boolean);
+        if (!storyTitle || phases.length < 1) return null;
+        return { title: storyTitle, structureName, phases };
+      };
+    },
+  });
 }
 
 function createDemoBoardFromJson(demoData) {
@@ -4067,12 +4248,20 @@ const boardInteractions = createBoardInteractionsController({
   },
 });
 
-createBoardForm.addEventListener("submit", (event) => {
+createBoardForm.addEventListener("submit", async (event) => {
   event.preventDefault();
   const title = boardTitleInput.value.trim();
   if (!title) return;
-  const newBoard = createBoard(title, boardStructureSelect.value);
+  let newBoard = null;
+  if (boardStructureSelect.value === NO_STRUCTURE_OPTION_VALUE) {
+    const payload = await promptCreateStoryFromScratch(title);
+    if (!payload) return;
+    newBoard = createBoardWithInitialAlteredStructure(payload.title, payload.phases, payload.structureName);
+  } else {
+    newBoard = createBoard(title, boardStructureSelect.value);
+  }
   boardTitleInput.value = "";
+  renderStructureOptions();
   closeDashboardCreateStoryModal();
   closeDashboardActionsModal();
   if (newBoard?.id) {
