@@ -1,6 +1,6 @@
 {
   "name": "structurer",
-  "version": "1.18.2",
+  "version": "1.18.3",
   "description": "A simple tool to build stories",
   "scripts": {
     "dev": "vite",
@@ -9,8 +9,7 @@
   },
   "author": "Francesco Sullo",
   "license": "GPL3",
-  "dependencies": {},
   "devDependencies": {
-    "vite": "^8.0.3"
+    "vite": "^8.0.5"
   }
 }

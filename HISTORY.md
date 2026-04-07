@@ -1,5 +1,9 @@
 # History
 
+**1.18.3** - 2026-04-07
+- **Share preview metadata + favicon:** added app favicon plus Open Graph/Twitter metadata in `index.html` (including homepage screenshot) so shared links have richer unfurl/preview cards across platforms.
+- **Stable preview asset URLs:** moved favicon and social preview screenshot to `public/` and updated meta/icon paths to fixed URLs (`/favicon.png`, `/home-screenshot.png`) so Vite builds no longer produce rotating hashed paths for these share-critical assets.
+
 **1.18.2** - 2026-04-06
 - **Optional comments in story export:** exporting a story now opens a small options dialog with **Export phase comments too** enabled by default. If unchecked, Structurer exports the story JSON without `phaseComments`/`phaseCommentsVersion`, making it easier to share cleaner files when comments are private (`main.js`).
 - **Shared preview UX refinement:** when `/#/shared?src=...` loads successfully, the temporary status line is hidden (the page title already communicates read-only mode). If the same story was already imported, Structurer now shows an inline **Open it** link in the note so you can jump directly to the local story (`index.html`, `main.js`).
