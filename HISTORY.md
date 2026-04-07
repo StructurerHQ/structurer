@@ -1,5 +1,9 @@
 # History
 
+**1.18.5** - 2026-04-07
+- **Shared JSON validation errors:** shared-story preview now distinguishes clearer failures for empty/non-JSON files, malformed/corrupted JSON, and JSON payloads that are valid but not Structurer story exports (`main.js`).
+- **Dashboard-first validation for shared URLs:** **View shared story from URL** now validates fetch + JSON shape before navigation. If invalid, Structurer stays on the dashboard and shows an alert; it opens the shared read-only page only when the story JSON is valid (`main.js`).
+
 **1.18.4** - 2026-04-07
 - **First phase-comment privacy notice:** when focusing the phase-comment textarea for the first time on a device/browser, Structurer now shows a one-time notice that comments are local-only unless the story JSON is explicitly exported and shared (`main.js`).
 
