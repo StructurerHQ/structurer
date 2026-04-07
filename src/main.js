@@ -2217,9 +2217,32 @@ function canonicalizeUrlToHashRoutesForPrivacy() {
 }
 
 function getSharedPreviewDataFromStoryJson(rawText) {
-  const parsed = JSON.parse(stripLeadingTrailingOutsideJsonObject(rawText));
-  if (!parsed || typeof parsed !== "object" || !Array.isArray(parsed.notes)) {
-    throw new Error("Invalid story JSON format.");
+  const trimmed = String(rawText ?? "").trim();
+  if (!trimmed) {
+    throw new Error("The shared file is empty. Provide a valid Structurer story JSON.");
+  }
+  const maybeHtml = trimmed.startsWith("<!doctype") || trimmed.startsWith("<html") || trimmed.startsWith("<?xml");
+  if (maybeHtml) {
+    throw new Error("The shared file is not JSON. Use a direct public URL to a `.json` file.");
+  }
+  let parsed;
+  try {
+    parsed = JSON.parse(stripLeadingTrailingOutsideJsonObject(trimmed));
+  } catch {
+    throw new Error("The shared file is not valid JSON (it may be corrupted).");
+  }
+  if (!parsed || typeof parsed !== "object") {
+    throw new Error("The shared file is not a valid JSON object.");
+  }
+  if (parsed.exportType && parsed.exportType !== "structurer.story") {
+    throw new Error(
+      `This JSON is not a Structurer story export (found exportType "${parsed.exportType}").`,
+    );
+  }
+  if (!Array.isArray(parsed.notes)) {
+    throw new Error(
+      'This JSON is valid, but it is not a Structurer story. Expected a story payload with a root "notes" array.',
+    );
   }
   const storySchemaVersion = normalizeImportedStorySchemaVersion(parsed);
   let structure;
@@ -2405,24 +2428,10 @@ async function renderSharedStory(sourceUrl) {
     sharedStorySourceLink.href = safeUrl;
   }
   try {
-    const response = await fetch(safeUrl, {
-      method: "GET",
-      mode: "cors",
-      credentials: "omit",
-      redirect: "follow",
-      cache: "no-store",
-    });
+    const loaded = await loadSharedStoryFromUrlForPreview(safeUrl);
     if (requestId !== sharedStoryRenderRequestId) return;
-    if (!response.ok) {
-      throw new Error(`Could not fetch shared JSON (${response.status}).`);
-    }
-    const rawText = await response.text();
-    if (requestId !== sharedStoryRenderRequestId) return;
-    const maxChars = 4 * 1024 * 1024;
-    if (rawText.length > maxChars) {
-      throw new Error("Shared JSON is too large. Ask the sender to use file export/import.");
-    }
-    const preview = getSharedPreviewDataFromStoryJson(rawText);
+    const rawText = loaded.rawText;
+    const preview = loaded.preview;
     latestSharedStoryRawText = rawText;
     renderSharedStoryPreview(preview);
     const importedBoard = preview.uid ? boards.find((board) => board.uid === preview.uid) : null;
@@ -2461,6 +2470,35 @@ async function renderSharedStory(sourceUrl) {
           : "Could not load shared story. Check that the URL is public and CORS allows access.";
     }
   }
+}
+
+async function loadSharedStoryFromUrlForPreview(sourceUrl) {
+  const safeUrl = ensureSafeSharedSourceUrl(sourceUrl);
+  if (!safeUrl) {
+    throw new Error("Missing or invalid source URL.");
+  }
+  let response;
+  try {
+    response = await fetch(safeUrl, {
+      method: "GET",
+      mode: "cors",
+      credentials: "omit",
+      redirect: "follow",
+      cache: "no-store",
+    });
+  } catch {
+    throw new Error("Could not fetch shared JSON. Check that the URL is public and CORS allows access.");
+  }
+  if (!response.ok) {
+    throw new Error(`Could not fetch shared JSON (${response.status}).`);
+  }
+  const rawText = await response.text();
+  const maxChars = 4 * 1024 * 1024;
+  if (rawText.length > maxChars) {
+    throw new Error("Shared JSON is too large. Ask the sender to use file export/import.");
+  }
+  const preview = getSharedPreviewDataFromStoryJson(rawText);
+  return { safeUrl, rawText, preview };
 }
 
 function showGroup(groupId) {
@@ -5837,6 +5875,12 @@ if (openViewSharedStoryActionBtn) {
       },
     });
     if (!result) return;
+    try {
+      await loadSharedStoryFromUrlForPreview(result);
+    } catch (error) {
+      await appAlert(error instanceof Error ? error.message : "Could not validate the shared story URL.");
+      return;
+    }
     closeDashboardActionsModal();
     openSharedStoryRouteFromSourceUrl(result);
   });
