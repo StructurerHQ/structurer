@@ -4922,8 +4922,10 @@ if (sharedStorySaveBookmarkBtn) {
       await appAlert("Could not save this bookmark.");
       return;
     }
+    sharedStorySaveBookmarkBtn.classList.add("hidden");
+    sharedStorySaveBookmarkBtn.disabled = true;
     renderHome();
-    await appAlert(result.created ? "Shared bookmark saved." : "Shared bookmark updated.");
+    await appAlert("Shared bookmark saved.");
   });
 }
 
