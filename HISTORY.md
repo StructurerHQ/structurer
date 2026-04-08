@@ -1,5 +1,12 @@
 # History
 
+**1.18.8** - 2026-04-08
+- **Shared view actions/menu refinement:** on shared-story pages, actions now live in a unified **… Actions** menu on desktop and **…** on mobile, with **Open original JSON** and **Save bookmark** as menu items. After saving, **Save bookmark** hides immediately (no refresh needed) (`index.html`, `main.js`).
+- **Shared preview layout parity with regular stories:** shared read-only boards now use the same contiguous phase-grid treatment as regular/group stories, including full-width horizontal span (no extra side inset and no legacy rounded-column look) (`styles.css`).
+- **Mobile topbar consistency pass:** on small screens the text **Back** button is hidden globally (only contextual arrow remains). Story/group/shared topbars now use compact left-side controls with right-aligned title/subtitle blocks; shared title is split into three readable lines (badge, title, structure) (`styles.css`, `main.js`).
+- **Shared bookmark card affordance fix:** shared bookmark titles no longer show inline-rename hover/cursor styling, avoiding false “editable” affordance (`styles.css`).
+- **Help copy update for shared links:** FAQ/landing copy now describes the shared-link + dashboard bookmark flow and removes outdated direct-import implications from shared preview (`index.html`).
+
 **1.18.7** - 2026-04-08
 - **Shared story comments in read-only preview:** `/#/shared?src=...` now renders phase comments under each phase (simple readonly block), including comments keyed by modern `phaseUids` and legacy numeric keys. The comment section label is now **COMMENTS (N)** and comment text is slightly smaller than note text for visual hierarchy (`main.js`, `styles.css`).
 - **Shared URL bookmarks instead of direct import from preview:** removed **Import into my workspace** from the shared-story page and added **Save in bookmarks**. Saved shared URLs now appear on the dashboard under **Shared bookmarks** (labelled **Shared**), where they can be reopened anytime to check updates; bookmarks can also be removed from that list (`index.html`, `main.js`).
