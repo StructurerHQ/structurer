@@ -6,6 +6,7 @@
 - **Mobile topbar consistency pass:** on small screens the text **Back** button is hidden globally (only contextual arrow remains). Story/group/shared topbars now use compact left-side controls with right-aligned title/subtitle blocks; shared title is split into three readable lines (badge, title, structure) (`styles.css`, `main.js`).
 - **Shared bookmark card affordance fix:** shared bookmark titles no longer show inline-rename hover/cursor styling, avoiding false “editable” affordance (`styles.css`).
 - **Help copy update for shared links:** FAQ/landing copy now describes the shared-link + dashboard bookmark flow and removes outdated direct-import implications from shared preview (`index.html`).
+- **Shared view options parity:** shared pages now expose an **Options** menu with **Resize columns** and **Wrap columns** (same behavior as regular stories), while still omitting story-specific note-height controls (`index.html`, `main.js`, `styles.css`).
 
 **1.18.7** - 2026-04-08
 - **Shared story comments in read-only preview:** `/#/shared?src=...` now renders phase comments under each phase (simple readonly block), including comments keyed by modern `phaseUids` and legacy numeric keys. The comment section label is now **COMMENTS (N)** and comment text is slightly smaller than note text for visual hierarchy (`main.js`, `styles.css`).

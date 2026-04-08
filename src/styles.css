@@ -150,6 +150,12 @@ body {
   justify-self: end;
 }
 
+#shared-view .dashboard-topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
 .editor-topbar {
   display: grid;
   grid-template-columns: 1fr auto 1fr;
@@ -3324,7 +3330,8 @@ a:hover {
   }
 
   #shared-view #go-home-from-shared,
-  #shared-view #shared-story-actions-btn {
+  #shared-view #shared-story-actions-btn,
+  #shared-view #shared-story-options-btn {
     width: 40px;
     min-width: 40px;
     height: 32px;
@@ -3365,9 +3372,14 @@ a:hover {
     margin-top: 4px;
   }
 
-  #shared-view #shared-story-actions-wrap .options-menu {
+  #shared-view #shared-story-actions-wrap .options-menu,
+  #shared-view #shared-story-options-wrap .options-menu {
     left: 0;
     right: auto;
+  }
+
+  #shared-view #shared-story-options-wrap {
+    display: none !important;
   }
 
   /* Mobile/tablet topbar pattern for main app views:
