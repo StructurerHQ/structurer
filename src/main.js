@@ -243,7 +243,10 @@ const goHomeFromSharedBtn = document.querySelector("#go-home-from-shared");
 const sharedStoryPageTitleEl = document.querySelector("#shared-story-page-title");
 const sharedStoryPageSubtitleEl = document.querySelector("#shared-story-page-subtitle");
 const sharedStoryStatusEl = document.querySelector("#shared-story-status");
-const sharedStorySourceLink = document.querySelector("#shared-story-source-link");
+const sharedStoryActionsWrap = document.querySelector("#shared-story-actions-wrap");
+const sharedStoryActionsBtn = document.querySelector("#shared-story-actions-btn");
+const sharedStoryActionsMenu = document.querySelector("#shared-story-actions-menu");
+const sharedStoryOpenJsonBtn = document.querySelector("#shared-story-open-json-btn");
 const sharedStorySaveBookmarkBtn = document.querySelector("#shared-story-save-bookmark-btn");
 const sharedStoryPreviewHostEl = document.querySelector("#shared-story-preview-host");
 const goDashboardFromBoardBtn = document.querySelector("#go-dashboard-from-board");
@@ -2533,9 +2536,10 @@ async function renderSharedStory(sourceUrl) {
   if (sharedStoryPreviewHostEl) {
     sharedStoryPreviewHostEl.innerHTML = "";
   }
-  if (sharedStorySourceLink) {
-    sharedStorySourceLink.classList.add("hidden");
-    sharedStorySourceLink.href = "#";
+  if (sharedStoryActionsWrap) {
+    sharedStoryActionsWrap.classList.add("hidden");
+    delete sharedStoryActionsWrap.dataset.sourceUrl;
+    closeSharedStoryActionsMenu();
   }
   if (sharedStoryPageTitleEl) {
     sharedStoryPageTitleEl.textContent = "Shared story (read-only)";
@@ -2544,12 +2548,7 @@ async function renderSharedStory(sourceUrl) {
     sharedStoryPageSubtitleEl.textContent = "";
     sharedStoryPageSubtitleEl.classList.add("hidden");
   }
-  if (sharedStorySaveBookmarkBtn) {
-    sharedStorySaveBookmarkBtn.classList.add("hidden");
-    sharedStorySaveBookmarkBtn.disabled = true;
-    delete sharedStorySaveBookmarkBtn.dataset.sourceUrl;
-    delete sharedStorySaveBookmarkBtn.dataset.title;
-  }
+  if (sharedStorySaveBookmarkBtn) sharedStorySaveBookmarkBtn.classList.add("hidden");
   const safeUrl = ensureSafeSharedSourceUrl(sourceUrl);
   if (!safeUrl) {
     if (sharedStoryStatusEl) {
@@ -2563,16 +2562,18 @@ async function renderSharedStory(sourceUrl) {
     sharedStoryStatusEl.classList.remove("hidden");
     sharedStoryStatusEl.textContent = "Loading shared story...";
   }
-  if (sharedStorySourceLink) {
-    sharedStorySourceLink.classList.remove("hidden");
-    sharedStorySourceLink.href = safeUrl;
+  if (sharedStoryActionsWrap) {
+    sharedStoryActionsWrap.classList.remove("hidden");
+    sharedStoryActionsWrap.dataset.sourceUrl = safeUrl;
   }
   try {
     const loaded = await loadSharedStoryFromUrlForPreview(safeUrl);
     if (requestId !== sharedStoryRenderRequestId) return;
     const preview = loaded.preview;
     if (sharedStoryPageTitleEl) {
-      sharedStoryPageTitleEl.innerHTML = `<span class="analysis-label">Shared</span> ${escapeHtml(preview.title)}`;
+      sharedStoryPageTitleEl.innerHTML = `<span class="analysis-label shared-title-badge">Shared</span><span class="shared-title-text">${escapeHtml(
+        preview.title,
+      )}</span>`;
     }
     if (sharedStoryPageSubtitleEl) {
       sharedStoryPageSubtitleEl.textContent = preview.structureName || "";
@@ -2580,12 +2581,9 @@ async function renderSharedStory(sourceUrl) {
     }
     renderSharedStoryPreview(preview);
     if (sharedStorySaveBookmarkBtn) {
-      sharedStorySaveBookmarkBtn.dataset.sourceUrl = safeUrl;
       sharedStorySaveBookmarkBtn.dataset.title = preview.title || "Shared story";
       const alreadyBookmarked = sharedStoryBookmarks.some((item) => item.url === safeUrl);
-      sharedStorySaveBookmarkBtn.textContent = "Save bookmark";
       sharedStorySaveBookmarkBtn.classList.toggle("hidden", alreadyBookmarked);
-      sharedStorySaveBookmarkBtn.disabled = alreadyBookmarked;
     }
     if (sharedStoryStatusEl) {
       sharedStoryStatusEl.textContent = "";
@@ -4912,9 +4910,25 @@ if (goHomeFromSharedBtn) {
   });
 }
 
+if (sharedStoryActionsBtn && sharedStoryActionsMenu) {
+  sharedStoryActionsBtn.addEventListener("click", (event) => {
+    event.stopPropagation();
+    sharedStoryActionsMenu.classList.toggle("hidden");
+  });
+}
+
+if (sharedStoryOpenJsonBtn) {
+  sharedStoryOpenJsonBtn.addEventListener("click", () => {
+    const sourceUrl = ensureSafeSharedSourceUrl(sharedStoryActionsWrap?.dataset.sourceUrl || "");
+    if (!sourceUrl) return;
+    closeSharedStoryActionsMenu();
+    window.open(sourceUrl, "_blank", "noopener");
+  });
+}
+
 if (sharedStorySaveBookmarkBtn) {
   sharedStorySaveBookmarkBtn.addEventListener("click", async () => {
-    const sourceUrl = ensureSafeSharedSourceUrl(sharedStorySaveBookmarkBtn.dataset.sourceUrl || "");
+    const sourceUrl = ensureSafeSharedSourceUrl(sharedStoryActionsWrap?.dataset.sourceUrl || "");
     const title = String(sharedStorySaveBookmarkBtn.dataset.title || "Shared story");
     if (!sourceUrl) return;
     const result = upsertSharedBookmark(sourceUrl, title);
@@ -4922,8 +4936,8 @@ if (sharedStorySaveBookmarkBtn) {
       await appAlert("Could not save this bookmark.");
       return;
     }
+    closeSharedStoryActionsMenu();
     sharedStorySaveBookmarkBtn.classList.add("hidden");
-    sharedStorySaveBookmarkBtn.disabled = true;
     renderHome();
     await appAlert("Shared bookmark saved.");
   });
@@ -5590,6 +5604,11 @@ if (confirmDeleteStoryBtn) {
 
 function closeOptionsMenu() {
   optionsMenu.classList.add("hidden");
+}
+
+function closeSharedStoryActionsMenu() {
+  if (!sharedStoryActionsMenu) return;
+  sharedStoryActionsMenu.classList.add("hidden");
 }
 
 function closeDashboardActionsModal() {
@@ -6608,6 +6627,10 @@ document.addEventListener("keydown", (event) => {
   }
   if (dashboardActionsModalOverlay && !dashboardActionsModalOverlay.classList.contains("hidden")) {
     closeDashboardActionsModal();
+    return;
+  }
+  if (sharedStoryActionsMenu && !sharedStoryActionsMenu.classList.contains("hidden")) {
+    closeSharedStoryActionsMenu();
   }
 });
 
@@ -6888,6 +6911,7 @@ document.addEventListener("click", (event) => {
 
   if (!event.target.closest(".options-wrap")) {
     closeOptionsMenu();
+    closeSharedStoryActionsMenu();
   }
   if (!event.target.closest(".phase-head") && !event.target.closest("#add-note-modal-overlay")) {
     boardNoteActions.closeAllColumnMenus();

@@ -939,15 +939,16 @@
             <p id="shared-story-page-subtitle" class="subtitle hidden"></p>
           </div>
           <div class="dashboard-topbar-right">
-            <a
-              id="shared-story-source-link"
-              href="#"
-              target="_blank"
-              rel="noopener noreferrer"
-              class="ghost-button hidden"
-              >Open original JSON</a
-            >
-            <button id="shared-story-save-bookmark-btn" type="button" class="ghost-button hidden">Save bookmark</button>
+            <div id="shared-story-actions-wrap" class="options-wrap hidden">
+              <button id="shared-story-actions-btn" class="ghost-button board-actions-trigger" type="button" aria-label="Shared actions">
+                <span class="action-icon" aria-hidden="true">…</span>
+                <span class="board-actions-trigger-label">Actions</span>
+              </button>
+              <div id="shared-story-actions-menu" class="options-menu hidden">
+                <button id="shared-story-open-json-btn" class="menu-item" type="button">Open original JSON</button>
+                <button id="shared-story-save-bookmark-btn" class="menu-item" type="button">Save bookmark</button>
+              </div>
+            </div>
           </div>
         </header>
 

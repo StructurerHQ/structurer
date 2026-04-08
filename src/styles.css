@@ -88,6 +88,14 @@ body {
   overflow-y: visible;
 }
 
+/* Shared preview should use the same full-bleed horizontal span as story/group boards. */
+#shared-view:not(.hidden) #shared-story-preview-host {
+  margin-left: calc(-1 * var(--app-padding-inline));
+  margin-right: calc(-1 * var(--app-padding-inline));
+  width: calc(100% + 2 * var(--app-padding-inline));
+  box-sizing: border-box;
+}
+
 .hidden {
   display: none;
 }
@@ -878,7 +886,8 @@ a:hover {
 
 /* Contiguous phase grid: container top+left only; each cell right+bottom — one hairline on outer edges, no doubling */
 /* Grid bg transparent so implicit empty slots show page bg through frameless card */
-#group-view .group-board-preview.board {
+#group-view .group-board-preview.board,
+#shared-view .group-board-preview.board {
   gap: 0;
   background: transparent;
   border: 0;
@@ -889,7 +898,8 @@ a:hover {
   padding-bottom: 0;
 }
 
-#group-view .group-board-preview .column {
+#group-view .group-board-preview .column,
+#shared-view .group-board-preview .column {
   border: none;
   border-radius: 0;
   padding: 16px 12px 18px;
@@ -899,11 +909,13 @@ a:hover {
   border-bottom: 1px solid var(--line);
 }
 
-#group-view .group-board-preview .column.column-empty {
+#group-view .group-board-preview .column.column-empty,
+#shared-view .group-board-preview .column.column-empty {
   background: var(--column-empty-bg);
 }
 
-#group-view .group-board-preview .phase-head {
+#group-view .group-board-preview .phase-head,
+#shared-view .group-board-preview .phase-head {
   margin-bottom: 12px;
 }
 
@@ -3277,6 +3289,199 @@ a:hover {
 }
 
 @media (max-width: 900px) {
+  .app-history-back-btn {
+    display: none !important;
+  }
+
+  /* Shared story mobile/tablet: left vertical controls, right-aligned title block. */
+  #shared-view .dashboard-topbar {
+    grid-template-columns: auto minmax(0, 1fr);
+    grid-template-rows: auto auto;
+    grid-template-areas:
+      "shared-left shared-center"
+      "shared-right shared-center";
+    align-items: start;
+    column-gap: 10px;
+    row-gap: 8px;
+  }
+
+  #shared-view .dashboard-topbar-left {
+    grid-area: shared-left;
+    align-self: start;
+    justify-self: start;
+  }
+
+  #shared-view .dashboard-topbar-right {
+    grid-area: shared-right;
+    align-self: start;
+    justify-self: start;
+  }
+
+  #shared-view #go-home-from-shared,
+  #shared-view #shared-story-actions-btn {
+    width: 40px;
+    min-width: 40px;
+    height: 32px;
+    padding: 0;
+    justify-content: center;
+  }
+
+  #shared-view .dashboard-topbar-center {
+    grid-area: shared-center;
+    align-self: center;
+    justify-self: end;
+    min-width: 0;
+  }
+
+  #shared-view .dashboard-topbar-center h1,
+  #shared-view .dashboard-topbar-center .subtitle {
+    text-align: right;
+  }
+
+  #shared-view .dashboard-topbar-center h1 {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 4px;
+    line-height: 1.15;
+  }
+
+  #shared-view .dashboard-topbar-center h1 .shared-title-badge {
+    align-self: flex-end;
+    margin-right: 0;
+  }
+
+  #shared-view .dashboard-topbar-center h1 .shared-title-text {
+    display: block;
+  }
+
+  #shared-view .dashboard-topbar-center .subtitle {
+    margin-top: 4px;
+  }
+
+  #shared-view #shared-story-actions-wrap .options-menu {
+    left: 0;
+    right: auto;
+  }
+
+  /* Mobile/tablet topbar pattern for main app views:
+     controls in a left vertical stack, title block on the right. */
+  #home-view .dashboard-topbar,
+  #ai-analysis-prompt-view .dashboard-topbar,
+  #editor-view .editor-topbar,
+  #group-view .editor-topbar {
+    grid-template-columns: auto minmax(0, 1fr);
+    grid-template-rows: auto auto;
+    align-items: start;
+    column-gap: 10px;
+    row-gap: 8px;
+  }
+
+  #home-view .dashboard-topbar {
+    grid-template-areas:
+      "home-left home-center"
+      "home-right home-center";
+  }
+
+  #ai-analysis-prompt-view .dashboard-topbar {
+    grid-template-areas:
+      "ai-left ai-center"
+      "ai-right ai-center";
+  }
+
+  #editor-view .editor-topbar {
+    grid-template-areas:
+      "editor-left editor-center"
+      "editor-right editor-center";
+  }
+
+  #group-view .editor-topbar {
+    grid-template-areas:
+      "group-left group-center"
+      "group-right group-center";
+  }
+
+  #home-view .dashboard-topbar-left {
+    grid-area: home-left;
+    justify-self: start;
+  }
+  #home-view .dashboard-topbar-right {
+    grid-area: home-right;
+    justify-self: start;
+  }
+  #home-view .dashboard-topbar-center {
+    grid-area: home-center;
+    justify-self: end;
+    min-width: 0;
+  }
+
+  #ai-analysis-prompt-view .dashboard-topbar-left {
+    grid-area: ai-left;
+    justify-self: start;
+  }
+  #ai-analysis-prompt-view .dashboard-topbar-right {
+    grid-area: ai-right;
+    justify-self: start;
+  }
+  #ai-analysis-prompt-view .dashboard-topbar-center {
+    grid-area: ai-center;
+    justify-self: end;
+    min-width: 0;
+  }
+
+  #editor-view .editor-topbar-left {
+    grid-area: editor-left;
+    justify-self: start;
+  }
+  #editor-view .editor-topbar-right {
+    grid-area: editor-right;
+    justify-self: start;
+  }
+  #editor-view .editor-topbar-center {
+    grid-area: editor-center;
+    justify-self: end;
+    min-width: 0;
+  }
+
+  #group-view .editor-topbar-left {
+    grid-area: group-left;
+    justify-self: start;
+  }
+  #group-view .editor-topbar-right {
+    grid-area: group-right;
+    justify-self: start;
+  }
+  #group-view .editor-topbar-center {
+    grid-area: group-center;
+    justify-self: end;
+    min-width: 0;
+  }
+
+  #home-view .dashboard-topbar-center h1,
+  #ai-analysis-prompt-view .dashboard-topbar-center h1,
+  #editor-view .editor-topbar-center h1,
+  #group-view .editor-topbar-center h1,
+  #home-view .dashboard-topbar-center .subtitle,
+  #ai-analysis-prompt-view .dashboard-topbar-center .subtitle,
+  #editor-view .editor-topbar-center .subtitle,
+  #group-view .editor-topbar-center .subtitle {
+    text-align: right;
+  }
+
+  #home-view .back-arrow-button,
+  #home-view #dashboard-actions-btn,
+  #ai-analysis-prompt-view .back-arrow-button,
+  #editor-view .back-arrow-button,
+  #editor-view #editor-board-actions-btn,
+  #group-view .back-arrow-button,
+  #group-view #group-view-actions-btn {
+    width: 40px;
+    min-width: 40px;
+    height: 32px;
+    padding: 0;
+    justify-content: center;
+  }
+
   .landing-grid {
     grid-template-columns: 1fr;
   }
@@ -3369,10 +3574,10 @@ a:hover {
     justify-self: end;
   }
 
-  /* Story editor: center demo badge, title, and structure line between the side buttons */
+  /* Story editor (mobile): align title block to the right like shared view */
   #editor-view .editor-topbar-center {
-    justify-self: stretch;
-    text-align: center;
+    justify-self: end;
+    text-align: right;
   }
 
   .editor-topbar-center h1 {
@@ -3385,8 +3590,8 @@ a:hover {
   }
 
   #editor-view .editor-topbar-center h1 {
-    text-align: center;
-    justify-content: center;
+    text-align: right;
+    justify-content: flex-end;
   }
 
   .editor-topbar-center .subtitle {
@@ -3400,11 +3605,11 @@ a:hover {
   }
 
   #editor-view .editor-topbar-center .subtitle {
-    text-align: center;
+    text-align: right;
   }
 
   #editor-view .editor-topbar-center h1 .inline-story-title-input.editor-title-input {
-    text-align: center;
+    text-align: right;
   }
 
   .options-menu .menu-item-desktop-only {
