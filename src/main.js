@@ -248,6 +248,11 @@ const sharedStoryActionsBtn = document.querySelector("#shared-story-actions-btn"
 const sharedStoryActionsMenu = document.querySelector("#shared-story-actions-menu");
 const sharedStoryOpenJsonBtn = document.querySelector("#shared-story-open-json-btn");
 const sharedStorySaveBookmarkBtn = document.querySelector("#shared-story-save-bookmark-btn");
+const sharedStoryOptionsWrap = document.querySelector("#shared-story-options-wrap");
+const sharedStoryOptionsBtn = document.querySelector("#shared-story-options-btn");
+const sharedStoryOptionsMenu = document.querySelector("#shared-story-options-menu");
+const sharedOpenResizeModalBtn = document.querySelector("#shared-open-resize-modal");
+const sharedToggleWrapColumnsBtn = document.querySelector("#shared-toggle-wrap-columns");
 const sharedStoryPreviewHostEl = document.querySelector("#shared-story-preview-host");
 const goDashboardFromBoardBtn = document.querySelector("#go-dashboard-from-board");
 const goDashboardFromGroupBtn = document.querySelector("#go-dashboard-from-group");
@@ -1013,6 +1018,9 @@ function applyColumnWidth() {
 function applyWrapColumns() {
   boardEl.classList.toggle("wrap-columns", wrapColumns);
   toggleWrapColumnsBtn.textContent = `Wrap columns: ${wrapColumns ? "On" : "Off"}`;
+  if (sharedToggleWrapColumnsBtn) {
+    sharedToggleWrapColumnsBtn.textContent = `Wrap columns: ${wrapColumns ? "On" : "Off"}`;
+  }
 }
 
 function getAdaptiveNoteBodyCapPx() {
@@ -2541,6 +2549,10 @@ async function renderSharedStory(sourceUrl) {
     delete sharedStoryActionsWrap.dataset.sourceUrl;
     closeSharedStoryActionsMenu();
   }
+  if (sharedStoryOptionsWrap) {
+    sharedStoryOptionsWrap.classList.add("hidden");
+    closeSharedStoryOptionsMenu();
+  }
   if (sharedStoryPageTitleEl) {
     sharedStoryPageTitleEl.textContent = "Shared story (read-only)";
   }
@@ -2565,6 +2577,9 @@ async function renderSharedStory(sourceUrl) {
   if (sharedStoryActionsWrap) {
     sharedStoryActionsWrap.classList.remove("hidden");
     sharedStoryActionsWrap.dataset.sourceUrl = safeUrl;
+  }
+  if (sharedStoryOptionsWrap) {
+    sharedStoryOptionsWrap.classList.remove("hidden");
   }
   try {
     const loaded = await loadSharedStoryFromUrlForPreview(safeUrl);
@@ -4914,6 +4929,15 @@ if (sharedStoryActionsBtn && sharedStoryActionsMenu) {
   sharedStoryActionsBtn.addEventListener("click", (event) => {
     event.stopPropagation();
     sharedStoryActionsMenu.classList.toggle("hidden");
+    closeSharedStoryOptionsMenu();
+  });
+}
+
+if (sharedStoryOptionsBtn && sharedStoryOptionsMenu) {
+  sharedStoryOptionsBtn.addEventListener("click", (event) => {
+    event.stopPropagation();
+    sharedStoryOptionsMenu.classList.toggle("hidden");
+    closeSharedStoryActionsMenu();
   });
 }
 
@@ -4940,6 +4964,21 @@ if (sharedStorySaveBookmarkBtn) {
     sharedStorySaveBookmarkBtn.classList.add("hidden");
     renderHome();
     await appAlert("Shared bookmark saved.");
+  });
+}
+
+if (sharedOpenResizeModalBtn) {
+  sharedOpenResizeModalBtn.addEventListener("click", () => {
+    closeSharedStoryOptionsMenu();
+    openResizeModal();
+  });
+}
+
+if (sharedToggleWrapColumnsBtn) {
+  sharedToggleWrapColumnsBtn.addEventListener("click", () => {
+    wrapColumns = !wrapColumns;
+    applyWrapColumns();
+    saveSettings();
   });
 }
 
@@ -5609,6 +5648,11 @@ function closeOptionsMenu() {
 function closeSharedStoryActionsMenu() {
   if (!sharedStoryActionsMenu) return;
   sharedStoryActionsMenu.classList.add("hidden");
+}
+
+function closeSharedStoryOptionsMenu() {
+  if (!sharedStoryOptionsMenu) return;
+  sharedStoryOptionsMenu.classList.add("hidden");
 }
 
 function closeDashboardActionsModal() {
@@ -6631,6 +6675,10 @@ document.addEventListener("keydown", (event) => {
   }
   if (sharedStoryActionsMenu && !sharedStoryActionsMenu.classList.contains("hidden")) {
     closeSharedStoryActionsMenu();
+    return;
+  }
+  if (sharedStoryOptionsMenu && !sharedStoryOptionsMenu.classList.contains("hidden")) {
+    closeSharedStoryOptionsMenu();
   }
 });
 
@@ -6912,6 +6960,7 @@ document.addEventListener("click", (event) => {
   if (!event.target.closest(".options-wrap")) {
     closeOptionsMenu();
     closeSharedStoryActionsMenu();
+    closeSharedStoryOptionsMenu();
   }
   if (!event.target.closest(".phase-head") && !event.target.closest("#add-note-modal-overlay")) {
     boardNoteActions.closeAllColumnMenus();
