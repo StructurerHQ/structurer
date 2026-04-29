@@ -1,5 +1,12 @@
 # History
 
+
+**1.19.2** - 2026-04-29
+- **Local URL watchdog script:** added a laptop-friendly monitor command that checks one or more URLs on a timer, tracks consecutive failures, and triggers an audible alert only when a target transitions to DOWN (plus recovery logging) to simplify remote Docker outage detection (`scripts/url-monitor.js`, `package.json`, `README.md`).
+- **Watchdog defaults for rare incidents + sleep-resume detection:** raised default URL monitor interval to one hour and added idle-gap detection so, after laptop wake/sleep gaps, the script logs resume and runs checks immediately instead of waiting for a full additional interval (`scripts/url-monitor.js`, `README.md`).
+- **Internet pre-check before endpoint checks:** each monitor cycle now validates internet connectivity first (configurable probe URLs). When offline, the script raises a dedicated internet alert once, skips endpoint checks to avoid false endpoint failures, and resumes normal URL checks automatically after connectivity recovery (`scripts/url-monitor.js`, `README.md`).
+- **URL list from `.env`:** monitor targets can now be defined in `.env` via `DEFAULT_URLS` (space-separated), so installers can configure their own endpoints without editing source code. `MONITOR_URLS` remains available as a runtime override (`scripts/url-monitor.js`, `README.md`).
+
 **1.19.1** - 2026-04-08
 - **Reusable title-line component baseline:** extracted a shared `titleLineTemplate` (badge + title) and wired it into editor/group/shared title rendering to reduce duplicated markup and prepare the next refactor steps (`ui-render.js`, `main.js`).
 - **Actions/modals refactor baseline:** moved shared-story actions/options menu behavior into a dedicated controller and extracted story export/slug dialogs into a modal module, reducing UI/event complexity in `main.js` while preserving behavior (`shared-view-actions.js`, `modals/story-action-modals.js`, `main.js`).

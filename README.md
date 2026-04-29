@@ -122,6 +122,44 @@ npm run preview
 - `npm run dev` - start Vite dev server
 - `npm run build` - create production build in `dist/`
 - `npm run preview` - preview production build locally
+- `npm run monitor:urls` - monitor one or more URLs and play an alert sound when a target goes down
+
+## URL Monitor Script (local watchdog)
+
+Run a local watchdog from your laptop to check remote endpoints continuously:
+
+```bash
+npm run monitor:urls
+```
+
+Optional environment variables:
+
+- `DEFAULT_URLS` - URLs to monitor (space-separated in `.env`; used as default list)
+- `MONITOR_URLS` - runtime override for URLs (space- or comma-separated, useful for one-off runs)
+- `MONITOR_CONNECTIVITY_URLS` - comma-separated URLs used for internet pre-check (default: Google 204 + Cloudflare trace)
+- `MONITOR_POLL_MS` - check interval in milliseconds (default: `3600000`, 1 hour)
+- `MONITOR_TIMEOUT_MS` - request timeout in milliseconds (default: `8000`)
+- `MONITOR_FAILURE_THRESHOLD` - consecutive failures before alert (default: `2`)
+- `MONITOR_RESUME_GAP_FACTOR` - resume detection multiplier for sleep/wake gaps (default: `1.5`)
+- `MONITOR_ALERT_SOUND_FILE` - custom local audio file path (macOS uses `afplay`)
+- `MONITOR_ALERT_SOUND_CMD` - custom command to play audio (for non-macOS setups)
+
+Example `.env`:
+
+```dotenv
+DEFAULT_URLS="https://structurer.sullo.co/ https://sullo.co/"
+MONITOR_POLL_MS=3600000
+MONITOR_TIMEOUT_MS=8000
+MONITOR_FAILURE_THRESHOLD=2
+```
+
+Example:
+
+```bash
+MONITOR_URLS="https://site-a.com/health,https://site-b.com/" MONITOR_POLL_MS=20000 npm run monitor:urls
+```
+
+Note: every cycle starts with an internet connectivity pre-check. If connectivity is down, the script alerts once, skips target URL checks, and resumes normal checks automatically when connectivity is restored.
 
 ## Data Storage
 
